@@ -64,6 +64,9 @@ public final class ScreenManager {
         return screens.get(screen).getPane().lookup("#"+node);
     }
 
+    public static Screen getCurrentScreen() {
+        return currentScreen;
+    }
 
     public static Scene getScene() {
         return scene;

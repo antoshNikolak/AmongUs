@@ -2,6 +2,7 @@ package Client;
 
 import Entity.GameClientHandler;
 import Entity.Player;
+import PlayerColourManager.PlayerColourFactory;
 
 public class Client {
 
@@ -9,9 +10,7 @@ public class Client {
     private Player player;
 
     public void createPlayer(){
-        String texture = GameClientHandler.getRandomFreeTexture();
-
-        this.player = new Player("green");
+        this.player = new Player(PlayerColourFactory.getRandomColour());
     }
 
     public Client(int connectionID) {

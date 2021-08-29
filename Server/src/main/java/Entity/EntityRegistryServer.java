@@ -15,7 +15,13 @@ public class EntityRegistryServer {
 //    }
 
     public static void addEntity(Entity entity) {
-        entityIDMap.put(getFreeID(), entity);
+        int id = getFreeID();
+//        if (entity instanceof  Tile) {
+//            System.out.println("Tile id: "+ id);
+//        }else {
+//            System.out.println("no tile id: "+ id);
+//        }
+        entityIDMap.put(id, entity);
     }
 
     public static Entity getEntity(int id) {

@@ -14,10 +14,7 @@ import System.*;
 public abstract class State implements ClientOperator {
 
     private final Map<Class<? extends BaseSystem>, BaseSystem> systems = new HashMap<>();
-//    protected final List<Client> clientPlayers = new ArrayList<>(); //maybe make this a player list
-    private final List<Entity> entities = new ArrayList<>();
-//    protected World world;
-
+    protected final List<Entity> entities = new ArrayList<>();
 
     public void addSystem(BaseSystem system){
         this.systems.put(system.getClass(), system);

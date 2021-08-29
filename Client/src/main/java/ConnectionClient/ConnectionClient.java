@@ -8,6 +8,7 @@ import Packet.Position.*;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
+import Packet.Timer.GameStartTimerReturn;
 import Position.Pos;
 import UserData.UserData;
 import com.esotericsoftware.kryo.Kryo;
@@ -67,21 +68,7 @@ public final class ConnectionClient {
         kryo.register(Animation.NewAnimationReturn[].class);
         kryo.register(Animation.NewAnimationReturn.class);
         kryo.register(AnimState.class);
-
-
-
+        kryo.register(GameStartTimerReturn.class);
+        kryo.register(ClearWorldReturn.class);
     }
-
-//    private static double timeBetweenPackets = 0.016;//default value
-//    private static double timeLastPacketArrived;
-//
-//    public static double calculateTimeDiffBetweenPackets() {
-//        if (timeLastPacketArrived != 0) timeBetweenPackets = System.nanoTime() - timeLastPacketArrived;
-//        timeLastPacketArrived = System.nanoTime();
-//        return timeBetweenPackets;
-//    }
-//
-//    public static double getTimeBetweenPackets() {
-//        return timeBetweenPackets;
-//    }
 }

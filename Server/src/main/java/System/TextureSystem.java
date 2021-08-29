@@ -5,6 +5,7 @@ import Component.AnimationComp;
 import Component.VelComp;
 import Entity.Entity;
 import StartUpServer.AppServer;
+import Entity.*;
 
 public class TextureSystem extends BaseSystem {
 
@@ -28,14 +29,10 @@ public class TextureSystem extends BaseSystem {
     }
 
     private void changeAnimFrame(VelComp velComp, AnimationComp animComp) {
-        if (velComp.getVelX() == 0) {
-            if (velComp.getVelY() != 0) {
-                animComp.getCurrentAnimation().runAnimation();
-            } else {
-                animComp.getCurrentAnimation().setIndex(0);
-            }
-        } else {
+        if (velComp.getVelX() != 0 || velComp.getVelY() != 0) {
             animComp.getCurrentAnimation().runAnimation();
+        }else {
+            animComp.getCurrentAnimation().setIndex(0);
         }
     }
 

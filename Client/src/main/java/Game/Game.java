@@ -51,10 +51,9 @@ public class Game {
 
 
     private void interpolate() {
-        myPlayer.interpolate();
-//        for (ChangingEntity changingEntity: changingEntities){//only loop through moving entities
-//            changingEntity.interpolate();
-//        }
+        for (ChangingEntity changingEntity: changingEntities){
+            changingEntity.interpolate();
+        }
     }
 
     private void render(GraphicsContext gc) {
@@ -62,6 +61,11 @@ public class Game {
         for (Entity entity : entities) {
             entity.render(gc);
         }
+    }
+
+    public void handleLocalPlayer(LocalPlayer localPlayer) {
+        this.myPlayer = localPlayer;
+        start();
     }
 
     public List<Entity> getEntities() {
@@ -80,10 +84,5 @@ public class Game {
         return changingEntities;
     }
 
-    public void handleLocalPlayer(LocalPlayer localPlayer) {
-        this.myPlayer = localPlayer;
-        this.entities.add(localPlayer);
-        this.changingEntities.add(localPlayer);
-        start();
-    }
+
 }

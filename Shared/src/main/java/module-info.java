@@ -13,6 +13,8 @@ module Shared {
     opens Position;
     exports Animation;
     opens Animation;
+    exports Packet.Timer;
+    opens Packet.Timer;
 
 
 }

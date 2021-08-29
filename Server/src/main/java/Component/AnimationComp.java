@@ -12,8 +12,9 @@ public class AnimationComp implements Component {
     private AnimState currentAnimationState = AnimState.CONST;
     private final EnumMap<AnimState, Animation> directionAnimationMap = new EnumMap<>(AnimState.class);
 
-    public void addAnimation(AnimState animState, String [] frames, int speed) {
-        directionAnimationMap.put(animState, new Animation(frames, speed));
+
+    public void addAnimation(AnimState animState, String [] frames, int framesPerIndex) {
+        directionAnimationMap.put(animState, new Animation(frames, framesPerIndex));
     }
 
     public void addAnimation(AnimState animState, String texture){
@@ -46,6 +47,14 @@ public class AnimationComp implements Component {
         return currentAnimation;
     }
 
+//    public boolean isAnimationRunnable(AnimationCondition animationCondition) {
+//        return animationCondition.returnLogic();
+//    }
+//
+//    public boolean isAnimationResetable(AnimationCondition animationCondition) {
+//        return animationCondition.returnLogic();
+//    }
+
 
     public static class Animation {
         private final String[] frames;
@@ -53,9 +62,9 @@ public class AnimationComp implements Component {
         private int index = 0;
 
 
-        public Animation(String [] frames, int slowness) {
+        public Animation(String [] frames, int framesPerIndex) {
             this.frames = frames;
-            this.indexesPerFrame = slowness;
+            this.indexesPerFrame = framesPerIndex;
         }
 
         public void runAnimation() {
@@ -76,6 +85,11 @@ public class AnimationComp implements Component {
         public int getIndexesPerFrame() {
             return indexesPerFrame;
         }
+    }
+
+    @FunctionalInterface
+    private interface AnimationCondition{
+        boolean returnLogic();
     }
 }
 

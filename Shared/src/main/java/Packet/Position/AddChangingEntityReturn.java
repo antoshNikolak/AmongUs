@@ -6,7 +6,7 @@ import java.util.List;
 public class AddChangingEntityReturn extends AddEntityReturn{
 
 
-    protected AddChangingEntityReturn() {
+    public AddChangingEntityReturn() {
         super();
     }
 

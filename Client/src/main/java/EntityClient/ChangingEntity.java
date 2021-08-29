@@ -3,6 +3,7 @@ package EntityClient;
 import Animation.AnimState;
 import Packet.Position.NewEntityState;
 import Position.Pos;
+import StartUp.AppClient;
 
 import java.util.LinkedList;
 
@@ -13,7 +14,7 @@ public class ChangingEntity extends Entity {
 
     public ChangingEntity(NewEntityState entityState) {
         super(entityState);
-        EntityRegistryClient.addEntity(entityState.getRegistrationID(), this);
+        AppClient.currentGame.getChangingEntities().add(this);
     }
 
     public void interpolate() {

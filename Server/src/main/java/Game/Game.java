@@ -16,16 +16,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import State.*;
+
 public class Game {
     private final StateManager stateManager = new StateManager();
     private final Set<Entity> entityReturnBuffer = ConcurrentHashMap.newKeySet();
     protected final List<Client> clients = new ArrayList<>(); //maybe make this a player list
 
-
     public void startGame() {
         init();
         startGameLoop();
-//        startSendStateLoop();
     }
 
     public void init() {
@@ -42,31 +42,24 @@ public class Game {
         }.start();
     }
 
-
-
-//    private void startSendStateLoop() {
-//        new GameLoop(5) {
-//            @Override
-//            public void handle() {
-//                sendGameState();
-//            }
-//        }.start();
-//    }
-
     private void sendGameState() {
         Set<EntityState> entityReturnStates = getEntityReturnStates();
         ConnectionServer.sendUDPToAllPlayers(new StateReturn(entityReturnStates));
         entityReturnBuffer.clear();
     }
 
-    private Set<EntityState> getEntityReturnStates(){
+    private Set<EntityState> getEntityReturnStates() {
         return entityReturnBuffer.stream().
                 map(entity -> entity.adaptToEntityState()).
                 collect(Collectors.toSet());
     }
 
-    public State getCurrentState(){
+    public GameState getCurrentState() {
         return stateManager.getCurrentState();
+    }
+
+    public StateManager getStateManager() {
+        return stateManager;
     }
 
     public Set<Entity> getEntityReturnBuffer() {

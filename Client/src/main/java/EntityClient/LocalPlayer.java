@@ -18,6 +18,7 @@ public class LocalPlayer extends ChangingEntity {
         if (hasUserInput(request) || hasInputChanged(request)) {
             ConnectionClient.sendUDP(request);
         }
+        this.prevRequest = request;
     }
 
     private boolean hasInputChanged(PosRequest posRequest) {

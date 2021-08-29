@@ -7,7 +7,7 @@ import java.util.ListIterator;
 
 public class StateManager {
 
-    private final Deque<State> states = new LinkedList<>();
+    private final Deque<GameState> states = new LinkedList<>();
     //todo use a stack probably
 
 
@@ -16,23 +16,21 @@ public class StateManager {
     }
 
     public void update(){
-        for (State state : states) {
+        for (GameState state : states) {
             state.update();
         }
     }
 
-    //        ListIterator<State> stateItr = states.listIterator(states.size());
-
-    public void pushState(State state){
+    public void pushState(GameState state){
         states.add(state);
         state.init();
     }
 
     public void popState(){
-        states.pop();
+        states.pop().close();
     }
 
-    public State getCurrentState(){
+    public GameState getCurrentState(){
         return states.peek();
     }
 }

@@ -5,5 +5,4 @@ public enum AnimState {
     RIGHT,
     DEAD,
     CONST
-
 }

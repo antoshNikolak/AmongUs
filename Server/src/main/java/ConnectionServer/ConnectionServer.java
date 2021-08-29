@@ -9,6 +9,7 @@ import Packet.Position.*;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
+import Packet.Timer.GameStartTimerReturn;
 import Position.Pos;
 import StartUpServer.AppServer;
 import UserData.UserData;
@@ -32,6 +33,12 @@ public final class ConnectionServer {
     public static void sendUDPToAllPlayers(Packet packet){
         for (Client client: AppServer.currentGame.getClients()){
             ConnectionServer.sendUDP(packet, client.getConnectionID());
+        }
+    }
+
+    public static void sendTCPToAllPlayers(Packet packet){
+        for (Client client: AppServer.currentGame.getClients()){
+            ConnectionServer.sendTCP(packet, client.getConnectionID());
         }
     }
 
@@ -103,7 +110,8 @@ public final class ConnectionServer {
         kryo.register(Animation.NewAnimationReturn[].class);
         kryo.register(Animation.NewAnimationReturn.class);
         kryo.register(AnimState.class);
-
+        kryo.register(GameStartTimerReturn.class);
+        kryo.register(ClearWorldReturn.class);
 
     }
 

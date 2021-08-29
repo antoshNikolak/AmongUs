@@ -3,12 +3,14 @@ package World;
 import Animation.AnimState;
 import Component.AnimationComp;
 import Component.PosComp;
+import Entity.EntityRegistryServer;
 import Entity.Tile;
 import Position.Pos;
 import Utils.FileUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class World {
 
@@ -32,11 +34,12 @@ public class World {
                 int id = Integer.parseInt(tokens[(x + y * width + 2)]);
                 String textureName = getTextureName(id);
 
-                if (!textureName.isEmpty()) {
+                if (!textureName.isEmpty()) {//todo redundant
                     addTile(textureName, x, y);
                 }
             }
         }
+
     }
 
     private String getTextureName(int id) {
@@ -49,11 +52,17 @@ public class World {
         return textureName;
     }
 
+    public List<Integer> getTileIDs(){
+        return tiles.stream().
+                map(EntityRegistryServer::getEntityID).
+                collect(Collectors.toList());
+    }
+
     private void addTile(String texture, double x, double y) {
         if (!texture.equals("no-tile")) {
             Pos tilePos = new Pos(x * TILE_WIDTH, y * TILE_HEIGHT);
             AnimationComp animationComp = new AnimationComp();
-            animationComp.addAnimation(AnimState.RIGHT, new String[]{texture}, 2);
+            animationComp.addAnimation(AnimState.RIGHT, new String[]{texture}, 2);//todo change to const
             tiles.add(new Tile(new PosComp(tilePos, TILE_WIDTH, TILE_HEIGHT)
                     , texture));
         }

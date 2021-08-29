@@ -12,10 +12,14 @@ public class AnimationManager {
     private AnimState currentState;
 
     public AnimationManager(List<NewAnimationReturn> newAnimationReturns) {
+        loadAnimationMap(newAnimationReturns);
+        determineCurrentState();
+    }
+
+    private void loadAnimationMap(List<NewAnimationReturn> newAnimationReturns){
         for (NewAnimationReturn anim: newAnimationReturns){
             directionAnimationMap.put(anim.getAnimState(), new AnimationClient(anim));
         }
-        determineCurrentState();
     }
 
     private void determineCurrentState(){

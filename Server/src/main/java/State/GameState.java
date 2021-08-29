@@ -7,19 +7,21 @@ import ConnectionServer.ConnectionServer;
 import Entity.Entity;
 import Entity.EntityRegistryServer;
 import Entity.Tile;
+import Packet.Position.ClearWorldReturn;
 import Packet.Position.EntityState;
 import Packet.Position.AddStationaryEntityReturn;
 import Packet.Position.NewEntityState;
+import StartUpServer.AppServer;
 import System.PhysicsSystem;
 import World.World;
 import System.*;
+import Entity.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameState extends State {
 
-//    private final List<Entity> entities = new ArrayList<>();
     protected World world;
 
     public GameState() {
@@ -35,7 +37,36 @@ public class GameState extends State {
     @Override
     public void init() {
         startSystems();
-        this.world = new World("World/lobby.txt");
+        addPlayersAsEntities();
+        createWord();
+        sendWorldDataToAllPlayers();
+    }
+
+    protected void createWord(){
+        this.world = new World("World/game-map.txt");
+    }
+
+    private void addPlayersAsEntities(){
+        AppServer.currentGame.getClients().stream().
+                map(client -> client.getPlayer()).
+                forEach(player ->{
+                    System.out.println("adding player");
+                    entities.add(player);
+                } );
+    }
+
+    public void close(){
+        clearWorldData();
+    }
+
+    private void clearWorldData(){
+        ConnectionServer.sendTCPToAllPlayers(new ClearWorldReturn(world.getTileIDs()));
+        //todo deregister tiles
+    }
+
+    private void sendWorldDataToAllPlayers(){
+        List<NewEntityState> newEntities = createEntityStatesFromTiles();
+        ConnectionServer.sendTCPToAllPlayers(new AddStationaryEntityReturn(newEntities));
     }
 
     protected void sendWorldData(int connectionID){
@@ -51,6 +82,9 @@ public class GameState extends State {
         return newEntities;
     }
 
+
+
+
     @Override
     public void removeClient(Client client) {
         //todo
@@ -59,4 +93,5 @@ public class GameState extends State {
     public World getWorld() {
         return world;
     }
+
 }

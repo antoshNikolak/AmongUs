@@ -9,6 +9,7 @@ import Packet.Position.AddChangingEntityReturn;
 import Packet.Position.NewEntityState;
 import StartUpServer.AppServer;
 import System.TextureSystem;
+import World.World;
 
 public class LobbyState extends GameState{
 
@@ -22,15 +23,25 @@ public class LobbyState extends GameState{
         AppServer.currentGame.getClients().add(client);
     }
 
-    private void sendPlayerData( Client client){
+    @Override
+    public void init() {
+        startSystems();
+        createWord();
+    }
+
+    @Override
+    protected void createWord() {
+        this.world = new World("World/lobby.txt");
+    }
+
+    private void sendPlayerData(Client client){
         sendExistingPlayersToClient(client.getConnectionID());
         sendNewPlayerToAll(client);
     }
 
     private void sendExistingPlayersToClient(int connectionID) {
         for (Client client: AppServer.currentGame.getClients()){
-            Player player = client.getPlayer();
-            ConnectionServer.sendTCP(player.adaptToEntityState(), connectionID);
+            ConnectionServer.sendTCP(new AddChangingEntityReturn(client.getPlayer().adaptToNewEntityState()), connectionID);
         }
     }
 
