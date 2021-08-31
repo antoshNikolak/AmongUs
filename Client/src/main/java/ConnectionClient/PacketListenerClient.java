@@ -36,8 +36,8 @@ public class PacketListenerClient extends Listener {
             packetController.handleStateReturn((StateReturn) object);
         }else if (object instanceof GameStartTimerReturn){
             packetController.handleGameStartTimerReturn((GameStartTimerReturn)object);
-        }else if (object instanceof ClearWorldReturn){
-            packetController.handleClearWorldReturn((ClearWorldReturn) object);
+        }else if (object instanceof ClearEntityReturn){
+            packetController.handleClearWorldReturn((ClearEntityReturn) object);
         }
     }
 

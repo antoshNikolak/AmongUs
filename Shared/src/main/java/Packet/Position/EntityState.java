@@ -5,7 +5,7 @@ import Animation.NewAnimationReturn;
 import Packet.Packet;
 import Position.Pos;
 
-public  class EntityState implements Packet {
+public  class EntityState{
     private int registrationID;
     private Pos pos;
 

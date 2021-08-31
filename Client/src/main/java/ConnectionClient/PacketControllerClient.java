@@ -60,13 +60,12 @@ public class PacketControllerClient {
         Platform.runLater(()->ScreenCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
 
-    public void handleClearWorldReturn(ClearWorldReturn packet) {
-        for (int tileID: packet.getTileIDs()){
+    public void handleClearWorldReturn(ClearEntityReturn packet) {
+        for (int tileID: packet.getRegistrationIDs()){
             Entity entity = EntityRegistryClient.getEntity(tileID);
             EntityRegistryClient.removeEntity(tileID);
             AppClient.currentGame.getEntities().remove(entity);
             if (entity instanceof ChangingEntity)AppClient.currentGame.getChangingEntities().remove(entity);
-            //todo merge entity with changing entity
         }
 
 

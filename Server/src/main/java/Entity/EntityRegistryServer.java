@@ -3,6 +3,7 @@ package Entity;
 import Utils.CollectionUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EntityRegistryServer {
@@ -15,14 +16,13 @@ public class EntityRegistryServer {
 //    }
 
     public static void addEntity(Entity entity) {
-        int id = getFreeID();
-//        if (entity instanceof  Tile) {
-//            System.out.println("Tile id: "+ id);
-//        }else {
-//            System.out.println("no tile id: "+ id);
-//        }
-        entityIDMap.put(id, entity);
+        entityIDMap.put(getFreeID(), entity);
     }
+
+    public static void removeEntity(int id){
+        entityIDMap.remove(id);
+    }
+
 
     public static Entity getEntity(int id) {
         return entityIDMap.get(id);

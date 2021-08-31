@@ -2,7 +2,6 @@ package EntityClient;
 
 import ConnectionClient.ConnectionClient;
 import KeyManager.KeyManager;
-import Packet.Position.EntityState;
 import Packet.Position.NewEntityState;
 import Packet.Position.PosRequest;
 
@@ -15,13 +14,13 @@ public class LocalPlayer extends ChangingEntity {
 
     public void sendInput() {
         PosRequest request = createPosRequest();
-        if (hasUserInput(request) || hasInputChanged(request)) {
+        if (hasUserInput(request) || hasMovementInputChanged(request) || request.isKillKey()) {
             ConnectionClient.sendUDP(request);
         }
         this.prevRequest = request;
     }
 
-    private boolean hasInputChanged(PosRequest posRequest) {
+    private boolean hasMovementInputChanged(PosRequest posRequest) {
         if (prevRequest == null) return  true;
         return !(posRequest.isUp() == prevRequest.isUp() &&
                 posRequest.isRight() == prevRequest.isRight() &&
@@ -33,7 +32,14 @@ public class LocalPlayer extends ChangingEntity {
         PosRequest request = new PosRequest();
         checkHorizontalMovement(request);
         checkVerticalMovement(request);
+        checkSpecialMoves(request);
         return request;
+    }
+
+    private void checkSpecialMoves(PosRequest posRequest){
+        if (KeyManager.isKillKeyPressed()){
+            posRequest.setKillKey(true);
+        }
     }
 
     private void checkVerticalMovement(PosRequest request) {

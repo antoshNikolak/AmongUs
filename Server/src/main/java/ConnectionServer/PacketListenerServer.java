@@ -31,7 +31,7 @@ public class PacketListenerServer extends Listener {
             packetController.handleSignup((SignupRequest)packet, connection.getID());
         }else if (packet instanceof StartGameRequest){
             packetController.handleStartGameRequest(connection.getID());
-        }else if (packet instanceof PosRequest){
+        }else if (packet instanceof PosRequest){ ;
             packetController.handlePosRequest((PosRequest)packet, connection.getID());
         }
     }

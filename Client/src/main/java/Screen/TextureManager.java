@@ -10,23 +10,21 @@ public class TextureManager {
     private final static Map<String, Image> images = new HashMap<>();
 
     public static void init() {
-        String [] playerColours = new String[]{"green", "blue", "orange", "cyan", "yellow", "pink", "red"};
-        for (String colour: playerColours){
-            loadImage("dead-"+ colour, "Texture/dead-"+colour+".png");
-            loadImage("standleft-"+ colour, "Texture/standleft-"+colour+".png", 50, 63, true);
-            loadImage("standright-"+ colour, "Texture/standright-"+colour+".png", 50, 63, true);
-            loadImage("left0-"+ colour, "Texture/left0-"+colour+".png", 50, 63, true);
-            loadImage("left3-"+ colour, "Texture/left1-"+colour+".png", 50, 63, true);
-            loadImage("left2-"+ colour, "Texture/left2-"+colour+".png", 50, 63, true);
-            loadImage("left1-"+ colour, "Texture/left3-"+colour+".png", 50, 63, true);
-            loadImage("right0-"+ colour, "Texture/right0-"+colour+".png", 50, 63, true);
-            loadImage("right3-"+ colour, "Texture/right1-"+colour+".png", 50, 63, true);
-            loadImage("right2-"+ colour, "Texture/right2-"+colour+".png", 50, 63, true);
-            loadImage("right1-"+ colour, "Texture/right3-"+colour+".png", 50, 63, true);
-
-            String s  = "right1-"+ colour;
-            System.out.println(images.get(s).getWidth());
-            System.out.println("height "+images.get(s).getHeight());
+        String[] playerColours = new String[]{"green", "blue", "orange", "cyan", "yellow", "pink", "red"};
+        for (String colour : playerColours) {
+            loadImage("dead-" + colour, "Texture/dead-" + colour + ".png");
+            loadImage("standleft-" + colour, "Texture/standleft-" + colour + ".png", 50, 63, true);
+            loadImage("standright-" + colour, "Texture/standright-" + colour + ".png", 50, 63, true);
+            loadImage("left0-" + colour, "Texture/left0-" + colour + ".png", 50, 63, true);
+            loadImage("left3-" + colour, "Texture/left1-" + colour + ".png", 50, 63, true);
+            loadImage("left2-" + colour, "Texture/left2-" + colour + ".png", 50, 63, true);
+            loadImage("left1-" + colour, "Texture/left3-" + colour + ".png", 50, 63, true);
+            loadImage("right0-" + colour, "Texture/right0-" + colour + ".png", 50, 63, true);
+            loadImage("right3-" + colour, "Texture/right1-" + colour + ".png", 50, 63, true);
+            loadImage("right2-" + colour, "Texture/right2-" + colour + ".png", 50, 63, true);
+            loadImage("right1-" + colour, "Texture/right3-" + colour + ".png", 50, 63, true);
+            loadImage("ghost-right-" + colour, "Texture/ghost-right-" + colour + ".png", 50, 50, true);
+            loadImage("ghost-left-" + colour, "Texture/ghost-left-" + colour + ".png", 50, 50, true);
         }
         loadImage("grey-tile", "Texture/grey-tile.png", 50, 50, true);
     }

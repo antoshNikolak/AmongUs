@@ -3,6 +3,7 @@ package Animation;
 public enum AnimState {
     LEFT,
     RIGHT,
-    DEAD,
+    GHOST_LEFT,
+    GHOST_RIGHT,
     CONST
 }

@@ -111,7 +111,7 @@ public final class ConnectionServer {
         kryo.register(Animation.NewAnimationReturn.class);
         kryo.register(AnimState.class);
         kryo.register(GameStartTimerReturn.class);
-        kryo.register(ClearWorldReturn.class);
+        kryo.register(ClearEntityReturn.class);
 
     }
 

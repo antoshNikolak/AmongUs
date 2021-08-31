@@ -21,9 +21,12 @@ public class ChangingEntity extends Entity {
         if (positionReturns.size() != 2) return;
         Pos oldPos = positionReturns.get(0);
         Pos newPos = positionReturns.get(1);
+//        System.out.println("old pos: "+oldPos.getX());
+//        System.out.println("new pos: "+newPos.getX());
         double timeSinceLastPacket = getTimeSinceLastPacket();
         Pos currentPos = getCurrentPos(oldPos, newPos, timeSinceLastPacket, timeBetweenPackets);
         pos.setPos(currentPos);
+//        System.out.println("current pos: "+currentPos.getX());
     }
 
     private Pos getCurrentPos(Pos oldPos, Pos newPos, double timeSinceLastPacket, double timeBetweenPackets) {

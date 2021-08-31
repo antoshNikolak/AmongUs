@@ -10,7 +10,7 @@ public class Client {
     private Player player;
 
     public void createPlayer(){
-        this.player = new Player(PlayerColourFactory.getRandomColour());
+        this.player = new Player(PlayerColourFactory.getRandomColour(), this);
     }
 
     public Client(int connectionID) {

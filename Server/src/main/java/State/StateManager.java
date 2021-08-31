@@ -30,7 +30,7 @@ public class StateManager {
         states.pop().close();
     }
 
-    public GameState getCurrentState(){
+    public  GameState getCurrentState(){
         return states.peek();
     }
 }

@@ -42,8 +42,8 @@ public class GameClientHandler {
     }
 
     private static void addClientToLobby(Client client) {
-        if(!(AppServer.currentGame.getCurrentState() instanceof  LobbyState))throw  new IllegalStateException();
-         ((LobbyState)AppServer.currentGame.getCurrentState()).handleNewPlayerJoin(client);
+        if(!(AppServer.currentGame.getStateManager().getCurrentState() instanceof  LobbyState))throw  new IllegalStateException();
+         ((LobbyState)AppServer.currentGame.getStateManager().getCurrentState()).handleNewPlayerJoin(client);
     }
 
     private static void prepareGame() {
@@ -53,7 +53,4 @@ public class GameClientHandler {
         }
     }
 
-    public static String getRandomFreeTexture() {
-        return "";
-    }
 }

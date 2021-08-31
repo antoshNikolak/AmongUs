@@ -1,6 +1,7 @@
 package System;
 
 import Animation.AnimState;
+import Component.AliveComp;
 import Component.AnimationComp;
 import Component.VelComp;
 import Entity.Entity;
@@ -12,7 +13,7 @@ public class TextureSystem extends BaseSystem {
 
     @Override
     public void update() {
-        for (Entity entity : AppServer.currentGame.getCurrentState().getEntities()) {
+        for (Entity entity : AppServer.currentGame.getStateManager().getCurrentState().getEntities()) {
             if (super.checkEntityHasComponents(entity, AnimationComp.class, VelComp.class)) {
                 AnimationComp animComp = entity.getComponent(AnimationComp.class);
                 VelComp velComp = entity.getComponent(VelComp.class);
@@ -24,7 +25,7 @@ public class TextureSystem extends BaseSystem {
     private void processEntityAnimation(AnimationComp animComp, VelComp velComp, Entity entity) {
         if (animComp.getCurrentAnimation().getIndexesPerFrame() != 0) {
             changeAnimFrame(velComp, animComp);
-            AppServer.currentGame.getEntityReturnBuffer().add(entity);
+            AppServer.currentGame.getEntityReturnBuffer().putEntity(entity);
         }
     }
 
@@ -37,13 +38,22 @@ public class TextureSystem extends BaseSystem {
     }
 
 
-    public static void handleAnimationState(VelComp velComp, AnimationComp animationComp) {
+    public static void handlePlayerAnimationState(VelComp velComp, AnimationComp animationComp, AliveComp aliveComp) {
         if (velComp.getVelX() != velComp.getPreviousVelX()) {
             if (velComp.getVelX() < 0) {
-                animationComp.setCurrentAnimation(AnimState.LEFT);
+                if (aliveComp.isAlive()) {
+                    animationComp.setCurrentAnimation(AnimState.LEFT);
+                }else {
+                    animationComp.setCurrentAnimation(AnimState.GHOST_LEFT);
+                }
             } else if (velComp.getVelX() > 0) {
-                animationComp.setCurrentAnimation(AnimState.RIGHT);
+                if (aliveComp.isAlive()) {
+                    animationComp.setCurrentAnimation(AnimState.RIGHT);
+                }else {
+                    animationComp.setCurrentAnimation(AnimState.GHOST_RIGHT);
+                }
             }
         }
     }
+
 }

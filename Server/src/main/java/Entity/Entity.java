@@ -14,7 +14,8 @@ public abstract class Entity {
     private final Map<Class<? extends Component>, Component> components = new HashMap<>();
 
     protected Entity() {
-        AppServer.currentGame.getCurrentState().getEntities().add(this);
+        EntityRegistryServer.addEntity(this);
+        AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(this);
     }
 
     public EntityState adaptToEntityState() {
@@ -48,6 +49,10 @@ public abstract class Entity {
 
     public boolean hasComponent(Class<? extends Component> component) {
         return components.containsKey(component);
+    }
+
+    public void removeComponent(Class<? extends Component> component){
+        this.components.remove(component);
     }
 
 }

@@ -14,6 +14,11 @@ public class StateReturn implements Packet {
         this.entityStates = entityStates;
     }
 
+    public StateReturn(EntityState entityState){
+        this.entityStates = new HashSet<>();
+        this.entityStates.add(entityState);
+    }
+
     public Set<EntityState> getEntityStates() {
         return entityStates;
     }

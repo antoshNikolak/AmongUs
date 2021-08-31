@@ -4,7 +4,7 @@ package AnimationClient;
 import Animation.NewAnimationReturn;
 
 public class AnimationClient {
-//    private int index = 0;
+    //    private int index = 0;
     private final String[] frames;
     private String currentFrame;
     private final int indexesPerFrame;
@@ -16,7 +16,11 @@ public class AnimationClient {
     }
 
     public void updateCurrentFrame(int index) {
-        this.currentFrame = frames[index / indexesPerFrame];
+        if (indexesPerFrame == 0) {
+            this.currentFrame = frames[0];
+        } else {
+            this.currentFrame = frames[index / indexesPerFrame];
+        }
     }
 
 

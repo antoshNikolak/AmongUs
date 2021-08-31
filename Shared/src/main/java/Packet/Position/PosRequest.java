@@ -7,15 +7,16 @@ public class PosRequest implements Packet {
     private boolean right= false;
     private boolean up= false;
     private boolean down= false;
+    private boolean killKey = false;
 
     public PosRequest() {}
 
-    public PosRequest(boolean left, boolean down, boolean up, boolean right) {
-        this.left = left;
-        this.down = down;
-        this.up = up;
-        this.right = right;
-    }
+//    public PosRequest(boolean left, boolean down, boolean up, boolean right) {
+//        this.left = left;
+//        this.down = down;
+//        this.up = up;
+//        this.right = right;
+//    }
 
     public boolean isLeft() {
         return left;
@@ -47,5 +48,13 @@ public class PosRequest implements Packet {
 
     public void setRight(boolean right) {
         this.right = right;
+    }
+
+    public void setKillKey(boolean killKey) {
+        this.killKey = killKey;
+    }
+
+    public boolean isKillKey() {
+        return killKey;
     }
 }

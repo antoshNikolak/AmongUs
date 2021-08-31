@@ -8,8 +8,8 @@ import Packet.Position.PosRequest;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
-import StartUpServer.AppServer;
 import System.PhysicsSystem;
+import System.ImposterActionsSystem;
 
 import java.util.Optional;
 
@@ -33,6 +33,13 @@ public class PacketControllerServer {
     }
 
     public void handlePosRequest(PosRequest packet, int connectionId) {
-        PhysicsSystem.updatePlayerPosition(packet, connectionId);
+        Optional<Client> optionalClient = PhysicsSystem.getPlayerOptional(connectionId);
+        optionalClient.ifPresent(client-> {
+            PhysicsSystem.processPlayerMove(optionalClient.get().getPlayer(), packet);
+            ImposterActionsSystem.handleSpecialActions(optionalClient.get().getPlayer(), packet);
+        });
+
+//        PhysicsSystem.updatePlayerPosition(packet, connectionId);
+//        GameLogicSystem.
     }
 }

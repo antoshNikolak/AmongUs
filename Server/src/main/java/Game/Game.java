@@ -11,17 +11,24 @@ import State.StateManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import Entity.*;
 import State.*;
+import Entity.Player;
+import Entity.EntityDestination;
 
 public class Game {
     private final StateManager stateManager = new StateManager();
-    private final Set<Entity> entityReturnBuffer = ConcurrentHashMap.newKeySet();
-    protected final List<Client> clients = new ArrayList<>(); //maybe make this a player list
+    private final EntityReturnBuffer entityReturnBuffer = new EntityReturnBuffer();
+    //    private final Set<Entity> entityReturnBuffer = ConcurrentHashMap.newKeySet();
+//    private final Map<Entity, List<Integer>> entityDestinationsReturnBuffer = new ConcurrentHashMap<>();
+    protected final List<Client> clients = new ArrayList<>();
+
 
     public void startGame() {
         init();
@@ -43,30 +50,55 @@ public class Game {
     }
 
     private void sendGameState() {
-        Set<EntityState> entityReturnStates = getEntityReturnStates();
-        ConnectionServer.sendUDPToAllPlayers(new StateReturn(entityReturnStates));
-        entityReturnBuffer.clear();
+        this.entityReturnBuffer.sendGameState();
+
     }
 
-    private Set<EntityState> getEntityReturnStates() {
-        return entityReturnBuffer.stream().
-                map(entity -> entity.adaptToEntityState()).
-                collect(Collectors.toSet());
+//    private void handleGenericReturnStates(){
+//        Set<EntityState> entityReturnStates = getEntityReturnStates();
+//        ConnectionServer.sendUDPToAllPlayers(new StateReturn(entityReturnStates));
+//        entityReturnBuffer.clear();
+//    }
+//
+//    private void handleSpecificEntityReturnStates() {
+//        for (Entity entity: entityDestinationsReturnBuffer.keySet()){
+//            for (Integer connectionID: entityDestinationsReturnBuffer.get(entity)){
+//                ConnectionServer.sendUDP(new StateReturn(entity.adaptToEntityState()), connectionID);
+//            }
+//        }
+//        entityDestinationsReturnBuffer.clear();
+//    }
+//
+//
+//        private Set<EntityState> getEntityReturnStates () {
+//            return entityReturnBuffer.stream().
+//                    map(entity -> entity.adaptToEntityState()).
+//                    collect(Collectors.toSet());
+//        }
+
+    public List<Player> getPlayers() {
+        return clients.stream().
+                map(Client::getPlayer)
+                .collect(Collectors.toList());
     }
 
-    public GameState getCurrentState() {
-        return stateManager.getCurrentState();
-    }
-
-    public StateManager getStateManager() {
+    public synchronized StateManager getStateManager() {
         return stateManager;
     }
 
-    public Set<Entity> getEntityReturnBuffer() {
-        return entityReturnBuffer;
-    }
+//        public Set<Entity> getEntityReturnBuffer () {
+//            return entityReturnBuffer;
+//        }
 
     public List<Client> getClients() {
         return clients;
     }
+
+    public EntityReturnBuffer getEntityReturnBuffer() {
+        return entityReturnBuffer;
+    }
+
+    //    public Map<Entity, List<Integer>> getEntityDestinationsReturnBuffer() {
+//        return entityDestinationsReturnBuffer;
+//    }
 }
