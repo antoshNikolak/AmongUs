@@ -110,7 +110,7 @@ public class PhysicsSystem extends BaseSystem {
         }
     }
 
-    private static void handleCollisionY(VelComp velComp, PosComp posComp, HitBoxComp hitBox) {
+    private static void handleCollisionY(VelComp velComp, PosComp posComp, HitBoxComp hitBox) {//null pointer happens when client sends input but state hasnt been changed yet
             hitBox.setY(posComp.getPos().getY());
             AppServer.currentGame.getStateManager().getCurrentState().getEntities().stream().
                     filter(PhysicsSystem::canEntityCollideWithPlayer).

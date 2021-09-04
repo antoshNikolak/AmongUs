@@ -14,9 +14,10 @@ public class Entity {
 
     public Entity (NewEntityState newEntityState){
         EntityRegistryClient.addEntity(newEntityState.getRegistrationID(), this);
-        this.animationManager = new AnimationManager(newEntityState.getNewAnimationReturn());
+        this.animationManager = new AnimationManager(newEntityState);
         this.pos = newEntityState.getPos();
         AppClient.currentGame.getEntities().add(this);
+
     }
 
     public void render(GraphicsContext gc){

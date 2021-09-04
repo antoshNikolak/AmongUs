@@ -28,7 +28,7 @@ public class PacketControllerServer {
     public void handleStartGameRequest(int connectionID) {
         Optional<Client> client = AuthorizationServer.getAuthorizedClient(connectionID);
         ConnectionServer.sendTCP(new StartGameReturn(client.isPresent()), connectionID);
-        client.ifPresent(GameClientHandler::prepareClientToPlay);
+        client.ifPresent(Client::prepareClientToPlay);
 
     }
 

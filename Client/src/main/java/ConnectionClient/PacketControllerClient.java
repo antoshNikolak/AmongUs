@@ -5,12 +5,14 @@ import Game.Game;
 import Packet.GameStart.StartGameReturn;
 import Packet.Position.*;
 import Packet.Registration.RegistrationConfirmation;
-import Packet.Timer.GameStartTimerReturn;
+import Packet.Timer.GameStartTimer;
+import Packet.Timer.KillCoolDownTimer;
 import Screen.MenuScreen;
-import Screen.ScreenCounter;
+import ScreenCounter.ScreenCounter;
 import Screen.ScreenManager;
 import StartUp.AppClient;
 import javafx.application.Platform;
+import ScreenCounter.*;
 
 public class PacketControllerClient {
 
@@ -22,7 +24,7 @@ public class PacketControllerClient {
         }
     }
 
-    public void handleStartGameReturn(StartGameReturn packet) {
+    public void handleStartGameReturn(StartGameReturn packet) {//handle new stationary entity came first once, why?
         if (packet.isAuthorizedToStartGame()) {
             AppClient.currentGame = new Game();
         } else {
@@ -56,11 +58,17 @@ public class PacketControllerClient {
         }
     }
 
-    public void handleGameStartTimerReturn(GameStartTimerReturn packet) {
-        Platform.runLater(()->ScreenCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
+    private GameStartCounter gameStartCounter = new GameStartCounter();
+    public void handleGameStartTimerReturn(GameStartTimer packet) {
+        Platform.runLater(()->gameStartCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
 
-    public void handleClearWorldReturn(ClearEntityReturn packet) {
+    private KillCoolDownCounter killCoolDownCounter = new KillCoolDownCounter();
+    public void handleKillCoolDownTimer(KillCoolDownTimer packet) {
+        Platform.runLater(()->killCoolDownCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
+    }
+
+    public void handleClearEntityReturn(ClearEntityReturn packet) {
         for (int tileID: packet.getRegistrationIDs()){
             Entity entity = EntityRegistryClient.getEntity(tileID);
             EntityRegistryClient.removeEntity(tileID);
@@ -70,4 +78,5 @@ public class PacketControllerClient {
 
 
     }
+
 }

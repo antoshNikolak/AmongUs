@@ -2,10 +2,10 @@ package Packet.Timer;
 
 import Packet.Packet;
 
-public class GameStartTimerReturn implements Packet {
+public abstract class Timer implements Packet {
     private int countDownValue;
 
-    public GameStartTimerReturn(int countDownValue) {
+    public Timer(int countDownValue) {
         this.countDownValue = countDownValue;
     }
 
@@ -13,6 +13,6 @@ public class GameStartTimerReturn implements Packet {
         return countDownValue;
     }
 
-    private GameStartTimerReturn() {
+    public Timer() {
     }
 }

@@ -2,6 +2,7 @@ package State;
 
 import Client.Client;
 import Component.ColourComp;
+import Component.ImposterComp;
 import Component.RoleComp;
 import ConnectionServer.ConnectionServer;
 import Entity.EntityRegistryServer;
@@ -47,11 +48,12 @@ public class GameState extends State {
         Player imposter = getRandomPlayer();
         for (Player player: AppServer.currentGame.getPlayers()){
             if (player == imposter){
-                player.addComponent(new RoleComp(Role.IMPOSTER));
+                player.addComponent(new ImposterComp());
                 System.out.println(player.getComponent(ColourComp.class).getColour() + "is the impostor");
-            }else {
-                player.addComponent(new RoleComp(Role.CREWMATE));
             }
+//            else {
+//                player.addComponent(new RoleComp(Role.CREWMATE));
+//            }
         }
     }
 

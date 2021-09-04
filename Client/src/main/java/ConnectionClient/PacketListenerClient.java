@@ -3,7 +3,8 @@ package ConnectionClient;
 import Packet.GameStart.StartGameReturn;
 import Packet.Position.*;
 import Packet.Registration.RegistrationConfirmation;
-import Packet.Timer.GameStartTimerReturn;
+import Packet.Timer.GameStartTimer;
+import Packet.Timer.KillCoolDownTimer;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
@@ -34,10 +35,13 @@ public class PacketListenerClient extends Listener {
             packetController.handleNewStationaryEntityReturn((AddStationaryEntityReturn)object);
         }else if(object instanceof StateReturn){
             packetController.handleStateReturn((StateReturn) object);
-        }else if (object instanceof GameStartTimerReturn){
-            packetController.handleGameStartTimerReturn((GameStartTimerReturn)object);
-        }else if (object instanceof ClearEntityReturn){
-            packetController.handleClearWorldReturn((ClearEntityReturn) object);
+        }else if (object instanceof GameStartTimer){
+            packetController.handleGameStartTimerReturn((GameStartTimer)object);
+        }else if (object instanceof KillCoolDownTimer){
+            packetController.handleKillCoolDownTimer((KillCoolDownTimer) object);
+        }
+            else if (object instanceof ClearEntityReturn){
+            packetController.handleClearEntityReturn((ClearEntityReturn) object);
         }
     }
 

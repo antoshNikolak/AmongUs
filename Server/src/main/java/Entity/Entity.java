@@ -29,9 +29,8 @@ public abstract class Entity {
         PosComp posComp = getComponent(PosComp.class);
         AnimationComp animationComp = getComponent(AnimationComp.class);
         int registrationID = EntityRegistryServer.getEntityID(this);
-        return new NewEntityState(registrationID, posComp.getPos(), animationComp.adaptToAllNewAnimations());
+        return new NewEntityState(registrationID, posComp.getPos(), animationComp.adaptToAllNewAnimations(), animationComp.getCurrentAnimationState());
     }
-
 
     public void addComponent(Component component) {
         components.put(component.getClass(), component);

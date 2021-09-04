@@ -12,17 +12,18 @@ public class Player extends Entity {
 //    TaskState currentTask;
 //    private Client client;
 
+    private int connectionID;
 
-    //todo consider removing client
-    public Player(String colour, Client client) {
+
+    public Player(String colour, int connectionID) {
+        this.connectionID = connectionID;
         startComps(new PosComp(100, 100, 50, 63), colour);
-//        this.client = client;
     }
 
-    public Player(String colour, Client client, PosComp posComp) {
+    public Player(String colour, int connectionID, PosComp posComp) {
         super();
+        this.connectionID = connectionID;
         startComps(posComp, colour);
-//        this.client = client;
     }
 
     private AnimationComp configAnimation(){
@@ -53,7 +54,7 @@ public class Player extends Entity {
         return new String[]{ "standleft-" + colour, "left0-" + colour, "left1-" + colour, "left2-"+ colour, "left3-"+ colour};
     }
 
-//    public Client getClient() {
-//        return client;
-//    }
+    public int getConnectionID() {
+        return connectionID;
+    }
 }

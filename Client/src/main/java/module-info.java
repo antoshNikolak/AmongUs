@@ -11,4 +11,5 @@ module Client {
     opens Screen;
     opens ScreenController;
     opens Texture;
+    opens ScreenCounter;
 }

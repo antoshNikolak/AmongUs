@@ -8,7 +8,9 @@ import Packet.Position.*;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
-import Packet.Timer.GameStartTimerReturn;
+import Packet.Timer.GameStartTimer;
+import Packet.Timer.KillCoolDownTimer;
+import Packet.Timer.Timer;
 import Position.Pos;
 import UserData.UserData;
 import com.esotericsoftware.kryo.Kryo;
@@ -68,7 +70,9 @@ public final class ConnectionClient {
         kryo.register(Animation.NewAnimationReturn[].class);
         kryo.register(Animation.NewAnimationReturn.class);
         kryo.register(AnimState.class);
-        kryo.register(GameStartTimerReturn.class);
+        kryo.register(Timer.class);
         kryo.register(ClearEntityReturn.class);
+        kryo.register(GameStartTimer.class);
+        kryo.register(KillCoolDownTimer.class);
     }
 }

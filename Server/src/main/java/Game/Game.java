@@ -54,27 +54,6 @@ public class Game {
 
     }
 
-//    private void handleGenericReturnStates(){
-//        Set<EntityState> entityReturnStates = getEntityReturnStates();
-//        ConnectionServer.sendUDPToAllPlayers(new StateReturn(entityReturnStates));
-//        entityReturnBuffer.clear();
-//    }
-//
-//    private void handleSpecificEntityReturnStates() {
-//        for (Entity entity: entityDestinationsReturnBuffer.keySet()){
-//            for (Integer connectionID: entityDestinationsReturnBuffer.get(entity)){
-//                ConnectionServer.sendUDP(new StateReturn(entity.adaptToEntityState()), connectionID);
-//            }
-//        }
-//        entityDestinationsReturnBuffer.clear();
-//    }
-//
-//
-//        private Set<EntityState> getEntityReturnStates () {
-//            return entityReturnBuffer.stream().
-//                    map(entity -> entity.adaptToEntityState()).
-//                    collect(Collectors.toSet());
-//        }
 
     public List<Player> getPlayers() {
         return clients.stream().

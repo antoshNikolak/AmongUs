@@ -3,6 +3,7 @@ package Entity;
 import Client.Client;
 import ConnectionServer.ConnectionServer;
 import Packet.Position.EntityState;
+import Packet.Position.NewEntityState;
 import Packet.Position.StateReturn;
 import StartUpServer.AppServer;
 
@@ -29,26 +30,32 @@ public class EntityReturnBuffer {
                 }
             }
         }
-
         for (Integer connectionID: connectionEntityMap.keySet()){
             ConnectionServer.sendUDP(new StateReturn(connectionEntityMap.get(connectionID)), connectionID);
         }
-
-
-//        for (Entity entity : entityDestinationsReturnBuffer.keySet()) {
-//            for (Integer connectionID : entityDestinationsReturnBuffer.get(entity)) {
-//                ConnectionServer.sendUDP(new StateReturn(entity.adaptToEntityState()), connectionID);
-//            }
-//        }
         entityDestinationsReturnBuffer.clear();
     }
 
-
-    private Set<EntityState> getEntityReturnStates() {
-        return entityDestinationsReturnBuffer.keySet().stream().
-                map(entity -> entity.adaptToEntityState()).
+    public static Set<NewEntityState> adaptCollectionToNewEntityStates(Collection<? extends Entity> entities){
+        return entities.stream().
+                map(entity -> entity.adaptToNewEntityState()).
                 collect(Collectors.toSet());
     }
+
+//    public static <T extends  Collection <? extends Entity>> T adaptCollectionToNewEntityStates(T entities){
+//        Collection collection = entities;
+//        for (Entity entity: entities){
+//
+//        }
+//    }
+
+
+//    private Set<EntityState> getEntityReturnStates() {
+//        return adaptCollectionToNewEntityStates(entityDestinationsReturnBuffer.keySet());
+////        return entityDestinationsReturnBuffer.keySet().stream().
+////                map(entity -> entity.adaptToEntityState()).
+////                collect(Collectors.toSet());
+//    }
 
     private List<Integer> getAllConnectionIDs() {
         return AppServer.currentGame.getClients().stream().
@@ -62,6 +69,10 @@ public class EntityReturnBuffer {
 
     public void putEntity(Entity entity, List<Integer> connectionIDs) {
         entityDestinationsReturnBuffer.put(entity, connectionIDs);
+    }
+
+    public void putEntity(Entity entity, Integer ... connectionIDs){
+        entityDestinationsReturnBuffer.put(entity, Arrays.asList(connectionIDs));
     }
 
 

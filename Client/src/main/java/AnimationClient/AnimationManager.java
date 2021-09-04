@@ -2,6 +2,7 @@ package AnimationClient;
 
 import Animation.AnimState;
 import Animation.NewAnimationReturn;
+import Packet.Position.NewEntityState;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -11,9 +12,9 @@ public class AnimationManager {
     private final EnumMap<AnimState, AnimationClient> directionAnimationMap = new EnumMap<>(AnimState.class);
     private AnimState currentState;
 
-    public AnimationManager(List<NewAnimationReturn> newAnimationReturns) {
-        loadAnimationMap(newAnimationReturns);
-        determineCurrentState();
+    public AnimationManager(NewEntityState newEntityState) {
+        loadAnimationMap(newEntityState.getNewAnimationReturn());
+        determineCurrentState(newEntityState);
     }
 
     private void loadAnimationMap(List<NewAnimationReturn> newAnimationReturns){
@@ -22,12 +23,14 @@ public class AnimationManager {
         }
     }
 
-    private void determineCurrentState(){
-        if (directionAnimationMap.containsKey(AnimState.CONST)) {
-            this.currentState = AnimState.CONST;
-        }else {
-            this.currentState = AnimState.RIGHT;
-        }
+    private void determineCurrentState(NewEntityState newEntityState){
+        this.currentState = newEntityState.getAnimState();
+        System.out.println(currentState);
+//        if (directionAnimationMap.containsKey(AnimState.CONST)) {
+//            this.currentState = AnimState.CONST;
+//        }else {
+//            this.currentState = AnimState.RIGHT;
+//        }
     }
 
     public AnimationClient getCurrentAnimation(){
