@@ -1,5 +1,7 @@
-package Packet.Position;
+package Packet.AddEntityReturn;
 
+
+import Packet.EntityState.NewEntityState;
 
 import java.util.List;
 

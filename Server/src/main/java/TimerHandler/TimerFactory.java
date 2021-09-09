@@ -6,7 +6,7 @@ import Packet.Timer.Timer;
 
 public class TimerFactory {
 
-    public static Timer getTimerPacket(String timerString, int seconds){
+    public static Timer createTimerPacket(String timerString, int seconds){
         try {
             if (timerString.equalsIgnoreCase("GameStartTimer")){
                 return new GameStartTimer(seconds);

@@ -1,4 +1,4 @@
-package ConnectionServer;
+package Client;
 
 import Client.Client;
 

@@ -15,6 +15,12 @@ module Shared {
     opens Animation;
     exports Packet.Timer;
     opens Packet.Timer;
+    exports Packet.Camera;
+    opens Packet.Camera;
+    exports Packet.EntityState;
+    opens Packet.EntityState;
+    exports Packet.AddEntityReturn;
+    opens Packet.AddEntityReturn;
 
 
 }

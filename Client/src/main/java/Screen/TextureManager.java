@@ -27,6 +27,9 @@ public class TextureManager {
             loadImage("ghost-left-" + colour, "Texture/ghost-left-" + colour + ".png", 50, 50, true);
         }
         loadImage("grey-tile", "Texture/grey-tile.png", 50, 50, true);
+        loadImage("sudoku-task", "Texture/bookshelf.png", 50, 50, false);
+        loadImage("maze-task", "Texture/maze-task.png", 50, 50, false);
+        loadImage("number-count-task", "Texture/number-count-task.png", 50, 50, false);
     }
 
     // used to scale an image when its loaded

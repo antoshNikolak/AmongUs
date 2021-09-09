@@ -1,7 +1,9 @@
 package EntityClient;
 
 import Animation.AnimState;
-import Packet.Position.NewEntityState;
+import Packet.EntityState.NewAnimatedEntityState;
+import Packet.EntityState.NewEntityState;
+import Packet.EntityState.NewLineState;
 import Position.Pos;
 import StartUp.AppClient;
 
@@ -12,10 +14,11 @@ public class ChangingEntity extends Entity {
     private static double timeBetweenPackets = 0.0066;//default value
     private static double timeLastPacketArrived;
 
-    public ChangingEntity(NewEntityState entityState) {
+    public ChangingEntity(NewAnimatedEntityState entityState) {
         super(entityState);
         AppClient.currentGame.getChangingEntities().add(this);
     }
+
 
     public void interpolate() {
         if (positionReturns.size() != 2) return;

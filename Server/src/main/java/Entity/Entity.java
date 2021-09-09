@@ -1,7 +1,8 @@
 package Entity;
 
-import Packet.Position.EntityState;
-import Packet.Position.NewEntityState;
+import Packet.EntityState.ExistingEntityState;
+import Packet.EntityState.NewAnimatedEntityState;
+import Packet.EntityState.NewEntityState;
 import StartUpServer.AppServer;
 
 import java.util.HashMap;
@@ -18,18 +19,18 @@ public abstract class Entity {
         AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(this);
     }
 
-    public EntityState adaptToEntityState() {
+    public ExistingEntityState adaptToEntityState() {
         PosComp posComp = getComponent(PosComp.class);
         AnimationComp animationComp = getComponent(AnimationComp.class);
         int registrationID = EntityRegistryServer.getEntityID(this);
-        return new EntityState(registrationID, posComp.getPos(), animationComp.getCurrentAnimationState(), animationComp.getCurrentAnimation().getIndex());
+        return new ExistingEntityState(registrationID, posComp.getPos(), animationComp.getCurrentAnimationState(), animationComp.getCurrentAnimation().getIndex());
     }
 
-    public NewEntityState adaptToNewEntityState() {
+    public NewAnimatedEntityState adaptToNewAnimatedEntityState() {
         PosComp posComp = getComponent(PosComp.class);
         AnimationComp animationComp = getComponent(AnimationComp.class);
         int registrationID = EntityRegistryServer.getEntityID(this);
-        return new NewEntityState(registrationID, posComp.getPos(), animationComp.adaptToAllNewAnimations(), animationComp.getCurrentAnimationState());
+        return new NewAnimatedEntityState(registrationID, posComp.getPos(), animationComp.adaptToAllNewAnimations(), animationComp.getCurrentAnimationState());
     }
 
     public void addComponent(Component component) {

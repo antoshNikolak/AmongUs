@@ -6,13 +6,14 @@ import Component.*;
 import Position.Pos;
 import StartUpServer.AppServer;
 import State.GameState;
+import State.TaskState;
 
 public class Player extends Entity {
     //each player must have its own state
-//    TaskState currentTask;
+    private TaskState currentTask;
 //    private Client client;
 
-    private int connectionID;
+    private final int connectionID;
 
 
     public Player(String colour, int connectionID) {
@@ -56,5 +57,13 @@ public class Player extends Entity {
 
     public int getConnectionID() {
         return connectionID;
+    }
+
+    public TaskState getCurrentTask() {
+        return currentTask;
+    }
+
+    public void setCurrentTask(TaskState currentTask) {
+        this.currentTask = currentTask;
     }
 }

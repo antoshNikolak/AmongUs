@@ -1,26 +1,25 @@
 package Packet.Position;
 
+import Packet.EntityState.ExistingEntityState;
 import Packet.Packet;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class StateReturn implements Packet {
-    private Set<EntityState> entityStates;
+    private Set<ExistingEntityState> existingEntityStates;
 
-    public StateReturn(Set<EntityState> entityStates) {
-        this.entityStates = entityStates;
+    public StateReturn(Set<ExistingEntityState> existingEntityStates) {
+        this.existingEntityStates = existingEntityStates;
     }
 
-    public StateReturn(EntityState entityState){
-        this.entityStates = new HashSet<>();
-        this.entityStates.add(entityState);
+    public StateReturn(ExistingEntityState existingEntityState){
+        this.existingEntityStates = new HashSet<>();
+        this.existingEntityStates.add(existingEntityState);
     }
 
-    public Set<EntityState> getEntityStates() {
-        return entityStates;
+    public Set<ExistingEntityState> getEntityStates() {
+        return existingEntityStates;
     }
 
     private StateReturn() {

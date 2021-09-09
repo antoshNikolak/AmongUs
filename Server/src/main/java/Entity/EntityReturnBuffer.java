@@ -2,8 +2,8 @@ package Entity;
 
 import Client.Client;
 import ConnectionServer.ConnectionServer;
-import Packet.Position.EntityState;
-import Packet.Position.NewEntityState;
+import Packet.EntityState.ExistingEntityState;
+import Packet.EntityState.NewEntityState;
 import Packet.Position.StateReturn;
 import StartUpServer.AppServer;
 
@@ -16,7 +16,7 @@ public class EntityReturnBuffer {
 
 
     public void sendGameState() {
-        Map<Integer, Set<EntityState>> connectionEntityMap = new HashMap<>();
+        Map<Integer, Set<ExistingEntityState>> connectionEntityMap = new HashMap<>();
 
         for (Entity entity : entityDestinationsReturnBuffer.keySet()) {
             List<Integer> connectionIDs = entityDestinationsReturnBuffer.get(entity);
@@ -24,7 +24,7 @@ public class EntityReturnBuffer {
                 if (connectionEntityMap.containsKey(connectionID)) {
                     connectionEntityMap.get(connectionID).add(entity.adaptToEntityState());
                 } else {
-                    Set<EntityState> entities = new HashSet<>();
+                    Set<ExistingEntityState> entities = new HashSet<>();
                     entities.add(entity.adaptToEntityState());
                     connectionEntityMap.put(connectionID, entities);
                 }
@@ -38,7 +38,7 @@ public class EntityReturnBuffer {
 
     public static Set<NewEntityState> adaptCollectionToNewEntityStates(Collection<? extends Entity> entities){
         return entities.stream().
-                map(entity -> entity.adaptToNewEntityState()).
+                map(entity -> entity.adaptToNewAnimatedEntityState()).
                 collect(Collectors.toSet());
     }
 

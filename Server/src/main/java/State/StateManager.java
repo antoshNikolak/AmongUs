@@ -1,36 +1,48 @@
 package State;
 
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.*;
 
 public class StateManager {
 
-    private final Deque<GameState> states = new LinkedList<>();
-    //todo use a stack probably
-
-
-    public void updateTop(){
-        states.getLast().update();
+    private final Stack<GameState> states = new Stack<>();//wont allow duplicates
+    
+    public void updateTop() {
+        states.peek().update();
     }
 
-    public void update(){
-        for (GameState state : states) {
-            state.update();
+    public void update() {
+        ListIterator<GameState> stateItr = states.listIterator(states.size());
+        while (stateItr.hasPrevious()){
+            GameState state = stateItr.previous();
+            if (!state.isBlocksUpdate()){
+                state.update();
+            }else {
+                break;
+            }
         }
     }
 
-    public void pushState(GameState state){
+    public void pushState(GameState state) {
+        if (states.contains(state)) return;
         states.add(state);
         state.init();
     }
 
-    public void popState(){
+    public void popState() {
         states.pop().close();
     }
 
-    public  GameState getCurrentState(){
+    public GameState getCurrentState() {
         return states.peek();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends State> T getState(Class<T> stateClass) {
+        for (State state : states) {
+            if (state.getClass().isAssignableFrom(stateClass)) {
+                return (T) state;
+            }
+        }
+        return null;
     }
 }

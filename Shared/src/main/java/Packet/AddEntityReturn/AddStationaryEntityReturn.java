@@ -1,6 +1,6 @@
-package Packet.Position;
+package Packet.AddEntityReturn;
 
-import Packet.Packet;
+import Packet.EntityState.NewEntityState;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public class AddStationaryEntityReturn extends AddEntityReturn {
         super(newEntityStates);
     }
 
-    public AddStationaryEntityReturn(NewEntityState... entityStates) {
-        super(entityStates);
+    public AddStationaryEntityReturn(NewEntityState... newEntityStates) {
+        super(newEntityStates);
     }
 }

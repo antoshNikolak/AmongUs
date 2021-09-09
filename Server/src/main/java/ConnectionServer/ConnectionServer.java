@@ -3,6 +3,12 @@ package ConnectionServer;
 import Animation.AnimState;
 import Client.Client;
 import Entity.Player;
+import Packet.AddEntityReturn.*;
+import Packet.Camera.ScrollingEnableReturn;
+import Packet.EntityState.ExistingEntityState;
+import Packet.EntityState.NewAnimatedEntityState;
+import Packet.EntityState.NewEntityState;
+import Packet.EntityState.NewLineState;
 import Packet.GameStart.StartGameRequest;
 import Packet.GameStart.StartGameReturn;
 import Packet.Packet;
@@ -28,7 +34,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public final class ConnectionServer {
-    private static final Server server = new Server();
+    private static final Server server = new Server(20000, 20000);
 
     public static void sendUDP(Packet packet, int connectionID) {
         server.sendToUDP(connectionID, packet);
@@ -117,7 +123,7 @@ public final class ConnectionServer {
     private static void startConnection() {
         try {
             server.start();
-            server.bind(49159, 65528);
+            server.bind(49158, 65529);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -153,7 +159,7 @@ public final class ConnectionServer {
         kryo.register(PosRequest.class);
         kryo.register(Pos.class);
         kryo.register(AddStationaryEntityReturn.class);
-        kryo.register(EntityState.class);
+        kryo.register(ExistingEntityState.class);
         kryo.register(ArrayList.class);
         kryo.register(AddLocalEntityReturn.class);
         kryo.register(AddChangingEntityReturn.class);
@@ -168,6 +174,14 @@ public final class ConnectionServer {
         kryo.register(ClearEntityReturn.class);
         kryo.register(GameStartTimer.class);
         kryo.register(KillCoolDownTimer.class);
+        kryo.register(ScrollingEnableReturn.class);
+        kryo.register(NewAnimatedEntityState.class);
+        kryo.register(AddLineReturn.class);
+        kryo.register(NewLineState.class);
+        kryo.register(AddNestedPane.class);
+
+
+
 
     }
 

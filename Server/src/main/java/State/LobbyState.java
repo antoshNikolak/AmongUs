@@ -1,14 +1,12 @@
 package State;
 
 import Client.Client;
-import Component.ColourComp;
 import ConnectionServer.ConnectionServer;
-import Entity.Player;
-import Packet.Position.AddLocalEntityReturn;
-import Packet.Position.AddChangingEntityReturn;
-import Packet.Position.NewEntityState;
+import Packet.AddEntityReturn.AddLocalEntityReturn;
+import Packet.AddEntityReturn.AddChangingEntityReturn;
+import Packet.EntityState.NewAnimatedEntityState;
+import Packet.EntityState.NewEntityState;
 import StartUpServer.AppServer;
-import System.TextureSystem;
 import World.World;
 
 public class LobbyState extends GameState{
@@ -41,12 +39,12 @@ public class LobbyState extends GameState{
 
     private void sendExistingPlayersToClient(int connectionID) {
         for (Client client: AppServer.currentGame.getClients()){
-            ConnectionServer.sendTCP(new AddChangingEntityReturn(client.getPlayer().adaptToNewEntityState()), connectionID);
+            ConnectionServer.sendTCP(new AddChangingEntityReturn(client.getPlayer().adaptToNewAnimatedEntityState()), connectionID);
         }
     }
 
     private void sendNewPlayerToAll(Client client){
-        NewEntityState playerState = client.getPlayer().adaptToNewEntityState();
+        NewAnimatedEntityState playerState = client.getPlayer().adaptToNewAnimatedEntityState();
         ConnectionServer.sendTCP(new AddLocalEntityReturn(playerState), client.getConnectionID());
         ConnectionServer.sendTCPToAllExcept(new AddChangingEntityReturn(playerState), client.getConnectionID());
     }

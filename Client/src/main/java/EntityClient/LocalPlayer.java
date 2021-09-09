@@ -2,22 +2,30 @@ package EntityClient;
 
 import ConnectionClient.ConnectionClient;
 import KeyManager.KeyManager;
-import Packet.Position.NewEntityState;
+import Packet.EntityState.NewAnimatedEntityState;
+import Packet.EntityState.NewEntityState;
 import Packet.Position.PosRequest;
+import StartUp.AppClient;
+import javafx.scene.canvas.GraphicsContext;
 
 public class LocalPlayer extends ChangingEntity {
     private PosRequest prevRequest;
+    private boolean scrollingEnabled = false;
 
-    public LocalPlayer(NewEntityState entityState) {
+    public LocalPlayer(NewAnimatedEntityState entityState) {
         super(entityState);
     }
 
     public void sendInput() {
         PosRequest request = createPosRequest();
-        if (hasUserInput(request) || hasMovementInputChanged(request) || request.isKillKey()) {
+        if (hasUserInput(request) || hasMovementInputChanged(request) || hasUserInputSpecialMove(request)) {
             ConnectionClient.sendUDP(request);
         }
         this.prevRequest = request;
+    }
+
+    private boolean hasUserInputSpecialMove(PosRequest posRequest){
+        return posRequest.isKillKey() || posRequest.isTaskKey();
     }
 
     private boolean hasMovementInputChanged(PosRequest posRequest) {
@@ -39,6 +47,9 @@ public class LocalPlayer extends ChangingEntity {
     private void checkSpecialMoves(PosRequest posRequest){
         if (KeyManager.isKillKeyPressed()){
             posRequest.setKillKey(true);
+        }
+        if (KeyManager.isTaskKeyPressed()){
+            posRequest.setTaskKey(true);
         }
     }
 
@@ -63,5 +74,13 @@ public class LocalPlayer extends ChangingEntity {
                 request.isUp() || request.isRight();
     }
 
+    @Override
+    public void render(GraphicsContext gc) {
+        if (scrollingEnabled) AppClient.currentGame.getCamera().centreOnEntity(this);
+        super.render(gc);
+    }
 
+    public void setScrollingEnabled(boolean scrollingEnabled) {
+        this.scrollingEnabled = scrollingEnabled;
+    }
 }

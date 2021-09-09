@@ -1,11 +1,8 @@
 package State;
 
-import Client.Client;
-import ConnectionServer.ClientOperator;
+import Client.ClientOperator;
 import Entity.Entity;
-import World.World;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +14,11 @@ public abstract class State implements ClientOperator {
 
     private final Map<Class<? extends BaseSystem>, BaseSystem> systems = new HashMap<>();
     protected final List<Entity> entities = new CopyOnWriteArrayList<>();
+    private boolean blocksUpdate = false;
+
+    public State(boolean blocksUpdate) {
+        this.blocksUpdate = blocksUpdate;
+    }
 
     public void addSystem(BaseSystem system){
         this.systems.put(system.getClass(), system);
@@ -42,5 +44,13 @@ public abstract class State implements ClientOperator {
 
     public List<Entity> getEntities() {
         return entities;
+    }
+
+    public boolean isBlocksUpdate() {
+        return blocksUpdate;
+    }
+
+    public void setBlocksUpdate(boolean blocksUpdate) {
+        this.blocksUpdate = blocksUpdate;
     }
 }

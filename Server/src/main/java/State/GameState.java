@@ -3,19 +3,20 @@ package State;
 import Client.Client;
 import Component.ColourComp;
 import Component.ImposterComp;
-import Component.RoleComp;
+import Component.PosComp;
 import ConnectionServer.ConnectionServer;
 import Entity.EntityRegistryServer;
 import Entity.Tile;
 import Packet.Position.ClearEntityReturn;
-import Packet.Position.AddStationaryEntityReturn;
-import Packet.Position.NewEntityState;
+import Packet.AddEntityReturn.AddStationaryEntityReturn;
+import Packet.EntityState.NewEntityState;
+import Packet.Camera.ScrollingEnableReturn;
+import Position.Pos;
 import StartUpServer.AppServer;
 import System.PhysicsSystem;
 import World.World;
 import System.*;
 import Entity.*;
-import Component.RoleComp.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +27,14 @@ public class GameState extends State {
     protected World world;
 
     public GameState() {
-        super();
+        super(false);
     }
 
     @Override
     protected void startSystems() {
         this.addSystem(new PhysicsSystem());
         this.addSystem(new TextureSystem());
+        this.addSystem(new TaskSystem());
     }
 
     @Override
@@ -42,6 +44,14 @@ public class GameState extends State {
         createWord();
         sendWorldDataToAllPlayers();
         selectImpostor();
+        enableClientScreenScrolling();
+    }
+
+    private void enableClientScreenScrolling(){
+        for (Client client: AppServer.currentGame.getClients()){
+            Pos pos = client.getPlayer().getComponent(PosComp.class).getPos();
+            ConnectionServer.sendTCP(new ScrollingEnableReturn(pos), client.getConnectionID());
+        }
     }
 
     private void selectImpostor() {
@@ -101,7 +111,7 @@ public class GameState extends State {
     private List<NewEntityState> createEntityStatesFromTiles() {
         List<NewEntityState> newEntities = new ArrayList<>();
         for (Tile tile : world.getTiles()) {
-            newEntities.add(tile.adaptToNewEntityState());
+            newEntities.add(tile.adaptToNewAnimatedEntityState());
         }
         return newEntities;
     }

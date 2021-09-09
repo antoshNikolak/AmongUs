@@ -1,12 +1,13 @@
-package PlayerDistance;
+package DistanceFinder;
 
 import Entity.Entity;
 
-public class EntityDistance <T> implements Comparable<EntityDistance>{
-    private T entity1, entity2;
-    private double distance;
+public final class EntityDistance<T extends Entity, S extends Entity>  implements Comparable<EntityDistance<T, S>>{
+    private final T entity1;
+    private final S entity2;
+    private final double distance;
 
-    public EntityDistance(T entity, T entity2, double distance) {
+    public EntityDistance(T entity, S entity2, double distance) {
         this.entity1 = entity;
         this.entity2 = entity2;
         this.distance = distance;
@@ -19,6 +20,10 @@ public class EntityDistance <T> implements Comparable<EntityDistance>{
 
     public T getEntity() {
         return entity1;
+    }
+
+    public S getEntity2() {
+        return entity2;
     }
 
     public double getDistance() {

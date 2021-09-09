@@ -2,13 +2,16 @@ package Entity;
 
 import Utils.CollectionUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class EntityRegistryServer {
     //    private static final Map<Integer, Entity> entityIDMap = new HashMap<>();
-    private static final Map<Integer, Entity> entityIDMap = new HashMap<>();
+    private static final Map<Integer, Entity> entityIDMap = new ConcurrentHashMap<>();
 
 
 //    public static void addEntity(int id, Entity entity) {

@@ -4,15 +4,13 @@ import Client.Client;
 import ConnectionServer.ConnectionServer;
 import DataBase.DataBaseUtil;
 import Packet.Registration.RegistrationConfirmation;
-import StartUpServer.AppServer;
-import State.LobbyState;
 import UserData.UserData;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import ConnectionServer.ClientOperator;
+import Client.ClientOperator;
 
 public final class AuthorizationServer implements ClientOperator {
 

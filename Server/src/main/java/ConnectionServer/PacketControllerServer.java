@@ -10,6 +10,7 @@ import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
 import System.PhysicsSystem;
 import System.ImposterActionsSystem;
+import System.*;
 
 import java.util.Optional;
 
@@ -37,6 +38,7 @@ public class PacketControllerServer {
         optionalClient.ifPresent(client-> {
             PhysicsSystem.processPlayerMove(optionalClient.get().getPlayer(), packet);
             ImposterActionsSystem.handleSpecialActions(optionalClient.get().getPlayer(), packet);
+            TaskSystem.handleTaskAction(optionalClient.get().getPlayer(), packet);
         });
 
 //        PhysicsSystem.updatePlayerPosition(packet, connectionId);

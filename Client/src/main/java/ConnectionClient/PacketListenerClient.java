@@ -1,5 +1,7 @@
 package ConnectionClient;
 
+import Packet.AddEntityReturn.*;
+import Packet.Camera.ScrollingEnableReturn;
 import Packet.GameStart.StartGameReturn;
 import Packet.Position.*;
 import Packet.Registration.RegistrationConfirmation;
@@ -27,6 +29,10 @@ public class PacketListenerClient extends Listener {
             packetController.handleRegistrationConfirmation((RegistrationConfirmation)object);
         }else if (object instanceof StartGameReturn){
             packetController.handleStartGameReturn((StartGameReturn)object);
+        }else if(object instanceof AddLineReturn){
+            packetController.handleAddLineReturn((AddLineReturn) object);
+        }else if (object instanceof AddNestedPane){
+            packetController.handleAddNestedPane();
         }else if (object instanceof AddLocalEntityReturn){
             packetController.handleAddLocalEntityReturn((AddLocalEntityReturn)object);
         }else if (object instanceof AddChangingEntityReturn){
@@ -39,9 +45,10 @@ public class PacketListenerClient extends Listener {
             packetController.handleGameStartTimerReturn((GameStartTimer)object);
         }else if (object instanceof KillCoolDownTimer){
             packetController.handleKillCoolDownTimer((KillCoolDownTimer) object);
-        }
-            else if (object instanceof ClearEntityReturn){
+        } else if (object instanceof ClearEntityReturn){
             packetController.handleClearEntityReturn((ClearEntityReturn) object);
+        }else if (object instanceof ScrollingEnableReturn){
+            packetController.handleScrollingEnableReturn((ScrollingEnableReturn)object);
         }
     }
 

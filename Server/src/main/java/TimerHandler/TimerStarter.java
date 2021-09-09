@@ -1,8 +1,6 @@
 package TimerHandler;
 
 import ConnectionServer.ConnectionServer;
-import Entity.GameClientHandler;
-import StartUpServer.AppServer;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,7 +13,7 @@ public class TimerStarter {
             @Override
             public void run() {
                 int counter = atomicCounter.decrementAndGet();
-                ConnectionServer.sendTCPToAllPlayers(TimerFactory.getTimerPacket(timerString, counter));
+                ConnectionServer.sendTCPToAllPlayers(TimerFactory.createTimerPacket(timerString, counter));
                 if (counter == 0){
                     onTimerFinished.execute();
                     cancel();
@@ -30,7 +28,7 @@ public class TimerStarter {
             @Override
             public void run() {
                 int counter = atomicCounter.decrementAndGet();
-                ConnectionServer.sendTCPTo(TimerFactory.getTimerPacket(timerString, counter), new ArrayList<>(Arrays.asList(connectionIDs)));
+                ConnectionServer.sendTCPTo(TimerFactory.createTimerPacket(timerString, counter), new ArrayList<>(Arrays.asList(connectionIDs)));
                 if (counter == 0){
                     onTimerFinished.execute();
                     cancel();

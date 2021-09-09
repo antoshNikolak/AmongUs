@@ -18,7 +18,7 @@ public class Client {
         prepareGame();
         client.createPlayer();
         addClientToLobby(client);
-        if (AppServer.currentGame.getClients().size() == 3) {
+        if (AppServer.currentGame.getClients().size() == 2) {
             TimerStarter.startTimer("GameStartTimer", 5, () -> startGameState());
         }
     }
@@ -29,9 +29,12 @@ public class Client {
     }
 
     private static void addClientToLobby(Client client) {
-        if (!(AppServer.currentGame.getStateManager().getCurrentState() instanceof LobbyState))
-            throw new IllegalStateException();
-        ((LobbyState) AppServer.currentGame.getStateManager().getCurrentState()).handleNewPlayerJoin(client);
+//        LobbyState.handleNewPlayerJoin();
+//        if (!(AppServer.currentGame.getStateManager().getCurrentState() instanceof LobbyState))
+//            throw new IllegalStateException();
+
+        AppServer.currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
+//        ((LobbyState) AppServer.currentGame.getStateManager().getCurrentState()).handleNewPlayerJoin(client);
     }
 
     private static void prepareGame() {
@@ -41,7 +44,7 @@ public class Client {
         }
     }
 
-    public void createPlayer(){
+    public void createPlayer() {
         this.player = new Player(PlayerColourFactory.getRandomColour(), connectionID);
     }
 

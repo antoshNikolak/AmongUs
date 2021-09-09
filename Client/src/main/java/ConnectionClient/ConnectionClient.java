@@ -2,6 +2,12 @@ package ConnectionClient;
 
 import Animation.AnimState;
 import Packet.*;
+import Packet.AddEntityReturn.*;
+import Packet.Camera.ScrollingEnableReturn;
+import Packet.EntityState.ExistingEntityState;
+import Packet.EntityState.NewAnimatedEntityState;
+import Packet.EntityState.NewEntityState;
+import Packet.EntityState.NewLineState;
 import Packet.GameStart.StartGameRequest;
 import Packet.GameStart.StartGameReturn;
 import Packet.Position.*;
@@ -22,7 +28,7 @@ import java.util.HashSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class ConnectionClient {
-    private final static Client client = new Client();
+    private final static Client client = new Client(1000000, 1000000);
 
     public static void sendTCP(Packet packet) {
         client.sendTCP(packet);
@@ -41,7 +47,8 @@ public final class ConnectionClient {
     private static void startConnection() {
         try {
             client.start();
-            client.connect(5000, "192.168.1.73", 49159, 65528);
+            client.connect(5000, "localhost", 49158, 65529);
+//            client.connect(5000, "192.168.1.73", 49158, 65529);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,7 +66,7 @@ public final class ConnectionClient {
         kryo.register(PosRequest.class);
         kryo.register(Pos.class);
         kryo.register(AddStationaryEntityReturn.class);
-        kryo.register(EntityState.class);
+        kryo.register(ExistingEntityState.class);
         kryo.register(ArrayList.class);
         kryo.register(AddLocalEntityReturn.class);
         kryo.register(AddChangingEntityReturn.class);
@@ -74,5 +81,11 @@ public final class ConnectionClient {
         kryo.register(ClearEntityReturn.class);
         kryo.register(GameStartTimer.class);
         kryo.register(KillCoolDownTimer.class);
+        kryo.register(ScrollingEnableReturn.class);
+        kryo.register(NewAnimatedEntityState.class);
+        kryo.register(AddLineReturn.class);
+        kryo.register(NewLineState.class);
+        kryo.register(AddNestedPane.class);
+
     }
 }

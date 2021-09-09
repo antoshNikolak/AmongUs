@@ -1,31 +1,33 @@
-package Packet.Position;
+package Packet.EntityState;
 
 import Animation.AnimState;
-import Animation.NewAnimationReturn;
-import Packet.Packet;
 import Position.Pos;
 
-public  class EntityState{
-    private int registrationID;
+public class ExistingEntityState extends EntityState {
+    //    private int registrationID;
     private Pos pos;
+
+    //create add new line
 
     private AnimState animState;
     private Integer animationIndex;
 
-    public EntityState(int registrationID, Pos pos, AnimState animState, Integer animationIndex) {
-        this.registrationID = registrationID;
+    public ExistingEntityState(int registrationID, Pos pos, AnimState animState, Integer animationIndex) {
+        super(registrationID);
         this.pos = pos;
         this.animState = animState;
         this.animationIndex = animationIndex;
     }
 
-    public EntityState(int registrationID, Pos pos) {
-        this.registrationID = registrationID;
+    public ExistingEntityState(int registrationID, Pos pos) {
+        super(registrationID);
         this.pos = pos;
     }
 
 
-    public EntityState() {}
+    private ExistingEntityState() {
+        super();
+    }
 
     public int getRegistrationID() {
         return registrationID;

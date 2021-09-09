@@ -1,5 +1,6 @@
 package Game;
 
+import Camera.Camera;
 import EntityClient.ChangingEntity;
 import EntityClient.Entity;
 import EntityClient.LocalPlayer;
@@ -19,6 +20,8 @@ public class Game {
     private final List<Entity> entities = new CopyOnWriteArrayList<>();
     private final List<ChangingEntity> changingEntities = new CopyOnWriteArrayList<>();
     private LocalPlayer myPlayer;
+
+    private final Camera camera = new Camera();
 
     public Game() {
     }
@@ -82,6 +85,10 @@ public class Game {
 
     public List<ChangingEntity> getChangingEntities() {
         return changingEntities;
+    }
+
+    public Camera getCamera() {
+        return camera;
     }
 
 
