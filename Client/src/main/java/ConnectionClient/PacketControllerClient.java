@@ -2,10 +2,7 @@ package ConnectionClient;
 
 import EntityClient.*;
 import Game.Game;
-import Packet.AddEntityReturn.AddChangingEntityReturn;
-import Packet.AddEntityReturn.AddLineReturn;
-import Packet.AddEntityReturn.AddLocalEntityReturn;
-import Packet.AddEntityReturn.AddStationaryEntityReturn;
+import Packet.AddEntityReturn.*;
 import Packet.Camera.ScrollingEnableReturn;
 import Packet.EntityState.*;
 import Packet.GameStart.StartGameReturn;
@@ -13,11 +10,13 @@ import Packet.Position.*;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Timer.GameStartTimer;
 import Packet.Timer.KillCoolDownTimer;
+import Screen.GameScreen;
 import Screen.MenuScreen;
 import Screen.ScreenManager;
 import StartUp.AppClient;
 import javafx.application.Platform;
 import ScreenCounter.*;
+import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 
 public class PacketControllerClient {
@@ -60,10 +59,10 @@ public class PacketControllerClient {
         }
     }
 
-    public void handleAddLineReturn(AddLineReturn packet){
-        for (NewLineState newLineState: packet.getNewEntityStates()){
+    public void handleAddLineReturn(AddLineReturn packet) {
+        for (NewLineState newLineState : packet.getNewEntityStates()) {
             System.out.println("creating a line");
-            Platform.runLater(()->{
+            Platform.runLater(() -> {
                 Line line = new Line(newLineState.getStartPos().getX(), newLineState.getStartPos().getY(), newLineState.getFinalPos().getX(), newLineState.getFinalPos().getY());
                 ScreenManager.getCurrentScreen().getPane().getChildren().add(line);
             });
@@ -101,7 +100,7 @@ public class PacketControllerClient {
         for (int tileID : packet.getRegistrationIDs()) {
             Entity entity = EntityRegistryClient.getEntity(tileID);
             EntityRegistryClient.removeEntity(tileID);
-            AppClient.currentGame.getEntities().remove(entity);
+            ScreenManager.getScreen(GameScreen.class).getEntities().remove(entity);
             if (entity instanceof ChangingEntity) AppClient.currentGame.getChangingEntities().remove(entity);
         }
     }
@@ -110,8 +109,36 @@ public class PacketControllerClient {
         AppClient.currentGame.getMyPlayer().setScrollingEnabled(packet.isScrollingEnabled());
     }
 
-    public void handleAddNestedPane() {
+    public void handleAddNestedPane(AddNestedPane packet) {
+        Pane pane = new Pane();
+        int paneX = packet.getPaneX();
+        int paneY = packet.getPaneY();
+        int paneWidth = packet.getPaneWidth();
+        int paneHeight = packet.getPaneHeight();
 
+        pane.setLayoutX(paneX);
+        pane.setLayoutY(paneY);
+        pane.setPrefWidth(paneWidth);
+        pane.setPrefHeight(paneHeight);
+
+        GameScreen gameScreen = new GameScreen(pane);
+        gameScreen.setClearBoundaries(paneX, paneY, paneX+ paneWidth, paneY + paneWidth);
+        System.out.println("adding nested screen");
+
+        for (NewEntityState newEntityState : packet.getNewEntityStates()) {
+            if (newEntityState instanceof NewAnimatedEntityState) {
+                gameScreen.getEntities().add(new Entity((NewAnimatedEntityState) newEntityState));
+            } else if (newEntityState instanceof NewLineState) {
+                NewLineState lineState = (NewLineState) newEntityState;
+                Line line = new Line(lineState.getStartPos().getX(), lineState.getStartPos().getY(), lineState.getFinalPos().getX(), lineState.getFinalPos().getY());
+                line.setStrokeWidth(lineState.getWidth());
+                gameScreen.getPane().getChildren().add(line);
+            }
+        }
+
+        Platform.runLater(() -> ScreenManager.getScreen(GameScreen.class).setNestedScreen(gameScreen));
+
+//        ScreenManager.getCurrentScreen().addNode(new Pane();
 
     }
 }

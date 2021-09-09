@@ -5,6 +5,7 @@ import Packet.EntityState.NewAnimatedEntityState;
 import Packet.EntityState.NewEntityState;
 import Packet.EntityState.NewLineState;
 import Position.Pos;
+import Screen.GameScreen;
 import Screen.ScreenManager;
 import Screen.TextureManager;
 import StartUp.AppClient;
@@ -23,7 +24,7 @@ public class Entity {
         }
         this.animationManager = new AnimationManager(newEntityState);
         this.pos = newEntityState.getPos();
-        AppClient.currentGame.getEntities().add(this);
+        ScreenManager.getScreen(GameScreen.class).getEntities().add(this);
     }
 
 //    public Entity(NewLineState newLineState) {//todo sulution does quite fit into the rest of the code

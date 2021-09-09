@@ -32,7 +32,7 @@ public class PacketListenerClient extends Listener {
         }else if(object instanceof AddLineReturn){
             packetController.handleAddLineReturn((AddLineReturn) object);
         }else if (object instanceof AddNestedPane){
-            packetController.handleAddNestedPane();
+            packetController.handleAddNestedPane((AddNestedPane)object);
         }else if (object instanceof AddLocalEntityReturn){
             packetController.handleAddLocalEntityReturn((AddLocalEntityReturn)object);
         }else if (object instanceof AddChangingEntityReturn){

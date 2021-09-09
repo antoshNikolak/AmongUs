@@ -10,13 +10,13 @@ public class EntryScreenController {
 
     public void login(){
         ScreenManager.activate(LoginScreen.class);
-        Button button = (Button) ScreenManager.getNode(LoginScreen.class, "proceed");
+        Button button = (Button) ScreenManager.getScreen(LoginScreen.class).getNode("proceed");
         button.setOnAction(e -> AuthorizationClient.login());
     }
 
     public void signup() {
         ScreenManager.activate(LoginScreen.class);
-        Button button = (Button) ScreenManager.getNode(LoginScreen.class, "proceed");
+        Button button = (Button) ScreenManager.getScreen(LoginScreen.class).getNode("proceed");
         button.setOnAction(e -> AuthorizationClient.signup());
     }
 }

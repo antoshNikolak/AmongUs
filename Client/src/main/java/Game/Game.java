@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Game {
-    private final List<Entity> entities = new CopyOnWriteArrayList<>();
+//    private final List<Entity> entities = new CopyOnWriteArrayList<>();
     private final List<ChangingEntity> changingEntities = new CopyOnWriteArrayList<>();
     private LocalPlayer myPlayer;
 
@@ -37,7 +37,9 @@ public class Game {
     }
 
     private GraphicsContext getGraphicsContext() {
-        Canvas canvas = (Canvas) ScreenManager.getNode(GameScreen.class, "canvas");
+//        Canvas canvas = (Canvas) ScreenManager.getNode(GameScreen.class, "canvas");
+        Canvas canvas = (Canvas) ScreenManager.getScreen(GameScreen.class).getNode("canvas");
+
         return canvas.getGraphicsContext2D();
     }
 
@@ -60,10 +62,11 @@ public class Game {
     }
 
     private void render(GraphicsContext gc) {
-        gc.clearRect(0, 0, 600, 400);
-        for (Entity entity : entities) {
-            entity.render(gc);
-        }
+//        gc.clearRect(0, 0, 600, 400);
+        ScreenManager.getScreen(GameScreen.class).render(gc);
+//        for (Entity entity : entities) {
+//            entity.render(gc);
+//        }
     }
 
     public void handleLocalPlayer(LocalPlayer localPlayer) {
@@ -71,9 +74,9 @@ public class Game {
         start();
     }
 
-    public List<Entity> getEntities() {
-        return entities;
-    }
+//    public List<Entity> getEntities() {
+//        return entities;
+//    }
 
     public LocalPlayer getMyPlayer() {
         return myPlayer;

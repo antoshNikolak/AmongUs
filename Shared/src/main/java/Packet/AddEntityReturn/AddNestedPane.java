@@ -9,29 +9,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AddNestedPane extends AddEntityReturn {
-    private Pos panePos;
-    private double paneWidth, paneHeight;
+
+    private int paneWidth, paneHeight ,paneX, paneY;
 
     public AddNestedPane() {
     }
 
-    public AddNestedPane(List<? extends NewEntityState> newEntityStates, Pos panePos, double paneWidth, double paneHeight) {
+    public AddNestedPane(List<? extends NewEntityState> newEntityStates, int paneX, int paneY, int paneWidth, int paneHeight) {
         super(newEntityStates);
-        this.panePos = panePos;
+        this.paneX = paneX;
+        this.paneY = paneY;
         this.paneWidth = paneWidth;
         this.paneHeight = paneHeight;
     }
 
-    public Pos getPanePos() {
-        return panePos;
-    }
-
-    public double getPaneWidth() {
+    public int getPaneWidth() {
         return paneWidth;
     }
 
-    public double getPaneHeight() {
+    public int getPaneHeight() {
         return paneHeight;
+    }
+
+    public int getPaneX() {
+        return paneX;
+    }
+
+    public int getPaneY() {
+        return paneY;
     }
 
     //    public AddNestedPane(NewEntityState... entityStates) {

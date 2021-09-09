@@ -21,9 +21,9 @@ public class AuthorizationClient {
     }
 
     private static UserData retrieveUserData(){
-        TextField textFieldUserName = (TextField) ScreenManager.getNode(LoginScreen.class, "userName");
+        TextField textFieldUserName = (TextField) ScreenManager.getScreen(LoginScreen.class).getNode("userName");
         String userName = textFieldUserName.getText();
-        TextField textFieldPassword = (TextField) ScreenManager.getNode(LoginScreen.class, "password");
+        TextField textFieldPassword = (TextField) ScreenManager.getScreen(LoginScreen.class).getNode("password");
         String password = textFieldPassword.getText();
         return new UserData(userName, password);
     }

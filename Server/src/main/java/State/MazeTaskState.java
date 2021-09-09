@@ -23,7 +23,7 @@ public class MazeTaskState extends TaskState{
     }
 
     private void sendClientMazeLines(){
-        ConnectionServer.sendTCP(new AddNestedPane(maze.createLineState(), new Pos( 50, 50), 300, 300), player.getConnectionID());
+        ConnectionServer.sendTCP(new AddNestedPane(maze.createLineState(), 50, 50, 300, 300), player.getConnectionID());
     }
 
     @Override

@@ -5,7 +5,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 
 public abstract class Screen {
-    private Pane pane;
+    protected Pane pane;
 
     public void addNode(Node node){
         this.pane.getChildren().add(node);
@@ -22,5 +22,9 @@ public abstract class Screen {
     public void removeNode(Node item) {
         System.out.println("removing item: " + ((Text)item).getText());
         this.pane.getChildren().remove(item);
+    }
+
+    public  Node getNode( String node) {
+        return pane.lookup("#" + node);
     }
 }
