@@ -11,9 +11,11 @@ import java.util.stream.Collectors;
 public class SquareGraph {
 
     private final int width;
+    private final int height;
 
-    public SquareGraph(int width) {
+    public SquareGraph(int width, int height) {
         this.width = width;
+        this.height = height;
     }
 
     private final List<Edge> edges = new ArrayList<>();
@@ -131,7 +133,7 @@ public class SquareGraph {
         if (currentVertex >width) {
             connectToUpperVertex(vertex2, width);
         }
-        if (currentVertex == width * width) {
+        if (currentVertex == width * height) {
             return;
         }
         addVertexToGraph(vertex2, currentVertex + 1);
@@ -173,7 +175,7 @@ public class SquareGraph {
 
     public List<NewLineState> createLinesStates(Cell[][] cells){
         List<NewLineState> lines = new ArrayList<>();
-        for (int y = 0; y < width; y++) {
+        for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Cell cell = cells[y][x];
                 int cellX = x*50;
@@ -200,10 +202,10 @@ public class SquareGraph {
 
     }
 
-    public Vertex[][] create2DArray(){
-        Vertex [][] vertices = new Vertex[width][width];
+    public Vertex[][] create2DArray(){//todo sort problem here
+        Vertex [][] vertices = new Vertex[height][width];
         int counter = 0;
-        for (int i = 0; i < width; i++) {
+        for (int i = 0; i < height; i++) {
             for (int j = 0; j <width ; j++) {//horizontal
                 Vertex vertex = this.vertices.get(counter);
                 vertices[i][j] = vertex;

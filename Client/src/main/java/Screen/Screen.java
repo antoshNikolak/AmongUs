@@ -20,7 +20,6 @@ public abstract class Screen {
     }
 
     public void removeNode(Node item) {
-        System.out.println("removing item: " + ((Text)item).getText());
         this.pane.getChildren().remove(item);
     }
 

@@ -27,6 +27,10 @@ public class Player extends Entity {
         startComps(posComp, colour);
     }
 
+
+
+
+
     private AnimationComp configAnimation(){
         AnimationComp animationComp = new AnimationComp();
         String colour = getComponent(ColourComp.class).getColour();

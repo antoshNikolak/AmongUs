@@ -21,9 +21,11 @@ public class Game {
     private final List<ChangingEntity> changingEntities = new CopyOnWriteArrayList<>();
     private LocalPlayer myPlayer;
 
-    private final Camera camera = new Camera();
+//    private final Camera camera = new Camera();
 
     public Game() {
+        ScreenManager.getScreen(GameScreen.class).setCamera(new Camera());
+
     }
 
     private void init() {
@@ -32,24 +34,24 @@ public class Game {
 
     public void start() {
         init();
-        GraphicsContext gc = getGraphicsContext();
-        startTimer(gc);
+//        GraphicsContext gc = getGraphicsContext();
+        startTimer();
     }
 
-    private GraphicsContext getGraphicsContext() {
-//        Canvas canvas = (Canvas) ScreenManager.getNode(GameScreen.class, "canvas");
-        Canvas canvas = (Canvas) ScreenManager.getScreen(GameScreen.class).getNode("canvas");
+//    private GraphicsContext getGraphicsContext() {
+////        Canvas canvas = (Canvas) ScreenManager.getNode(GameScreen.class, "canvas");
+//        Canvas canvas = (Canvas) ScreenManager.getScreen(GameScreen.class).getNode("canvas");
+//
+//        return canvas.getGraphicsContext2D();
+//    }
 
-        return canvas.getGraphicsContext2D();
-    }
-
-    public void startTimer(GraphicsContext gc) {
+    public void startTimer() {
         new AnimationTimer() {
             @Override
             public void handle(long now) {
                 myPlayer.sendInput();
                 interpolate();
-                render(gc);
+                render();
             }
         }.start();
     }
@@ -61,15 +63,16 @@ public class Game {
         }
     }
 
-    private void render(GraphicsContext gc) {
+    private void render() {
 //        gc.clearRect(0, 0, 600, 400);
-        ScreenManager.getScreen(GameScreen.class).render(gc);
+        ScreenManager.getScreen(GameScreen.class).render();
 //        for (Entity entity : entities) {
 //            entity.render(gc);
 //        }
     }
 
     public void handleLocalPlayer(LocalPlayer localPlayer) {
+        ScreenManager.getScreen(GameScreen.class).getEntities().add(localPlayer);
         this.myPlayer = localPlayer;
         start();
     }
@@ -90,9 +93,9 @@ public class Game {
         return changingEntities;
     }
 
-    public Camera getCamera() {
-        return camera;
-    }
+//    public Camera getCamera() {
+//        return camera;
+//    }
 
 
 }

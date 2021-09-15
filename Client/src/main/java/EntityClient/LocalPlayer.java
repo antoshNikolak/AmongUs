@@ -1,10 +1,13 @@
 package EntityClient;
 
+import Camera.Camera;
 import ConnectionClient.ConnectionClient;
 import KeyManager.KeyManager;
 import Packet.EntityState.NewAnimatedEntityState;
 import Packet.EntityState.NewEntityState;
 import Packet.Position.PosRequest;
+import Screen.GameScreen;
+import Screen.ScreenManager;
 import StartUp.AppClient;
 import javafx.scene.canvas.GraphicsContext;
 
@@ -74,10 +77,22 @@ public class LocalPlayer extends ChangingEntity {
                 request.isUp() || request.isRight();
     }
 
+//    @Override
+//    public void render(GraphicsContext gc) {
+//        if (scrollingEnabled) {
+//            System.out.println("scrolling");
+//            ScreenManager.getScreen(GameScreen.class).getCamera().centreOnEntity(this);
+//        }
+//        super.render(gc);
+//    }
+
     @Override
-    public void render(GraphicsContext gc) {
-        if (scrollingEnabled) AppClient.currentGame.getCamera().centreOnEntity(this);
-        super.render(gc);
+    public void render(GraphicsContext gc, Camera camera) {
+        if (scrollingEnabled) {
+            System.out.println("scrolling");
+            ScreenManager.getScreen(GameScreen.class).getCamera().centreOnEntity(this);
+        }
+        super.render(gc, camera);
     }
 
     public void setScrollingEnabled(boolean scrollingEnabled) {

@@ -24,25 +24,24 @@ public class Entity {
         }
         this.animationManager = new AnimationManager(newEntityState);
         this.pos = newEntityState.getPos();
-        ScreenManager.getScreen(GameScreen.class).getEntities().add(this);
     }
 
-//    public Entity(NewLineState newLineState) {//todo sulution does quite fit into the rest of the code
-//        System.out.println("adding new line");
-//        AppClient.currentGame.getEntities().add(this);
-//        Line line = new Line(newLineState.getStartPos().getX(), newLineState.getStartPos().getY(), newLineState.getFinalPos().getX(), newLineState.getFinalPos().getY());
-//        ScreenManager.getCurrentScreen().getPane().getChildren().add(line);
-//    }
-
-
-
-    public void render(GraphicsContext gc) {
-        Camera camera = AppClient.currentGame.getCamera();
+    public void render(GraphicsContext gc, Camera camera) {
+//        Camera camera = AppClient.currentGame.getCamera();
         Image image = TextureManager.getTexture(animationManager.getCurrentFrame());
         gc.drawImage(image, pos.getX() - camera.getOffsetX(), pos.getY() - camera.getOffsetY());
     }
 
+    public void render(GraphicsContext gc) {
+//        Camera camera = AppClient.currentGame.getCamera();
+        Image image = TextureManager.getTexture(animationManager.getCurrentFrame());
+        gc.drawImage(image, pos.getX(), pos.getY());
+    }
+
+
+
     public Pos getPos() {
         return pos;
     }
+
 }

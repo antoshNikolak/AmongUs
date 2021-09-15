@@ -28,7 +28,7 @@ public class TaskSystem extends BaseSystem {
     }
 
     public static void handleTaskAction(Player player, PosRequest posRequest) {
-        if (posRequest.isTaskKey() && !player.hasComponent(ImposterComp.class)) {
+        if (posRequest.isTaskKey() && !player.hasComponent(ImposterComp.class) && player.getCurrentTask() == null) {
             Optional<Tile> closestTaskTile = getClosestTaskTile(player);
             closestTaskTile.ifPresent(tile ->{
                 player.setCurrentTask(tile.getComponent(TaskComp.class).getTaskState());

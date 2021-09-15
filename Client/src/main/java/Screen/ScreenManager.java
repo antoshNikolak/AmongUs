@@ -17,6 +17,13 @@ public final class ScreenManager {
     static {
         List<Class<? extends Screen>> screens = getScreenClassObjects();
         loadScreens(screens);
+//        String[] paneNames = new String[]{"EntryScreen", "LoginScreen", "MenuScreen", "GameScreen"};
+//        for (String paneName: paneNames){
+//            Pane pane = createPane(paneName);
+//            addScreen(new E);
+//
+//        }
+
     }
 
     private static List<Class<? extends Screen>> getScreenClassObjects() {
@@ -37,9 +44,25 @@ public final class ScreenManager {
     private static void loadScreen(Class<? extends Screen> screenClass) throws IOException {
         Pane pane = new FXMLLoader().load(Thread.currentThread().getContextClassLoader().
                 getResourceAsStream("Screen/" + screenClass.getSimpleName() + ".fxml"));
+
+//        pane.setMinWidth(600);
+//        pane.setMinHeight(400);
+
         Screen screen = createInstanceFromClass(screenClass, pane);
         addScreen(screen);
     }
+
+//    private static Pane createPane(String paneName){
+//        try {
+//            return new FXMLLoader().load(Thread.currentThread().getContextClassLoader().
+//                    getResourceAsStream("Screen/" + paneName + ".fxml"));
+//        } catch (IOException e) {
+//            System.out.println("error loading screen: "+ paneName);
+//            e.printStackTrace();
+//            return null;
+//        }
+//
+//    }
 
     private static Screen createInstanceFromClass(Class<? extends Screen> screenClass, Pane pane) {
         try {

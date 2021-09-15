@@ -9,7 +9,9 @@ import java.util.Set;
 
 public class Maze {
 
-    private final int width = 10;
+    private final int width = 8;
+    private final int height= 5;
+
     private final Cell[][] cells;
     private SquareGraph graph;
 
@@ -18,18 +20,14 @@ public class Maze {
     }
 
     public void start() {
-        graph = new SquareGraph(width);
+        graph = new SquareGraph(width, height);
         graph.init();
         Set<Edge> minimalSpanningTree = graph.createSpanningTree();
         createConnectionsBetweenCells(graph, minimalSpanningTree);
-        createStartFinish();
-
-//        Canvas canvas = new Canvas(Main.pane.getWidth(), Main.pane.getHeight());
-//        Main.pane.getChildren().add(canvas);
-//        graph.createLinesStates(cells);
+//        createStartFinish();
     }
 
-    public List<NewLineState> createLineState(){
+    public List<NewLineState> createLineState() {
         return graph.createLinesStates(cells);
     }
 
@@ -66,22 +64,15 @@ public class Maze {
     }
 
     private void createConnectionsBetweenCells(SquareGraph graph, Set<Edge> MSM) {
-        //for each edge look at its connection and the 2 vertex (use the position of the vertex in the array)
-        //get the cells corresponding to those 2 vertex
-        //remove the wall between them
-        //OR
-        //asign a vertex to each cell
-
         Vertex[][] vertices = graph.create2DArray();
-
 
         for (Edge edge : MSM) {
             Pos arrayPos1 = getPosInArray(vertices, edge.getVertex1());
             Pos arrayPos2 = getPosInArray(vertices, edge.getVertex2());//or we could base this on their s co ordinate
             assert arrayPos1 != null && arrayPos2 != null;
 
-            Cell cell1 = cells[(int)arrayPos1.getY()][(int)arrayPos1.getX()];
-            Cell cell2 = cells[(int)arrayPos2.getY()][(int)arrayPos2.getX()];
+            Cell cell1 = cells[(int) arrayPos1.getY()][(int) arrayPos1.getX()];
+            Cell cell2 = cells[(int) arrayPos2.getY()][(int) arrayPos2.getX()];
 
             if (arrayPos1.getX() < arrayPos2.getX()) {
                 cell1.setRightWall(false);
@@ -103,8 +94,8 @@ public class Maze {
     }
 
     private <T> Pos getPosInArray(T[][] vertices, T vertex) {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < width; y++) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 if (vertices[y][x] == vertex) {
                     return new Pos(x, y);
                 }
@@ -114,12 +105,10 @@ public class Maze {
     }
 
     private Cell[][] initializeCells() {
-        System.out.println("initializing cell");
-        Cell[][] cells = new Cell[width][width];
-        for (int i = 0; i < width; i++) {
+        Cell[][] cells = new Cell[height][width];
+        for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                System.out.println("here");
-                cells[j][i] = new Cell();
+                cells[i][j] = new Cell();
             }
         }
         return cells;
