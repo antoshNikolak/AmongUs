@@ -29,7 +29,7 @@ public class ImposterActionsSystem extends BaseSystem {
     public void update() {
     }
 
-    public static void handleSpecialActions(Player player, PosRequest packet) {
+    public void handleSpecialActions(Player player, PosRequest packet) {
         if (packet.isKillKey() && player.hasComponent(ImposterComp.class)) {
             if (player.getComponent(ImposterComp.class).isAbleToKill()) {
                 handleKillAction(player);
@@ -37,7 +37,7 @@ public class ImposterActionsSystem extends BaseSystem {
         }
     }
 
-    private static void handleKillAction(Player imposter) {
+    private void handleKillAction(Player imposter) {
         Optional<Player> crewMateOptional = getClosestCrewMate(imposter);
         crewMateOptional.ifPresent(crewMate -> {
             killCrewMate(crewMate);
@@ -45,21 +45,27 @@ public class ImposterActionsSystem extends BaseSystem {
         });
     }
 
-    private static void killCrewMate(Player crewMate) {
+    private void killCrewMate(Player crewMate) {
+        stopCrewMateTask(crewMate);
         setGhostAttributes(crewMate);
         sendDeadBodyToClients(crewMate);
         raiseGhost(crewMate);
         updateGhostForClients(crewMate);
-
     }
 
-    private static void startKillImposterCoolDown(Player imposter) {
+    private void stopCrewMateTask(Player crewMate){
+        ConnectionServer.sendTCP(new RemoveNestedScreen(), crewMate.getConnectionID());
+        crewMate.getCurrentTask().setPlayer(null);
+        crewMate.setCurrentTask(null);
+    }
+
+    private void startKillImposterCoolDown(Player imposter) {
         ImposterComp imposterComp = imposter.getComponent(ImposterComp.class);
         imposterComp.setAbleToKill(false);
         TimerStarter.startTimer("KillCoolDownTimer", 5, () -> imposterComp.setAbleToKill(true), imposter.getConnectionID());
     }
 
-    private static void setGhostAttributes(Player crewMate) {
+    private void setGhostAttributes(Player crewMate) {
         crewMate.getComponent(AliveComp.class).setAlive(false);
         crewMate.getComponent(AnimationComp.class).setCurrentAnimation(AnimState.GHOST_RIGHT);
         crewMate.removeComponent(HitBoxComp.class);
@@ -67,19 +73,19 @@ public class ImposterActionsSystem extends BaseSystem {
 
     }
 
-    private static void updateGhostForClients(Player ghost) {
+    private void updateGhostForClients(Player ghost) {
         clearGhostsForAlivePlayers(ghost);
         sendNewGhostExistingGhosts(ghost);
         AppServer.currentGame.getEntityReturnBuffer().putEntity(ghost, getGhostConnectionIDs());
     }
 
-    private static void clearGhostsForAlivePlayers(Player ghost){
+    private void clearGhostsForAlivePlayers(Player ghost) {
         for (Integer connectionID : getAliveConnectionIDs()) {
             ConnectionServer.sendTCP(new ClearEntityReturn(EntityRegistryServer.getEntityID(ghost)), connectionID);
         }
     }
 
-    private static void sendNewGhostExistingGhosts(Player ghost) {
+    private void sendNewGhostExistingGhosts(Player ghost) {
         int connectionID = ConnectionServer.getConnectionIDFromPlayer(ghost);
         List<Player> otherGhosts = getGhostPlayers();
         otherGhosts.remove(ghost);
@@ -88,31 +94,31 @@ public class ImposterActionsSystem extends BaseSystem {
     }
 
 
-    private static void raiseGhost(Player ghost) {
+    private void raiseGhost(Player ghost) {
         PosComp posComp = ghost.getComponent(PosComp.class);
         posComp.getPos().incrementY(-30);
     }
 
 
-    private static void sendDeadBodyToClients(Player crewMate) {
+    private void sendDeadBodyToClients(Player crewMate) {
         ColourComp colourComp = crewMate.getComponent(ColourComp.class);
         PosComp posComp = crewMate.getComponent(PosComp.class);
         ConnectionServer.sendTCPToAllPlayers(new AddChangingEntityReturn(new DeadPlayer(colourComp.getColour(), posComp).adaptToNewAnimatedEntityState()));
     }
 
-    private static Optional<Player> getClosestCrewMate(Player impostor) {
+    private Optional<Player> getClosestCrewMate(Player impostor) {
         PriorityQueue<EntityDistance<Player, Player>> smallestDistances = new PriorityQueue<>();
         addToSmallestDistancesQueue(smallestDistances, impostor);
         return Optional.ofNullable(popClosestPlayer(smallestDistances));
     }
 
-    private static void addToSmallestDistancesQueue(PriorityQueue<EntityDistance<Player, Player>> smallestDistances, Player impostor) {
+    private void addToSmallestDistancesQueue(PriorityQueue<EntityDistance<Player, Player>> smallestDistances, Player impostor) {
         AppServer.currentGame.getPlayers().stream().
                 filter(player -> checkPlayerCanDie(player, impostor)).
                 forEach(player -> smallestDistances.add(DistanceFinder.getDistanceBetweenEntities(player, impostor)));
     }
 
-    private static Player popClosestPlayer(PriorityQueue<EntityDistance<Player, Player>> smallestDistances) {
+    private Player popClosestPlayer(PriorityQueue<EntityDistance<Player, Player>> smallestDistances) {
         while (true) {
             EntityDistance<Player, Player> entityDistance = smallestDistances.poll();
             if (entityDistance != null && entityDistance.getDistance() < 300) {
@@ -144,16 +150,16 @@ public class ImposterActionsSystem extends BaseSystem {
 //        }
 //    }
 
-    private static boolean checkPlayerCanDie(Player player, Player impostor) {
+    private boolean checkPlayerCanDie(Player player, Player impostor) {
         return player != impostor && player.getComponent(AliveComp.class).isAlive();
     }
 
 
-    public static List<Integer> getGhostConnectionIDs() {
+    public List<Integer> getGhostConnectionIDs() {
         return ConnectionServer.getPlayerConnectionIDs(getGhostPlayers());
     }
 
-    public static List<Player> getGhostPlayers(){
+    private static List<Player> getGhostPlayers() {
         return AppServer.currentGame.getClients().stream().
                 map(Client::getPlayer).
                 filter(player -> !player.getComponent(AliveComp.class).isAlive()).
@@ -161,13 +167,8 @@ public class ImposterActionsSystem extends BaseSystem {
     }
 
 
-
     public static List<Integer> getAliveConnectionIDs() {
         return ConnectionServer.getPlayerConnectionIDs(getAlivePlayers());
-//        return AppServer.currentGame.getClients().stream().
-//                filter(client -> client.getPlayer().getComponent(AliveComp.class).isAlive()).
-//                map(Client::getConnectionID).
-//                collect(Collectors.toList());
     }
 
     private static List<Player> getAlivePlayers() {

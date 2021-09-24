@@ -1,6 +1,6 @@
 package Maze;
 
-import Packet.EntityState.NewLineState;
+import Entity.CollidableRect;
 import Position.Pos;
 
 import java.util.List;
@@ -9,37 +9,68 @@ import java.util.Set;
 
 public class Maze {
 
-    private final int width = 8;
-    private final int height= 5;
+    private final int width;
+    private final int height;
+    private final int cellDimension;
+
 
     private final Cell[][] cells;
     private SquareGraph graph;
 
-    public Maze() {
+    private Pos startPos, endPos;
+
+
+    public Maze(int width, int height, int cellDimension) {
+        this.width = width;
+        this.height = height;
+        this.cellDimension = cellDimension;
         this.cells = initializeCells();
     }
 
     public void start() {
-        graph = new SquareGraph(width, height);
+        graph = new SquareGraph(width, height, cellDimension);
         graph.init();
         Set<Edge> minimalSpanningTree = graph.createSpanningTree();
         createConnectionsBetweenCells(graph, minimalSpanningTree);
-//        createStartFinish();
+        createStartFinish();
     }
 
-    public List<NewLineState> createLineState() {
+    public List<CollidableRect> createLineState() {
         return graph.createLinesStates(cells);
     }
 
     private void createStartFinish() {
-        Random random = new Random();
-        int side = random.nextInt(2);
-        if (side == 0) {
-            creatVerticalOpening(random); //start y is 0 or width
-        } else {
-            createHorizontalOpenings(random);
-        }
+        createStartCell();
+        createEndCell();
+//        Random random = new Random();
+
+//        int startCellHeight = random.nextInt(height);
+//        Cell startCell = cells [startCellHeight][0];
+//        startCell.setLeftWall(false);
+//        this.startPos = new Pos(0, startCellHeight*cellDimension);
+
+//        int endCellHeight = random.nextInt(height);
+//        Cell endCell = cells [endCellHeight][width-1];
+//        endCell.setRightWall(false);
+//        this.endPos = new Pos((width-1)* cellDimension, endCellHeight * cellDimension);
     }
+
+    private void createStartCell(){
+        Random random = new Random();
+        int startCellHeight = random.nextInt(height);
+        Cell startCell = cells [startCellHeight][0];
+        startCell.setLeftWall(false);
+        this.startPos = new Pos((double) cellDimension/2, startCellHeight*cellDimension + (double)cellDimension/2);
+    }
+
+    private void createEndCell(){
+        Random random = new Random();
+        int endCellHeight = random.nextInt(height);
+        Cell endCell = cells [endCellHeight][width-1];
+        endCell.setRightWall(false);
+        this.endPos = new Pos((width-1)* cellDimension, endCellHeight * cellDimension);
+    }
+
 
     private void creatVerticalOpening(Random random) {
         int startY = 0;
@@ -114,5 +145,20 @@ public class Maze {
         return cells;
     }
 
+//    public Cell getStartCell() {
+//        return startCell;
+//    }
+//
+//    public Cell getEndCell() {
+//        return endCell;
+//    }
 
+
+    public Pos getStartPos() {
+        return startPos;
+    }
+
+    public Pos getEndPos() {
+        return endPos;
+    }
 }

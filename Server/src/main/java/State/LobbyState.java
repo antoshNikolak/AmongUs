@@ -8,6 +8,7 @@ import Packet.EntityState.NewAnimatedEntityState;
 import Packet.EntityState.NewEntityState;
 import StartUpServer.AppServer;
 import World.World;
+import System.*;
 
 public class LobbyState extends GameState{
 
@@ -25,6 +26,13 @@ public class LobbyState extends GameState{
     public void init() {
         startSystems();
         createWord();
+    }
+
+    @Override
+    protected void startSystems() {
+        this.addSystem(new PhysicsSystem(entities));
+        this.addSystem(new TextureSystem());
+        this.addSystem(new ImposterActionsSystem());
     }
 
     @Override

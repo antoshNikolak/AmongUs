@@ -18,6 +18,7 @@ import javafx.application.Platform;
 import ScreenCounter.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class PacketControllerClient {
     public void handleAddChangingEntityReturn(AddChangingEntityReturn packet) {
         for (NewEntityState newEntityState : packet.getNewEntityStates()) {
             if (newEntityState instanceof NewAnimatedEntityState) {
-                ScreenManager.getScreen(GameScreen.class).getEntities().add(new ChangingEntity((NewAnimatedEntityState) newEntityState));
+                ScreenManager.getScreen(GameScreen.class).getEntities().add(new Entity((NewAnimatedEntityState) newEntityState));
             }
 //            else if(newEntityState instanceof NewLineState){
 //                new Entity((NewLineState) newEntityState);
@@ -63,7 +64,6 @@ public class PacketControllerClient {
 
     public void handleAddLineReturn(AddLineReturn packet) {
         for (NewLineState newLineState : packet.getNewEntityStates()) {
-            System.out.println("creating a line");
             Platform.runLater(() -> {
                 Line line = new Line(newLineState.getStartPos().getX(), newLineState.getStartPos().getY(), newLineState.getFinalPos().getX(), newLineState.getFinalPos().getY());
                 ScreenManager.getCurrentScreen().getPane().getChildren().add(line);
@@ -79,9 +79,9 @@ public class PacketControllerClient {
 
 
     public void handleStateReturn(StateReturn packet) {
-        ChangingEntity.calculateTimeDiffBetweenPackets();
+        Entity.calculateTimeDiffBetweenPackets();
         for (ExistingEntityState existingEntityState : packet.getEntityStates()) {
-            ((ChangingEntity) EntityRegistryClient.getEntity(existingEntityState.getRegistrationID())).
+            EntityRegistryClient.getEntity(existingEntityState.getRegistrationID()).
                     changeAttributes(existingEntityState.getAnimState(), existingEntityState.getAnimationIndex(), existingEntityState.getPos());
         }
     }
@@ -103,7 +103,7 @@ public class PacketControllerClient {
             Entity entity = EntityRegistryClient.getEntity(tileID);
             EntityRegistryClient.removeEntity(tileID);
             ScreenManager.getScreen(GameScreen.class).getEntities().remove(entity);
-            if (entity instanceof ChangingEntity) AppClient.currentGame.getChangingEntities().remove(entity);
+            AppClient.currentGame.getChangingEntities().remove(entity);
         }
     }
 
@@ -112,31 +112,9 @@ public class PacketControllerClient {
     }
 
     public void handleAddNestedPane(AddNestedPane packet) {
-//        Pane pane = new Pane();
-//        int paneX = packet.getPaneX();
-//        int paneY = packet.getPaneY();
-//        int paneWidth = packet.getPaneWidth();
-//        int paneHeight = packet.getPaneHeight();
-//
-//        pane.setLayoutX(paneX);
-//        pane.setLayoutY(paneY);
-//        pane.setPrefWidth(paneWidth);
-//        pane.setPrefHeight(paneHeight);
-
         GameScreen gameScreen = new GameScreen(createPane(packet));
-        gameScreen.setClearBoundaries(packet.getPaneX(), packet.getPaneY(), packet.getPaneX()+ packet.getPaneWidth(),
-                packet.getPaneY()+ packet.getPaneHeight());
+        gameScreen.setClearBoundaries(0, 0,  packet.getPaneWidth(), packet.getPaneHeight());
         createEntity(packet.getNewEntityStates(), gameScreen);
-//        for (NewEntityState newEntityState : packet.getNewEntityStates()) {
-//            if (newEntityState instanceof NewAnimatedEntityState) {
-//                gameScreen.getEntities().add(new Entity((NewAnimatedEntityState) newEntityState));
-//            } else if (newEntityState instanceof NewLineState) {
-////                NewLineState lineState = (NewLineState) newEntityState;
-////                Line line = new Line(lineState.getStartPos().getX(), lineState.getStartPos().getY(), lineState.getFinalPos().getX(), lineState.getFinalPos().getY());
-////                line.setStrokeWidth(lineState.getWidth());
-//                gameScreen.getPane().getChildren().add(createLine((NewLineState)newEntityState));
-//            }
-//        }
         Platform.runLater(() -> ScreenManager.getScreen(GameScreen.class).setNestedScreen(gameScreen));
     }
 
@@ -145,30 +123,27 @@ public class PacketControllerClient {
             if (newEntityState instanceof NewAnimatedEntityState) {
                 gameScreen.getEntities().add(new Entity((NewAnimatedEntityState) newEntityState));
             } else if (newEntityState instanceof NewLineState) {
-//                NewLineState lineState = (NewLineState) newEntityState;
-//                Line line = new Line(lineState.getStartPos().getX(), lineState.getStartPos().getY(), lineState.getFinalPos().getX(), lineState.getFinalPos().getY());
-//                line.setStrokeWidth(lineState.getWidth());
                 gameScreen.getPane().getChildren().add(createLine((NewLineState) newEntityState));
             }
         }
-
     }
 
-    private Line  createLine(NewLineState lineState){
-//        NewLineState lineState = (NewLineState) newEntityState;
+    private Line createLine(NewLineState lineState) {
         Line line = new Line(lineState.getStartPos().getX(), lineState.getStartPos().getY(), lineState.getFinalPos().getX(), lineState.getFinalPos().getY());
         line.setStrokeWidth(lineState.getWidth());
         return line;
-//        gameScreen.getPane().getChildren().add(line);
-
     }
 
-    private Pane createPane(AddNestedPane packet){
+    private Pane createPane(AddNestedPane packet) {
         Pane pane = new Pane();
         pane.setLayoutX(packet.getPaneX());
         pane.setLayoutY(packet.getPaneY());
         pane.setPrefWidth(packet.getPaneWidth());
         pane.setPrefHeight(packet.getPaneHeight());
-        return  pane;
+        return pane;
+    }
+
+    public void removeNestedScreen() {
+        Platform.runLater(()->ScreenManager.getScreen(GameScreen.class).removeNestedScreen());
     }
 }

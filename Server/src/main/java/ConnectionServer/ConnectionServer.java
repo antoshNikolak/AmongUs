@@ -138,6 +138,15 @@ public final class ConnectionServer {
         return Optional.empty();
     }
 
+    public static Optional<Player> getPlayerFromConnectionID(List<Player> players, int connectionID) {//should this return optional
+        for (Player player: players){
+            if (player.getConnectionID() == connectionID){
+                return Optional.of(player);
+            }
+        }
+        return Optional.empty();
+    }
+
     public static int getConnectionIDFromPlayer(Player player){
         for (Client client: AppServer.currentGame.getClients()){
             if (player == client.getPlayer()){
@@ -179,10 +188,7 @@ public final class ConnectionServer {
         kryo.register(AddLineReturn.class);
         kryo.register(NewLineState.class);
         kryo.register(AddNestedPane.class);
-
-
-
-
+        kryo.register(RemoveNestedScreen.class);
     }
 
 

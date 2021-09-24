@@ -24,8 +24,10 @@ public class Client {
     }
 
     public static void startGameState() {//todo ask if accessing this twice affect objects getting locks
-        AppServer.currentGame.getStateManager().popState();
-        AppServer.currentGame.getStateManager().pushState(new GameState());
+        synchronized (AppServer.currentGame.getStateManager()) {
+            AppServer.currentGame.getStateManager().popState();
+            AppServer.currentGame.getStateManager().pushState(new GameState());
+        }
     }
 
     private static void addClientToLobby(Client client) {
@@ -46,6 +48,8 @@ public class Client {
 
     public void createPlayer() {
         this.player = new Player(PlayerColourFactory.getRandomColour(), connectionID);
+        AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(player);
+
     }
 
     public Client(int connectionID) {

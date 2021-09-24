@@ -1,9 +1,7 @@
 package Maze;
 
-import Entity.EntityRegistryServer;
-import Packet.EntityState.NewLineState;
+import Entity.CollidableRect;
 import Position.Pos;
-import javafx.scene.canvas.GraphicsContext;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,10 +10,12 @@ public class SquareGraph {
 
     private final int width;
     private final int height;
+    private final int cellDimension;
 
-    public SquareGraph(int width, int height) {
+    public SquareGraph(int width, int height, int cellDimension) {
         this.width = width;
         this.height = height;
+        this.cellDimension = cellDimension;
     }
 
     private final List<Edge> edges = new ArrayList<>();
@@ -156,7 +156,7 @@ public class SquareGraph {
 
     public void connectVertices(Vertex v1, Vertex v2) {
         int rand = new Random().nextInt(100) + 1;
-        edges.add(new Edge(v1, v2, rand));
+        edges.add(new  Edge(v1, v2, rand));
     }
 
     public void connectToUpperVertex(Vertex vertex, int mazeWidth) {
@@ -173,34 +173,41 @@ public class SquareGraph {
         });
     }
 
-    public List<NewLineState> createLinesStates(Cell[][] cells){
-        List<NewLineState> lines = new ArrayList<>();
+    public List<CollidableRect> createLinesStates(Cell[][] cells){
+//        List<NewLineState> lines = new ArrayList<>();
+        List<CollidableRect> lines = new ArrayList<>();
+
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Cell cell = cells[y][x];
-                int cellX = x*50;
-                int cellY = y*50;//may have to swap x and y values
+                int cellX = x* cellDimension;
+                int cellY = y* cellDimension;//may have to swap x and y values
                 if (cell.isTopWall()){
-                    lines.add(createLineState(cellX, cellY, cellX+50, cellY));
+                    lines.add(createCollidableLineLine(cellX, cellY, cellX+ cellDimension, cellY));
                 }
                 if (cell.isLeftWall()){
-                    lines.add(createLineState(cellX, cellY, cellX, cellY+ 50));
+                    lines.add(createCollidableLineLine(cellX, cellY, cellX, cellY+ cellDimension));
                 }
                 if (cell.isBottomWall()){
-                    lines.add(createLineState(cellX, cellY+50, cellX+50, cellY+ 50));
+                    lines.add(createCollidableLineLine(cellX, cellY+ cellDimension, cellX+ cellDimension, cellY+ cellDimension));
                 }
                 if (cell.isRightWall()){
-                    lines.add(createLineState(cellX+ 50, cellY, cellX+50, cellY+ 50));
+                    lines.add(createCollidableLineLine(cellX+ cellDimension, cellY, cellX+ cellDimension, cellY+ cellDimension));
                 }
             }
         }
         return lines;
     }
 
-    private NewLineState createLineState(int cellX, int cellY, int cellX2, int cellY2){
-        return new NewLineState(new Pos(cellX, cellY), new Pos(cellX2, cellY2), 10);
+    private CollidableRect createCollidableLineLine(int cellX, int cellY, int cellX2, int cellY2){
+        return new CollidableRect(new Pos(cellX, cellY), cellX2- cellX, cellY2- cellY);
 
     }
+
+//    private NewLineState createLineState(int cellX, int cellY, int cellX2, int cellY2){
+//        return new NewLineState(new Pos(cellX, cellY), new Pos(cellX2, cellY2), 10);
+//
+//    }
 
     public Vertex[][] create2DArray(){//todo sort problem here
         Vertex [][] vertices = new Vertex[height][width];
@@ -209,8 +216,8 @@ public class SquareGraph {
             for (int j = 0; j <width ; j++) {//horizontal
                 Vertex vertex = this.vertices.get(counter);
                 vertices[i][j] = vertex;
-                vertex.setX(j*50);
-                vertex.setY(i*50);
+                vertex.setX(j* cellDimension);
+                vertex.setY(i* cellDimension);
                 counter++;
             }
         }

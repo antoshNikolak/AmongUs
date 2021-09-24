@@ -29,6 +29,11 @@ public abstract class State implements ClientOperator {
         return  (T) systems.get(system);
     }
 
+    public boolean hasSystem( Class<? extends BaseSystem> system) {
+        return  systems.containsKey(system);
+    }
+
+
     public void clearSystems(){
         this.systems.clear();
     }
@@ -53,4 +58,5 @@ public abstract class State implements ClientOperator {
     public void setBlocksUpdate(boolean blocksUpdate) {
         this.blocksUpdate = blocksUpdate;
     }
+
 }

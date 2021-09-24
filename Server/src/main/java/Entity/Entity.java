@@ -3,6 +3,8 @@ package Entity;
 import Packet.EntityState.ExistingEntityState;
 import Packet.EntityState.NewAnimatedEntityState;
 import Packet.EntityState.NewEntityState;
+import Packet.EntityState.NewLineState;
+import Position.Pos;
 import StartUpServer.AppServer;
 
 import java.util.HashMap;
@@ -16,7 +18,13 @@ public abstract class Entity {
 
     protected Entity() {
         EntityRegistryServer.addEntity(this);
-        AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(this);
+//        AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(this);
+//
+//        if (hasComponent(TaskPlayerComp.class)) {
+//            getComponent(TaskPlayerComp.class).getTaskState().getEntities().add(this);
+//        } else {
+//            AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(this);
+//        }
     }
 
     public ExistingEntityState adaptToEntityState() {
@@ -31,6 +39,13 @@ public abstract class Entity {
         AnimationComp animationComp = getComponent(AnimationComp.class);
         int registrationID = EntityRegistryServer.getEntityID(this);
         return new NewAnimatedEntityState(registrationID, posComp.getPos(), animationComp.adaptToAllNewAnimations(), animationComp.getCurrentAnimationState());
+    }
+
+    public NewLineState adaptToNewLineState() {
+        PosComp posComp = getComponent(PosComp.class);
+        Pos endPos = new Pos(posComp.getPos().getX() + posComp.getWidth(), posComp.getPos().getY() + posComp.getHeight());
+        return new NewLineState(posComp.getPos(), endPos, 10);
+
     }
 
     public void addComponent(Component component) {
@@ -51,7 +66,7 @@ public abstract class Entity {
         return components.containsKey(component);
     }
 
-    public void removeComponent(Class<? extends Component> component){
+    public void removeComponent(Class<? extends Component> component) {
         this.components.remove(component);
     }
 

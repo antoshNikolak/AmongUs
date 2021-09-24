@@ -1,31 +1,23 @@
 package Game;
 
 import Camera.Camera;
-import EntityClient.ChangingEntity;
 import EntityClient.Entity;
+//import EntityClient.Entity;
 import EntityClient.LocalPlayer;
-import Screen.Screen;
 import StartUp.AppClient;
 import javafx.animation.AnimationTimer;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import Screen.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Game {
-//    private final List<Entity> entities = new CopyOnWriteArrayList<>();
-    private final List<ChangingEntity> changingEntities = new CopyOnWriteArrayList<>();
+    private final List<Entity> changingEntities = new CopyOnWriteArrayList<>();
     private LocalPlayer myPlayer;
 
-//    private final Camera camera = new Camera();
 
     public Game() {
         ScreenManager.getScreen(GameScreen.class).setCamera(new Camera());
-
     }
 
     private void init() {
@@ -34,41 +26,44 @@ public class Game {
 
     public void start() {
         init();
-//        GraphicsContext gc = getGraphicsContext();
         startTimer();
     }
 
-//    private GraphicsContext getGraphicsContext() {
-////        Canvas canvas = (Canvas) ScreenManager.getNode(GameScreen.class, "canvas");
-//        Canvas canvas = (Canvas) ScreenManager.getScreen(GameScreen.class).getNode("canvas");
-//
-//        return canvas.getGraphicsContext2D();
-//    }
 
     public void startTimer() {
         new AnimationTimer() {
             @Override
             public void handle(long now) {
                 myPlayer.sendInput();
-                interpolate();
-                render();
+                interpolate(ScreenManager.getScreen(GameScreen.class));
+                ScreenManager.getScreen(GameScreen.class).render();
             }
         }.start();
     }
 
 
-    private void interpolate() {
-        for (ChangingEntity changingEntity: changingEntities){
-            changingEntity.interpolate();
+    private void interpolate(GameScreen gameScreen) {//todo doc recursion
+        for (Entity entity : gameScreen.getEntities()) {
+            entity.interpolate();
         }
-    }
+        if (gameScreen.getNestedScreen() != null){
+            interpolate(gameScreen.getNestedScreen());
+        }
 
-    private void render() {
-//        gc.clearRect(0, 0, 600, 400);
-        ScreenManager.getScreen(GameScreen.class).render();
-//        for (Entity entity : entities) {
-//            entity.render(gc);
+//        do {
+//            for (Entity entity : ScreenManager.getScreen(GameScreen.class).getEntities()) {
+//                entity.interpolate();
+//            }
+//        } while (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null);
+
+
+        //todo remember to include innder pane interp
+
+
+//        for (Entity entity : changingEntities){
+//            entity.interpolate();
 //        }
+
     }
 
     public void handleLocalPlayer(LocalPlayer localPlayer) {
@@ -76,10 +71,6 @@ public class Game {
         this.myPlayer = localPlayer;
         start();
     }
-
-//    public List<Entity> getEntities() {
-//        return entities;
-//    }
 
     public LocalPlayer getMyPlayer() {
         return myPlayer;
@@ -89,13 +80,9 @@ public class Game {
         this.myPlayer = myPlayer;
     }
 
-    public List<ChangingEntity> getChangingEntities() {
+    public List<Entity> getChangingEntities() {
         return changingEntities;
     }
-
-//    public Camera getCamera() {
-//        return camera;
-//    }
 
 
 }

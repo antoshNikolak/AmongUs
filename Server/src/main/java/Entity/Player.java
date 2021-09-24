@@ -18,14 +18,14 @@ public class Player extends Entity {
 
     public Player(String colour, int connectionID) {
         this.connectionID = connectionID;
-        startComps(new PosComp(100, 100, 50, 63), colour);
+        startComps(new PosComp(100, 100, 50, 63), colour, connectionID);
     }
 
-    public Player(String colour, int connectionID, PosComp posComp) {
-        super();
-        this.connectionID = connectionID;
-        startComps(posComp, colour);
-    }
+//    public Player(String colour, int connectionID, PosComp posComp) {
+//        super();
+//        this.connectionID = connectionID;
+//        startComps(posComp, colour);
+//    }
 
 
 
@@ -42,12 +42,13 @@ public class Player extends Entity {
         return animationComp;
     }
 
-    public void startComps(PosComp posComp, String colour){
+    public void startComps(PosComp posComp, String colour, int connectionID){
         addComponent(posComp);
         addComponent(new ColourComp(colour));
         addComponent(new VelComp());
         addComponent(new HitBoxComp(posComp));
         addComponent(new AliveComp(true));
+//        addComponent(new ConnectionComp(connectionID));
         addComponent(configAnimation());
     }
 

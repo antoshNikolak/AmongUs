@@ -4,6 +4,7 @@ import Client.Client;
 import ConnectionServer.ConnectionServer;
 import Packet.EntityState.ExistingEntityState;
 import Packet.EntityState.NewEntityState;
+import Packet.EntityState.NewLineState;
 import Packet.Position.StateReturn;
 import StartUpServer.AppServer;
 
@@ -39,6 +40,12 @@ public class EntityReturnBuffer {
     public static Set<NewEntityState> adaptCollectionToNewEntityStates(Collection<? extends Entity> entities){
         return entities.stream().
                 map(entity -> entity.adaptToNewAnimatedEntityState()).
+                collect(Collectors.toSet());
+    }
+
+    public static Set<NewLineState> adaptCollectionToNewLineStates(Collection<? extends Entity> entities){
+        return entities.stream().
+                map(entity -> entity.adaptToNewLineState()).
                 collect(Collectors.toSet());
     }
 

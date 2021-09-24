@@ -86,6 +86,7 @@ public final class ConnectionClient {
         kryo.register(AddLineReturn.class);
         kryo.register(NewLineState.class);
         kryo.register(AddNestedPane.class);
+        kryo.register(RemoveNestedScreen.class);
 
     }
 }

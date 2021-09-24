@@ -7,6 +7,7 @@ import Component.TaskComp;
 import Entity.EntityRegistryServer;
 import Entity.Tile;
 import Position.Pos;
+import StartUpServer.AppServer;
 import State.MazeTaskState;
 import State.NumberCountTaskState;
 import State.SudokuTaskState;
@@ -65,6 +66,8 @@ public class World {
     }
 
     private Tile createTile(Pos tilePos, String textureName) {
+        Tile tile =new Tile(new PosComp(tilePos, TILE_WIDTH, TILE_HEIGHT), textureName);
+        AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(tile);
         return new Tile(new PosComp(tilePos, TILE_WIDTH, TILE_HEIGHT), textureName);
     }
 

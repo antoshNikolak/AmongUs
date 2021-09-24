@@ -50,8 +50,10 @@ public class Game {
                 .collect(Collectors.toList());
     }
 
-    public synchronized StateManager getStateManager() {
-        return stateManager;
+    public  StateManager getStateManager() {
+//        synchronized (stateManager) {
+            return stateManager;
+//        }
     }
 
 //        public Set<Entity> getEntityReturnBuffer () {

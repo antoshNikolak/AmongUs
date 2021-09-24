@@ -26,7 +26,7 @@ public class TextureManager {
             loadImage("ghost-right-" + colour, "Texture/ghost-right-" + colour + ".png", 50, 50, true);
             loadImage("ghost-left-" + colour, "Texture/ghost-left-" + colour + ".png", 50, 50, true);
         }
-        loadImage("red-rect", "Texture/red-rectangle.png", 50, 50, true);
+        loadImage("red-rect", "Texture/red-rectangle.png", 15, 15, true);
         loadImage("grey-tile", "Texture/grey-tile.png", 50, 50, true);
         loadImage("sudoku-task", "Texture/bookshelf.png", 50, 50, false);
         loadImage("maze-task", "Texture/maze-task.png", 50, 50, false);

@@ -2,15 +2,20 @@ package ConnectionServer;
 
 import AuthorizationServer.AuthorizationServer;
 import Client.Client;
+import Entity.Entity;
 import Entity.GameClientHandler;
+import Entity.Player;
 import Packet.GameStart.StartGameReturn;
 import Packet.Position.PosRequest;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
+import StartUpServer.AppServer;
+import State.State;
 import System.PhysicsSystem;
 import System.ImposterActionsSystem;
 import System.*;
+import State.*;
 
 import java.util.Optional;
 
@@ -34,14 +39,25 @@ public class PacketControllerServer {
     }
 
     public void handlePosRequest(PosRequest packet, int connectionId) {
-        Optional<Client> optionalClient = PhysicsSystem.getPlayerOptional(connectionId);
-        optionalClient.ifPresent(client-> {
-            PhysicsSystem.processPlayerMove(optionalClient.get().getPlayer(), packet);
-            ImposterActionsSystem.handleSpecialActions(optionalClient.get().getPlayer(), packet);
-            TaskSystem.handleTaskAction(optionalClient.get().getPlayer(), packet);
-        });
+        Optional<Player> optionalPlayer = ConnectionServer.getPlayerFromConnectionID(AppServer.currentGame.getPlayers(), connectionId);
+        if (optionalPlayer.isPresent()) {
+            State state = getPlayerState(optionalPlayer.get());
+            if (state.hasSystem(PhysicsSystem.class)) {
+                state.getSystem(PhysicsSystem.class).processPlayerMove(optionalPlayer.get(), packet);
+            }
+            if (state.hasSystem(ImposterActionsSystem.class)) {
+                state.getSystem(ImposterActionsSystem.class).handleSpecialActions(optionalPlayer.get(), packet);
+            }
+            if (state.hasSystem(TaskSystem.class)) {
+                state.getSystem(TaskSystem.class).handleTaskAction(optionalPlayer.get(), packet);
+            }
+        }
+    }
 
-//        PhysicsSystem.updatePlayerPosition(packet, connectionId);
-//        GameLogicSystem.
+    private State getPlayerState(Player player) {
+        if (player.getCurrentTask() != null) {
+            return player.getCurrentTask();
+        }
+        return AppServer.currentGame.getStateManager().getCurrentState();
     }
 }

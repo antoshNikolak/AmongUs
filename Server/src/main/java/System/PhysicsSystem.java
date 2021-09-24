@@ -8,13 +8,19 @@ import Entity.Player;
 import Entity.*;
 import Packet.Position.PosRequest;
 import StartUpServer.AppServer;
+import State.MazeTaskState;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class PhysicsSystem extends BaseSystem {
+    private List<Entity> entitiesToCollideWith = new ArrayList<>();
 
+    public PhysicsSystem(List<Entity> entitiesToCollideWith) {
+        this.entitiesToCollideWith = entitiesToCollideWith;
+    }
 
     @Override
     public void update() {
@@ -29,37 +35,50 @@ public class PhysicsSystem extends BaseSystem {
 //        processPlayerMove(player, packet);
 //    }
 
-    public static Optional<Client> getPlayerOptional(int connectionId) {
-        List<Client> clientsPlaying = AppServer.currentGame.getClients();
-        return ConnectionServer.getClientFromConnectionID(clientsPlaying, connectionId);
+//    public static Optional<? extends Entity> getPlayerOptional(int connectionId) {
+//        return ConnectionServer.getPlayerFromConnectionID(AppServer.currentGame.getPlayers(), connectionId);
+//    }
+
+
+    public void processPlayerMove(Player player, PosRequest packet) {
+        Entity playerForm = getPlayersMovingForm(player);
+        applyPacketToPlayer(playerForm, packet);
+        handleClientReturn(playerForm);
     }
 
-
-    public static void processPlayerMove(Player player, PosRequest packet) {
-        applyPacketToPlayer(player, packet);
-        handleClientReturn(player);
+    private Entity getPlayersMovingForm(Player player) {
+        if (player.getCurrentTask() != null) {
+            if (player.getCurrentTask() instanceof MazeTaskState) {
+                return ((MazeTaskState) player.getCurrentTask()).getMazePlayer();
+            }
+        }
+        return player;
     }
 
-    private static void handleClientReturn(Player player) {
-        if (player.getComponent(AliveComp.class).isAlive()) {
+    private void handleClientReturn(Entity player) {
+        if (player.hasComponent(TaskPlayerComp.class)) {
+            AppServer.currentGame.getEntityReturnBuffer().putEntity(player, player.getComponent(TaskPlayerComp.class).getConnectionID());
+        } else if (player.getComponent(AliveComp.class).isAlive()) {
             AppServer.currentGame.getEntityReturnBuffer().putEntity(player);
         } else {
-            AppServer.currentGame.getEntityReturnBuffer().putEntity(player, ImposterActionsSystem.getGhostConnectionIDs());
+            AppServer.currentGame.getEntityReturnBuffer().putEntity(player,
+                    AppServer.currentGame.getStateManager().getCurrentState().getSystem(ImposterActionsSystem.class).getGhostConnectionIDs());
         }
-
     }
 
-    private static void applyPacketToPlayer(Player player, PosRequest packet) {
+
+    private void applyPacketToPlayer(Entity player, PosRequest packet) {
         PosComp posComp = player.getComponent(PosComp.class);
         VelComp velComp = player.getComponent(VelComp.class);
         AliveComp aliveComp = player.getComponent(AliveComp.class);
         AnimationComp animationComp = player.getComponent(AnimationComp.class);
         applyPacketToPos(posComp, velComp, packet);
-        TextureSystem.handlePlayerAnimationState(velComp, animationComp, aliveComp);
         handleCollisions(player, velComp, posComp);
+        TextureSystem.handlePlayerAnimationState(velComp, animationComp, aliveComp);
+
     }
 
-    private static void handleCollisions(Player player, VelComp velComp, PosComp posComp) {
+    private void handleCollisions(Entity player, VelComp velComp, PosComp posComp) {
         if (player.hasComponent(HitBoxComp.class)) {
             HitBoxComp hitBoxComp = player.getComponent(HitBoxComp.class);
             handleCollisionY(velComp, posComp, hitBoxComp);
@@ -92,14 +111,14 @@ public class PhysicsSystem extends BaseSystem {
     }
 
 
-    private static void handleCollisionX(VelComp velComp, PosComp posComp, HitBoxComp hitBox) {
+    private void handleCollisionX(VelComp velComp, PosComp posComp, HitBoxComp hitBox) {
         hitBox.setX(posComp.getPos().getX());
-        AppServer.currentGame.getStateManager().getCurrentState().getEntities().stream().
-                filter(PhysicsSystem::canEntityCollideWithPlayer).
+        entitiesToCollideWith.stream().
+                filter(this::canEntityCollideWithPlayer).
                 forEach(entity -> checkCollisionsX(entity.getComponent(HitBoxComp.class), hitBox, posComp, velComp));
     }
 
-    private static void checkCollisionsX(HitBoxComp bumperHitBox, HitBoxComp hitBox, PosComp posComp, VelComp velComp) {
+    private void checkCollisionsX(HitBoxComp bumperHitBox, HitBoxComp hitBox, PosComp posComp, VelComp velComp) {
         if (bumperHitBox.intersect(hitBox)) {
             hitBox.incrementX(-velComp.getVelX());
             while (!bumperHitBox.intersect(hitBox)) {
@@ -110,14 +129,14 @@ public class PhysicsSystem extends BaseSystem {
         }
     }
 
-    private static void handleCollisionY(VelComp velComp, PosComp posComp, HitBoxComp hitBox) {//null pointer happens when client sends input but state hasnt been changed yet
-            hitBox.setY(posComp.getPos().getY());
-            AppServer.currentGame.getStateManager().getCurrentState().getEntities().stream().
-                    filter(PhysicsSystem::canEntityCollideWithPlayer).
-                    forEach(entity -> checkCollisionsY(entity.getComponent(HitBoxComp.class), hitBox, posComp, velComp));
+    private void handleCollisionY(VelComp velComp, PosComp posComp, HitBoxComp hitBox) {//null pointer happens when client sends input but state hasnt been changed yet
+        hitBox.setY(posComp.getPos().getY());
+        entitiesToCollideWith.stream().
+                filter(this::canEntityCollideWithPlayer).
+                forEach(entity -> {checkCollisionsY(entity.getComponent(HitBoxComp.class), hitBox, posComp, velComp);});
     }
 
-    private static void checkCollisionsY(HitBoxComp bumperHitBox, HitBoxComp hitBox, PosComp posComp, VelComp velComp) {
+    private void checkCollisionsY(HitBoxComp bumperHitBox, HitBoxComp hitBox, PosComp posComp, VelComp velComp) {
         if (bumperHitBox.intersect(hitBox)) {
             hitBox.incrementY(-velComp.getVelY());
             while (!bumperHitBox.intersect(hitBox)) {
@@ -128,8 +147,8 @@ public class PhysicsSystem extends BaseSystem {
         }
     }
 
-    private static boolean canEntityCollideWithPlayer(Entity entity) {
-        return entity.hasComponent(HitBoxComp.class) && !(entity instanceof Player);
+    private boolean canEntityCollideWithPlayer(Entity entity) {
+        return entity.hasComponent(HitBoxComp.class) && !(entity instanceof Player) && !(entity instanceof MazePlayer);
     }
 
 }

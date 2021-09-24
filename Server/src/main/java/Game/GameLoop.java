@@ -8,7 +8,9 @@ public abstract class GameLoop  implements Runnable{
     }
 
     public void start(){
-        new Thread(this).start();
+        Thread thread =new Thread(this);
+        thread.start();
+        thread.setName("game loop");
     }
 
     @Override

@@ -8,6 +8,9 @@ import Entity.Entity;
 import StartUpServer.AppServer;
 import Entity.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class TextureSystem extends BaseSystem {
 
 
@@ -39,6 +42,7 @@ public class TextureSystem extends BaseSystem {
 
 
     public static void handlePlayerAnimationState(VelComp velComp, AnimationComp animationComp, AliveComp aliveComp) {
+        if (!checkAnimationIsValid(animationComp)) return;
         if (velComp.getVelX() != velComp.getPreviousVelX()) {
             if (velComp.getVelX() < 0) {
                 if (aliveComp.isAlive()) {
@@ -55,5 +59,12 @@ public class TextureSystem extends BaseSystem {
             }
         }
     }
+
+    private static boolean checkAnimationIsValid(AnimationComp animationComp){
+        Set<AnimState> animStates = animationComp.getAnimStates();
+        return animStates.contains(AnimState.GHOST_LEFT) && animStates.contains(AnimState.GHOST_RIGHT);
+    }
+
+
 
 }

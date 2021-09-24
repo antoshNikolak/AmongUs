@@ -32,9 +32,10 @@ public class GameState extends State {
 
     @Override
     protected void startSystems() {
-        this.addSystem(new PhysicsSystem());
+        this.addSystem(new PhysicsSystem(entities));
         this.addSystem(new TextureSystem());
         this.addSystem(new TaskSystem());
+        this.addSystem(new ImposterActionsSystem());
     }
 
     @Override
@@ -75,6 +76,7 @@ public class GameState extends State {
 
     protected void createWord() {
         this.world = new World("World/game-map.txt");
+        System.out.println("world created");
     }
 
     private void addPlayersAsEntities() {

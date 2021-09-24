@@ -3,6 +3,7 @@ package Component;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Set;
 
 import Animation.AnimState;
 import Animation.NewAnimationReturn;
@@ -45,6 +46,10 @@ public class AnimationComp implements Component {
 
     public Animation getCurrentAnimation() {
         return currentAnimation;
+    }
+
+    public Set<AnimState> getAnimStates(){
+        return directionAnimationMap.keySet();
     }
 
 //    public boolean isAnimationRunnable(AnimationCondition animationCondition) {

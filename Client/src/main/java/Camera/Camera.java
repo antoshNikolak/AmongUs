@@ -1,6 +1,7 @@
 package Camera;
 
 import EntityClient.Entity;
+//import EntityClient.Entity;
 import Screen.ScreenManager;
 import Screen.TextureManager;
 

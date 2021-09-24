@@ -49,6 +49,8 @@ public class PacketListenerClient extends Listener {
             packetController.handleClearEntityReturn((ClearEntityReturn) object);
         }else if (object instanceof ScrollingEnableReturn){
             packetController.handleScrollingEnableReturn((ScrollingEnableReturn)object);
+        }else if (object instanceof RemoveNestedScreen){
+            packetController.removeNestedScreen();
         }
     }
 
