@@ -50,15 +50,11 @@ public class Game {
                 .collect(Collectors.toList());
     }
 
-    public  StateManager getStateManager() {
-//        synchronized (stateManager) {
+    public synchronized StateManager getStateManager() {
             return stateManager;
-//        }
     }
 
-//        public Set<Entity> getEntityReturnBuffer () {
-//            return entityReturnBuffer;
-//        }
+
 
     public List<Client> getClients() {
         return clients;
@@ -68,7 +64,4 @@ public class Game {
         return entityReturnBuffer;
     }
 
-    //    public Map<Entity, List<Integer>> getEntityDestinationsReturnBuffer() {
-//        return entityDestinationsReturnBuffer;
-//    }
 }

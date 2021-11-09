@@ -25,10 +25,7 @@ public class SquareGraph {
     public Set<Edge> createSpanningTree() {
         Set<Edge> minimalSpanningTree = new HashSet<>();
         PriorityQueue<Edge> edgesConnected = new PriorityQueue<>();
-
-
         while (true) {
-
             if (minimalSpanningTree.isEmpty()) {
                 Vertex source = getRandomVertex();
                 edgesConnected = getConnectedEdges(source);
@@ -36,20 +33,15 @@ public class SquareGraph {
                 edgesConnected = getConnectedEdges(minimalSpanningTree);//cant be part
             }
 
-            if (edgesConnected.isEmpty()) {
-                break;
-            }
-
+            if (edgesConnected.isEmpty()) break;
             Edge shortestEdge = edgesConnected.peek();
             minimalSpanningTree.add(shortestEdge);
         }
-
         return minimalSpanningTree;
-
     }
 
     private PriorityQueue<Edge> getConnectedEdges(Set<Edge> MSM) {
-        PriorityQueue <Edge> priorityQueue = getEdgePriorityQueue();
+        PriorityQueue <Edge> priorityQueue = getNewEdgePriorityQueue();
         for (Edge edge: edges){
             if (isEdgeValidForMSM(MSM, edge)){
                priorityQueue.add(edge);
@@ -60,16 +52,16 @@ public class SquareGraph {
 
     private PriorityQueue<Edge> getConnectedEdges(Vertex vertex) {
         return edges.stream().filter(edge -> edge.hasConnectionToVertex(vertex))
-                .collect(Collectors.toCollection(this::getEdgePriorityQueue));
+                .collect(Collectors.toCollection(this::getNewEdgePriorityQueue));
     }
 
 
     private boolean isEdgeValidForMSM(Set<Edge> MSM, Edge currentEdge) {
         return !(MSM.contains(currentEdge))
-                && checkEdgeWontLoop(MSM, currentEdge);
+                && checkEdgeConnectedAndWontLoop(MSM, currentEdge);
     }
 
-    private boolean checkEdgeWontLoop(Set<Edge> MSM, Edge currentEdge) {
+    private boolean checkEdgeConnectedAndWontLoop(Set<Edge> MSM, Edge currentEdge) {
         boolean commonVertexOne = false;
         boolean commonVertexTwo = false;
         for (Edge edge : MSM) {
@@ -83,17 +75,6 @@ public class SquareGraph {
             }
         }
          return oneOfEquals(commonVertexOne, commonVertexTwo, true);
-
-
-//        return !(commonVertexOne && commonVertexTwo);//todo no need to check if edge connected
-        //todo if one vertex is common, edge connected
-        //todo if 2 common, edge loops
-        //OR get a set of vertices from edge
-
-//        Set<Vertex> uniqueVertices = getUniqueVerticesFromEdges(MSM);
-//        return uniqueVertices.contains(currentEdge.getVertex1())
-//                && uniqueVertices.contains(currentEdge.getVertex2());
-
     }
 
     private boolean oneOfEquals(boolean a, boolean b, boolean expected){
@@ -164,7 +145,7 @@ public class SquareGraph {
         connectVertices(vertex, vertices.toArray(new Vertex[0])[index]);
     }
 
-    private PriorityQueue<Edge> getEdgePriorityQueue(){
+    private PriorityQueue<Edge> getNewEdgePriorityQueue(){
         return new PriorityQueue<>(new Comparator<Edge>() {
             @Override
             public int compare(Edge edge1, Edge edge2) {
@@ -174,32 +155,31 @@ public class SquareGraph {
     }
 
     public List<CollidableRect> createLinesStates(Cell[][] cells){
-//        List<NewLineState> lines = new ArrayList<>();
         List<CollidableRect> lines = new ArrayList<>();
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Cell cell = cells[y][x];
                 int cellX = x* cellDimension;
-                int cellY = y* cellDimension;//may have to swap x and y values
+                int cellY = y* cellDimension;
                 if (cell.isTopWall()){
-                    lines.add(createCollidableLineLine(cellX, cellY, cellX+ cellDimension, cellY));
+                    lines.add(createCollidableLine(cellX, cellY, cellX+ cellDimension, cellY));
                 }
                 if (cell.isLeftWall()){
-                    lines.add(createCollidableLineLine(cellX, cellY, cellX, cellY+ cellDimension));
+                    lines.add(createCollidableLine(cellX, cellY, cellX, cellY+ cellDimension));
                 }
                 if (cell.isBottomWall()){
-                    lines.add(createCollidableLineLine(cellX, cellY+ cellDimension, cellX+ cellDimension, cellY+ cellDimension));
+                    lines.add(createCollidableLine(cellX, cellY+ cellDimension, cellX+ cellDimension, cellY+ cellDimension));
                 }
                 if (cell.isRightWall()){
-                    lines.add(createCollidableLineLine(cellX+ cellDimension, cellY, cellX+ cellDimension, cellY+ cellDimension));
+                    lines.add(createCollidableLine(cellX+ cellDimension, cellY, cellX+ cellDimension, cellY+ cellDimension));
                 }
             }
         }
         return lines;
     }
 
-    private CollidableRect createCollidableLineLine(int cellX, int cellY, int cellX2, int cellY2){
+    private CollidableRect createCollidableLine(int cellX, int cellY, int cellX2, int cellY2){
         return new CollidableRect(new Pos(cellX, cellY), cellX2- cellX, cellY2- cellY);
 
     }
@@ -209,11 +189,11 @@ public class SquareGraph {
 //
 //    }
 
-    public Vertex[][] create2DArray(){//todo sort problem here
+    public Vertex[][] create2DArray(){
         Vertex [][] vertices = new Vertex[height][width];
         int counter = 0;
         for (int i = 0; i < height; i++) {
-            for (int j = 0; j <width ; j++) {//horizontal
+            for (int j = 0; j <width ; j++) {
                 Vertex vertex = this.vertices.get(counter);
                 vertices[i][j] = vertex;
                 vertex.setX(j* cellDimension);
@@ -221,7 +201,6 @@ public class SquareGraph {
                 counter++;
             }
         }
-
         return vertices;
     }
 

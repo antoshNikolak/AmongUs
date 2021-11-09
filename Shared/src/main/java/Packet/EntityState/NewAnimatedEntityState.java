@@ -10,6 +10,7 @@ public class NewAnimatedEntityState extends NewEntityState{
     private Pos pos;
     private List<NewAnimationReturn> newAnimationReturns;
     private AnimState currentState;
+    private boolean scrollable = true;
 
 
     public NewAnimatedEntityState(int registrationID, Pos pos, List<NewAnimationReturn> newAnimationReturns, AnimState currentState) {
@@ -33,5 +34,13 @@ public class NewAnimatedEntityState extends NewEntityState{
 
     public AnimState getCurrentState() {
         return currentState;
+    }
+
+    public boolean isScrollable() {
+        return scrollable;
+    }
+
+    public void setScrollable(boolean scrollable) {
+        this.scrollable = scrollable;
     }
 }

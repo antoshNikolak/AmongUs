@@ -9,6 +9,7 @@ public class PosRequest implements Packet {
     private boolean down= false;
     private boolean killKey = false;
     private boolean taskKey = false;
+    private boolean reportKey = false;
 
     public PosRequest() {}
 
@@ -65,5 +66,13 @@ public class PosRequest implements Packet {
 
     public void setTaskKey(boolean taskKey) {
         this.taskKey = taskKey;
+    }
+
+    public boolean isReportKey() {
+        return reportKey;
+    }
+
+    public void setReportKey(boolean reportKey) {
+        this.reportKey = reportKey;
     }
 }

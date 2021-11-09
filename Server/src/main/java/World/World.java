@@ -1,85 +1,87 @@
 package World;
 
-import Animation.AnimState;
-import Component.AnimationComp;
-import Component.PosComp;
 import Component.TaskComp;
 import Entity.EntityRegistryServer;
 import Entity.Tile;
 import Position.Pos;
-import StartUpServer.AppServer;
-import State.MazeTaskState;
-import State.NumberCountTaskState;
-import State.SudokuTaskState;
 import Utils.FileUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class World {
 
-    private final Set<Tile> tiles = new HashSet<>();
+    private Tile[][] tileMatrix;
     public static final int TILE_WIDTH = 50;
     public static final int TILE_HEIGHT = 50;
+    private WorldDimension dimension;
 
     public World(String fileName) {
         createWorld(fileName);
     }
 
-    public void createWorld(String fileName) {
-        String contents = FileUtils.getFileAsString(fileName);
-        String[] tokens = contents.split("\\s");//split at space
-        int width = Integer.parseInt(tokens[0]);
-        int height = Integer.parseInt(tokens[1]);
+    public void createWorld(String fileName) { ;
+        String[] tokens = createTokens(fileName);
+        initWorldParams(tokens);
+        String[][] tokenMatrix = create2DTokenArray(tokens);
+        tileMatrix = new Tile[dimension.getHeight()][dimension.getWidth()];
+        mapTokensToTiles(tokenMatrix);
+        new MergeTileHandler(tileMatrix, dimension).handleMergedTiles(tokenMatrix);
+    }
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int id = Integer.parseInt(tokens[(x + y * width + 2)]);
-                Tile tile = createTile(id, x, y);
-                if (tile!= null)tiles.add(tile);
+    private void mapTokensToTiles(String [][] tokenMatrix){
+        for (int y = 0; y < dimension.getHeight(); y++) {
+            for (int x = 0; x < dimension.getWidth(); x++) {
+                int id = Integer.parseInt(tokenMatrix[y][x]);
+                Tile tile = TileFactory.handleTileCreation(id, new Pos(x * TILE_WIDTH, y * TILE_HEIGHT));
+                tileMatrix[y][x] = tile;
             }
         }
-
     }
 
-    private Tile createTile(int id, int x, int y) {
-        Tile tile = null;
-        Pos tilePos = new Pos(x * TILE_WIDTH, y * TILE_HEIGHT);
-        if (id == 1) {
-            tile = createTile(tilePos, "grey-tile");
-        } else if (id == 2) {
-            tile = createTile(tilePos, "sudoku-task");
-            tile.addComponent(new TaskComp(new SudokuTaskState()));
-        } else if (id == 3) {
-            tile = createTile(tilePos, "maze-task");
-            tile.addComponent(new TaskComp(new MazeTaskState()));
-        } else if (id == 4) {
-            tile = createTile(tilePos, "number-count-task");
-            tile.addComponent(new TaskComp(new NumberCountTaskState()));
-        } else if (id != 0) {
-            throw new IllegalStateException("the world file nums are too big");
+    private void initWorldParams(String [] tokens){
+        this.dimension = new WorldDimension(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]));
+    }
+
+    private String[] createTokens(String fileName){
+        String contents = FileUtils.getFileAsString(fileName);
+        return contents.split("\\s");//split at space
+    }
+
+    private String[][] create2DTokenArray(String[] tokens) {
+        String[][] tokens2D = new String[dimension.getHeight()][dimension.getWidth()];
+        for (int i = 2; i < tokens.length; i++) {
+            int y = (int) Math.floor((i - 2) / (double) dimension.getWidth());//method reutnr double for precision
+            int x = (i - 2) % dimension.getWidth();
+            tokens2D[y][x] = tokens[i];
         }
-        return tile;
+        return tokens2D;
     }
 
-    private Tile createTile(Pos tilePos, String textureName) {
-        Tile tile =new Tile(new PosComp(tilePos, TILE_WIDTH, TILE_HEIGHT), textureName);
-        AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(tile);
-        return new Tile(new PosComp(tilePos, TILE_WIDTH, TILE_HEIGHT), textureName);
-    }
 
     public List<Integer> getTileIDs() {
-        return tiles.stream().
+        return getTiles().stream().
                 map(EntityRegistryServer::getEntityID).
                 collect(Collectors.toList());
     }
 
 
-    public Set<Tile> getTiles() {
+    public List<Tile> getTiles() {
+        List<Tile> tiles = new ArrayList<>();
+        for (int y = 0; y < dimension.getHeight(); y++) {
+            for (int x = 0; x < dimension.getWidth(); x++) {
+                if (tileMatrix[y][x]!= null){
+                    tiles.add(tileMatrix[y][x]);
+                }
+            }
+        }
         return tiles;
+    }
+
+    public Set<Tile> getTilesWithTask() {
+        return getTiles().stream().
+                filter(tile -> tile.hasComponent(TaskComp.class)).
+                collect(Collectors.toSet());
     }
 
     public static int getTILE_WIDTH() {

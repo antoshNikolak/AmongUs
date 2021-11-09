@@ -1,16 +1,15 @@
 package ConnectionServer;
 
+import Animation.AnimationOver;
 import Packet.GameStart.StartGameRequest;
-import Packet.Packet;
 import Packet.Position.PosRequest;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.SignupRequest;
-import com.esotericsoftware.kryo.Kryo;
+import Packet.Sound.Sound;
+import SudokuPacket.VerifySudokuRequest;
+import Voting.ImpostorVote;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.kryonet.Server;
-
-import java.io.IOException;
 
 public class PacketListenerServer extends Listener {
     private final PacketControllerServer packetController = new PacketControllerServer();
@@ -33,6 +32,14 @@ public class PacketListenerServer extends Listener {
             packetController.handleStartGameRequest(connection.getID());
         }else if (packet instanceof PosRequest){ ;
             packetController.handlePosRequest((PosRequest)packet, connection.getID());
+        }else if(packet instanceof VerifySudokuRequest){
+            packetController.handleVerifySudokuRequest((VerifySudokuRequest)packet, connection.getID());
+        }else if (packet instanceof Sound){
+            packetController.handleVoiceChat((Sound) packet, connection.getID());
+        }else if (packet instanceof ImpostorVote){
+            packetController.handleImpostorVote((ImpostorVote) packet, connection.getID());
+        }else if (packet instanceof AnimationOver){
+            packetController.handleAnimationOver((AnimationOver) packet, connection.getID());
         }
     }
 }

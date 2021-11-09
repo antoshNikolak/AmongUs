@@ -2,10 +2,11 @@ package EntityClient;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityRegistryClient {
 
-    private static final Map<Integer, Entity> entityIDMap = new HashMap<>();
+    private static final Map<Integer, Entity> entityIDMap = new ConcurrentHashMap<>();
 
     public static void addEntity(int id, Entity entity){
         entityIDMap.put(id, entity);

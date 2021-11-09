@@ -17,12 +17,9 @@ public abstract class ScreenCounter {
 
     private void addCountDownValueToScreen(String value) {
         Text text = getConfigText(value);
-//        System.out.println(previousText == null);
-//        System.out.println("current screen "+ ScreenManager.getCurrentScreen());
         if (previousText != null)ScreenManager.getCurrentScreen().removeNode(previousText);
         ScreenManager.getCurrentScreen().addNode(text);
         previousText = text;
-
     }
 
     public abstract Text getConfigText(String value);

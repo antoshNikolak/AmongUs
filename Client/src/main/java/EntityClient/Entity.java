@@ -4,8 +4,6 @@ import Animation.AnimState;
 import AnimationClient.AnimationManager;
 import Camera.Camera;
 import Packet.EntityState.NewAnimatedEntityState;
-import Packet.EntityState.NewEntityState;
-import Packet.EntityState.NewLineState;
 import Position.Pos;
 import Screen.TextureManager;
 import StartUp.AppClient;
@@ -18,18 +16,25 @@ public class Entity {
     private final LinkedList<Pos> positionReturns = new LinkedList<>();
     private static double timeBetweenPackets = 0.0066;//default value
     private static double timeLastPacketArrived;
-
     protected Pos pos;
     protected AnimationManager animationManager;
+    private boolean scrollable = true;
 
     public Entity(NewAnimatedEntityState newEntityState) {
-
         if (newEntityState.getRegistrationID() != -1) {
             EntityRegistryClient.addEntity(newEntityState.getRegistrationID(), this);
         }
         this.animationManager = new AnimationManager(newEntityState);
         this.pos = newEntityState.getPos();
-        AppClient.currentGame.getChangingEntities().add(this);
+        try {
+            AppClient.currentGame.getEntites().add(this);
+        }catch (NullPointerException e){
+            System.out.println("problem adding Entity: "+ newEntityState.getCurrentState());
+            System.out.println(AppClient.currentGame);
+            System.out.println(AppClient.currentGame.getEntites());
+            System.out.println(this);
+
+        }
     }
 
     public void render(GraphicsContext gc, Camera camera) {
@@ -38,8 +43,15 @@ public class Entity {
     }
 
     public void render(GraphicsContext gc) {
-//        Camera camera = AppClient.currentGame.getCamera();
         Image image = TextureManager.getTexture(animationManager.getCurrentFrame());
+//        System.out.println(animationManager.getCurrentFrame());
+//
+//        if (animationManager.getCurrentFrame().contains("task")) {
+//            System.out.println(animationManager.getCurrentFrame());
+//        }
+//        if (image == null){
+//            System.out.println("image is null");
+//        }
         gc.drawImage(image, pos.getX(), pos.getY());
     }
 
@@ -50,7 +62,10 @@ public class Entity {
         Pos newPos = positionReturns.get(1);
         if (oldPos == null){
             System.out.println("position returns contents:");
-            positionReturns.forEach(System.out::println);
+            positionReturns.forEach(pos -> {
+                System.out.println(pos.getX());
+                System.out.println(pos.getY());
+            });
         }
 //        System.out.println("old pos: "+oldPos.getX());
 //        System.out.println("new pos: "+newPos.getX());
@@ -111,4 +126,11 @@ public class Entity {
         return pos;
     }
 
+    public boolean isScrollable() {
+        return scrollable;
+    }
+
+    public void setScrollable(boolean scrollable) {
+        this.scrollable = scrollable;
+    }
 }

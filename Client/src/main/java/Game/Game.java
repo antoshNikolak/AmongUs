@@ -5,6 +5,7 @@ import EntityClient.Entity;
 //import EntityClient.Entity;
 import EntityClient.LocalPlayer;
 import StartUp.AppClient;
+import VoiceChat.RecordHandler;
 import javafx.animation.AnimationTimer;
 import Screen.*;
 
@@ -14,6 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Game {
     private final List<Entity> changingEntities = new CopyOnWriteArrayList<>();
     private LocalPlayer myPlayer;
+    private RecordHandler recordHandler = new RecordHandler();
 
 
     public Game() {
@@ -49,21 +51,6 @@ public class Game {
         if (gameScreen.getNestedScreen() != null){
             interpolate(gameScreen.getNestedScreen());
         }
-
-//        do {
-//            for (Entity entity : ScreenManager.getScreen(GameScreen.class).getEntities()) {
-//                entity.interpolate();
-//            }
-//        } while (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null);
-
-
-        //todo remember to include innder pane interp
-
-
-//        for (Entity entity : changingEntities){
-//            entity.interpolate();
-//        }
-
     }
 
     public void handleLocalPlayer(LocalPlayer localPlayer) {
@@ -80,9 +67,15 @@ public class Game {
         this.myPlayer = myPlayer;
     }
 
-    public List<Entity> getChangingEntities() {
+    public List<Entity> getEntites() {
         return changingEntities;
     }
 
+    public RecordHandler getRecordHandler() {
+        return recordHandler;
+    }
 
+    public void setRecordHandler(RecordHandler recordHandler) {
+        this.recordHandler = recordHandler;
+    }
 }

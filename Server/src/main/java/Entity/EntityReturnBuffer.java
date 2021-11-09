@@ -39,7 +39,7 @@ public class EntityReturnBuffer {
 
     public static Set<NewEntityState> adaptCollectionToNewEntityStates(Collection<? extends Entity> entities){
         return entities.stream().
-                map(entity -> entity.adaptToNewAnimatedEntityState()).
+                map(entity -> entity.adaptToNewAnimatedEntityState(true)).
                 collect(Collectors.toSet());
     }
 

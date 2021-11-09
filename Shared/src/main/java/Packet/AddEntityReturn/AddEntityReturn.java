@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class AddEntityReturn implements Packet {
+public class AddEntityReturn implements Packet {
 
     protected List<? extends NewEntityState> newEntityStates;
 
@@ -18,8 +18,7 @@ public abstract class AddEntityReturn implements Packet {
 
     public AddEntityReturn(NewEntityState... entityStates) {
         this.newEntityStates = new ArrayList<>(Arrays.asList(entityStates));
-//        this.newEntityStates.addAll(Arrays.asList(entityStates));
-    }//todo can I add to a list when it has ? extends T
+    }
 
     public AddEntityReturn() { }
 

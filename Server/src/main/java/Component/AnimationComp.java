@@ -50,6 +50,10 @@ public class AnimationComp implements Component {
 
     public Set<AnimState> getAnimStates(){
         return directionAnimationMap.keySet();
+//        return new ArrayList<>(directionAnimationMap.keySet());
+    }
+    public Animation getAnimation(AnimState animState){
+        return directionAnimationMap.get(animState);
     }
 
 //    public boolean isAnimationRunnable(AnimationCondition animationCondition) {
@@ -79,6 +83,14 @@ public class AnimationComp implements Component {
             }
         }
 
+        public String getCurrentFrame(){
+            return frames[index];
+        }
+
+        public String[] getFrames() {
+            return frames;
+        }
+
         public int getIndex() {
             return index;
         }
@@ -92,9 +104,6 @@ public class AnimationComp implements Component {
         }
     }
 
-    @FunctionalInterface
-    private interface AnimationCondition{
-        boolean returnLogic();
-    }
+
 }
 

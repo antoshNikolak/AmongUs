@@ -1,6 +1,8 @@
 package ConnectionClient;
 
 import Animation.AnimState;
+import Animation.AnimationDisplayReturn;
+import Animation.AnimationOver;
 import Packet.*;
 import Packet.AddEntityReturn.*;
 import Packet.Camera.ScrollingEnableReturn;
@@ -10,20 +12,30 @@ import Packet.EntityState.NewEntityState;
 import Packet.EntityState.NewLineState;
 import Packet.GameStart.StartGameRequest;
 import Packet.GameStart.StartGameReturn;
+import Packet.NestedPane.*;
 import Packet.Position.*;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
+import Packet.Sound.CloseRecordHandler;
+import Packet.Sound.OpenRecordHandler;
+import Packet.Sound.Sound;
 import Packet.Timer.GameStartTimer;
 import Packet.Timer.KillCoolDownTimer;
 import Packet.Timer.Timer;
+import Packet.Timer.VotingTimer;
 import Position.Pos;
+import SudokuPacket.VerifySudokuRequest;
+import SudokuPacket.VerifySudokuReturn;
 import UserData.UserData;
+import Voting.ElectionReturn;
+import Voting.ImpostorVote;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -47,7 +59,7 @@ public final class ConnectionClient {
     private static void startConnection() {
         try {
             client.start();
-            client.connect(5000, "localhost", 49158, 65529);
+            client.connect(5000, "localhost", 49159, 65520);
 //            client.connect(5000, "192.168.1.73", 49158, 65529);
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,11 +77,11 @@ public final class ConnectionClient {
         kryo.register(StateReturn.class);
         kryo.register(PosRequest.class);
         kryo.register(Pos.class);
-        kryo.register(AddStationaryEntityReturn.class);
+//        kryo.register(AddStationaryEntityReturn.class);
         kryo.register(ExistingEntityState.class);
         kryo.register(ArrayList.class);
         kryo.register(AddLocalEntityReturn.class);
-        kryo.register(AddChangingEntityReturn.class);
+//        kryo.register(AddChangingEntityReturn.class);
         kryo.register(CopyOnWriteArrayList.class);
         kryo.register(HashSet.class);
         kryo.register(NewEntityState.class);
@@ -87,6 +99,30 @@ public final class ConnectionClient {
         kryo.register(NewLineState.class);
         kryo.register(AddNestedPane.class);
         kryo.register(RemoveNestedScreen.class);
-
+        kryo.register(AddsPane.class);
+        kryo.register(AddSudokuPane.class);
+        kryo.register(int[][].class);
+        kryo.register(int[].class);
+        kryo.register(VerifySudokuReturn.class);
+        kryo.register(VerifySudokuRequest.class);
+        kryo.register(Integer[][].class);
+        kryo.register(Integer[].class);
+        kryo.register(Integer.class);
+        kryo.register(AnimationDisplayReturn.class);
+        kryo.register(NodeInfo.class);
+        kryo.register(NodeType.class);
+        kryo.register(OpenRecordHandler.class);
+        kryo.register(CloseRecordHandler.class);
+        kryo.register(Sound.class);
+        kryo.register(AddVotingPane.class);
+        kryo.register(byte[].class);
+        kryo.register(ImpostorVote.class);
+        kryo.register(VotingTimer.class);
+        kryo.register(ElectionReturn.class);
+        kryo.register(RemoveVotingScreen.class);
+        kryo.register(HashMap.class);
+        kryo.register(AnimationOver.class);
+        kryo.register(TaskBarUpdate.class);
+        kryo.register(AddEntityReturn.class);
     }
 }

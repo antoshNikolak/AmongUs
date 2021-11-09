@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class PhysicsSystem extends BaseSystem {
-    private List<Entity> entitiesToCollideWith = new ArrayList<>();
+    private List<Entity> entitiesToCollideWith;
 
     public PhysicsSystem(List<Entity> entitiesToCollideWith) {
         this.entitiesToCollideWith = entitiesToCollideWith;

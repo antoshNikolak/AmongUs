@@ -3,6 +3,7 @@ package TimerHandler;
 import Packet.Timer.GameStartTimer;
 import Packet.Timer.KillCoolDownTimer;
 import Packet.Timer.Timer;
+import Packet.Timer.VotingTimer;
 
 public class TimerFactory {
 
@@ -12,7 +13,9 @@ public class TimerFactory {
                 return new GameStartTimer(seconds);
             }else if (timerString.equalsIgnoreCase("KillCoolDownTimer")){
                 return new KillCoolDownTimer(seconds);
-            }else {
+            }else if (timerString.equalsIgnoreCase("VotingTimer")){
+                return new VotingTimer(seconds);
+            } else {
                 throw new IllegalArgumentException("Timer Factory received an illegal argument");
             }
         }catch (IllegalArgumentException e){

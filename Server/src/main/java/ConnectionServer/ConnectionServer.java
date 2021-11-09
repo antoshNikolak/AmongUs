@@ -1,6 +1,8 @@
 package ConnectionServer;
 
 import Animation.AnimState;
+import Animation.AnimationDisplayReturn;
+import Animation.AnimationOver;
 import Client.Client;
 import Entity.Player;
 import Packet.AddEntityReturn.*;
@@ -11,25 +13,31 @@ import Packet.EntityState.NewEntityState;
 import Packet.EntityState.NewLineState;
 import Packet.GameStart.StartGameRequest;
 import Packet.GameStart.StartGameReturn;
+import Packet.NestedPane.*;
 import Packet.Packet;
 import Packet.Position.*;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
+import Packet.Sound.CloseRecordHandler;
+import Packet.Sound.OpenRecordHandler;
+import Packet.Sound.Sound;
 import Packet.Timer.GameStartTimer;
 import Packet.Timer.KillCoolDownTimer;
 import Packet.Timer.Timer;
+import Packet.Timer.VotingTimer;
 import Position.Pos;
 import StartUpServer.AppServer;
+import SudokuPacket.VerifySudokuRequest;
+import SudokuPacket.VerifySudokuReturn;
 import UserData.UserData;
+import Voting.ElectionReturn;
+import Voting.ImpostorVote;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Server;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -123,7 +131,7 @@ public final class ConnectionServer {
     private static void startConnection() {
         try {
             server.start();
-            server.bind(49158, 65529);
+            server.bind(49159, 65520);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -140,6 +148,15 @@ public final class ConnectionServer {
 
     public static Optional<Player> getPlayerFromConnectionID(List<Player> players, int connectionID) {//should this return optional
         for (Player player: players){
+            if (player.getConnectionID() == connectionID){
+                return Optional.of(player);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<Player> getPlayerFromConnectionID( int connectionID) {//should this return optional
+        for (Player player: AppServer.currentGame.getPlayers()){
             if (player.getConnectionID() == connectionID){
                 return Optional.of(player);
             }
@@ -167,11 +184,11 @@ public final class ConnectionServer {
         kryo.register(StateReturn.class);
         kryo.register(PosRequest.class);
         kryo.register(Pos.class);
-        kryo.register(AddStationaryEntityReturn.class);
+//        kryo.register(AddStationaryEntityReturn.class);
         kryo.register(ExistingEntityState.class);
         kryo.register(ArrayList.class);
         kryo.register(AddLocalEntityReturn.class);
-        kryo.register(AddChangingEntityReturn.class);
+//        kryo.register(AddChangingEntityReturn.class);
         kryo.register(CopyOnWriteArrayList.class);
         kryo.register(HashSet.class);
         kryo.register(NewEntityState.class);
@@ -189,6 +206,32 @@ public final class ConnectionServer {
         kryo.register(NewLineState.class);
         kryo.register(AddNestedPane.class);
         kryo.register(RemoveNestedScreen.class);
+        kryo.register(AddsPane.class);
+        kryo.register(AddSudokuPane.class);
+        kryo.register(int[][].class);
+        kryo.register(int[].class);
+        kryo.register(VerifySudokuReturn.class);
+        kryo.register(VerifySudokuRequest.class);
+        kryo.register(Integer[][].class);
+        kryo.register(Integer[].class);
+        kryo.register(Integer.class);
+        kryo.register(AnimationDisplayReturn.class);
+        kryo.register(NodeInfo.class);
+        kryo.register(NodeType.class);
+        kryo.register(OpenRecordHandler.class);
+        kryo.register(CloseRecordHandler.class);
+        kryo.register(Sound.class);
+        kryo.register(AddVotingPane.class);
+        kryo.register(byte[].class);
+        kryo.register(ImpostorVote.class);
+        kryo.register(VotingTimer.class);
+        kryo.register(ElectionReturn.class);
+        kryo.register(RemoveVotingScreen.class);
+        kryo.register(HashMap.class);
+        kryo.register(AnimationOver.class);
+        kryo.register(TaskBarUpdate.class);
+        kryo.register(AddEntityReturn.class);
+
     }
 
 

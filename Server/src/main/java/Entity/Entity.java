@@ -34,11 +34,13 @@ public abstract class Entity {
         return new ExistingEntityState(registrationID, posComp.getPos(), animationComp.getCurrentAnimationState(), animationComp.getCurrentAnimation().getIndex());
     }
 
-    public NewAnimatedEntityState adaptToNewAnimatedEntityState() {
+    public NewAnimatedEntityState adaptToNewAnimatedEntityState(boolean scrollable) {
         PosComp posComp = getComponent(PosComp.class);
         AnimationComp animationComp = getComponent(AnimationComp.class);
         int registrationID = EntityRegistryServer.getEntityID(this);
-        return new NewAnimatedEntityState(registrationID, posComp.getPos(), animationComp.adaptToAllNewAnimations(), animationComp.getCurrentAnimationState());
+        NewAnimatedEntityState newAnimatedEntityState = new NewAnimatedEntityState(registrationID, posComp.getPos(), animationComp.adaptToAllNewAnimations(), animationComp.getCurrentAnimationState());
+        newAnimatedEntityState.setScrollable(scrollable);
+        return newAnimatedEntityState;//todo record in document and simplify
     }
 
     public NewLineState adaptToNewLineState() {

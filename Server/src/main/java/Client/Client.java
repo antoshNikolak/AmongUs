@@ -9,34 +9,28 @@ import State.GameState;
 import State.LobbyState;
 import TimerHandler.TimerStarter;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class Client {
 
     private final int connectionID;
     private Player player;
+    private boolean inGame = false;
 
     public static void prepareClientToPlay(Client client) {
         prepareGame();
         client.createPlayer();
-        addClientToLobby(client);
+        AppServer.currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
         if (AppServer.currentGame.getClients().size() == 2) {
             TimerStarter.startTimer("GameStartTimer", 5, () -> startGameState());
         }
     }
 
-    public static void startGameState() {//todo ask if accessing this twice affect objects getting locks
+    public static void startGameState() {
         synchronized (AppServer.currentGame.getStateManager()) {
             AppServer.currentGame.getStateManager().popState();
             AppServer.currentGame.getStateManager().pushState(new GameState());
         }
-    }
-
-    private static void addClientToLobby(Client client) {
-//        LobbyState.handleNewPlayerJoin();
-//        if (!(AppServer.currentGame.getStateManager().getCurrentState() instanceof LobbyState))
-//            throw new IllegalStateException();
-
-        AppServer.currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
-//        ((LobbyState) AppServer.currentGame.getStateManager().getCurrentState()).handleNewPlayerJoin(client);
     }
 
     private static void prepareGame() {
@@ -62,5 +56,13 @@ public class Client {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public boolean isInGame() {
+        return inGame;
+    }
+
+    public void setInGame(boolean inGame) {
+        this.inGame = inGame;
     }
 }

@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TimerStarter {
 
-    public  static void startTimer(String timerString,int counter, TimerFinish onTimerFinished){
+    public  static void startTimer(String timerString , int counter, TimerFinish onTimerFinished){
         AtomicInteger atomicCounter = new AtomicInteger(counter);
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override

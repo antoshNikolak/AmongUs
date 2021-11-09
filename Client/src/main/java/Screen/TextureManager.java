@@ -31,6 +31,11 @@ public class TextureManager {
         loadImage("sudoku-task", "Texture/bookshelf.png", 50, 50, false);
         loadImage("maze-task", "Texture/maze-task.png", 50, 50, false);
         loadImage("number-count-task", "Texture/number-count-task.png", 50, 50, false);
+        loadImage("meeting-table", "Texture/meeting-table.png", 150, 150, false);
+        loadImage("emergency-meeting", "Texture/emergency-meeting.png", 600, 200, true);
+        loadImage("dead-body-reported", "Texture/dead-body-reported.png", 600, 200, true);
+        loadImage("task-bar", "Texture/task-bar.png", 500, 50, true);
+
     }
 
     // used to scale an image when its loaded

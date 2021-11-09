@@ -4,25 +4,27 @@ import Client.Client;
 import Component.PosComp;
 import ConnectionServer.ConnectionServer;
 import Entity.CollidableRect;
-import Entity.EntityReturnBuffer;
 import Entity.MazePlayer;
 import Maze.Maze;
-import Packet.AddEntityReturn.AddNestedPane;
-import Packet.EntityState.NewEntityState;
-import Packet.Position.RemoveNestedScreen;
+import Packet.NestedPane.AddNestedPane;
+import Packet.NestedPane.NodeInfo;
+import Packet.NestedPane.NodeType;
 import Position.Pos;
 import System.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MazeTaskState extends TaskState {
 
-    private final int mazeHeight ;
+    private final int mazeHeight;
     private final int mazeWidth;
     private final int cellDimension;
-    private  Maze maze;
+    private Maze maze;
     private MazePlayer mazePlayer;
+
+    private final List<CollidableRect> mazeLines = new ArrayList<>();
 
 
     public MazeTaskState() {
@@ -30,36 +32,36 @@ public class MazeTaskState extends TaskState {
         this.mazeHeight = 5;
         this.mazeWidth = 8;
         this.cellDimension = 50;
-//        this.maze = new Maze(mazeWidth, mazeHeight, cellDimension);
     }
 
     @Override
-    public void update(){//when this happens, in another thread player isnt initialized
+    public void update() {
         super.update();
         checkTaskComplete();
     }
 
-
-
     private void checkTaskComplete() {
-        if (isMazeComplete()){
-            player.setCurrentTask(null);
-            this.entities.clear();
-            ConnectionServer.sendTCP(new RemoveNestedScreen(), player.getConnectionID());
+        if (isMazeComplete()) {
+            super.endState();
+            super.incrementTaskBar();
         }
     }
 
-    public boolean isMazeComplete(){
+    public boolean isMazeComplete() {
         return mazePlayer.getComponent(PosComp.class).getPos().getX() >= mazeWidth * cellDimension;
     }
 
     @Override
     public void init() {
-        this.maze = new Maze(mazeWidth, mazeHeight, cellDimension);
-        maze.start();
+        startMaze();
         createMazePlayer();
         sendClientMazeLines();
         startSystems();
+    }
+
+    private void startMaze() {
+        this.maze = new Maze(mazeWidth, mazeHeight, cellDimension);
+        this.maze.start();
     }
 
     private void createMazePlayer() {
@@ -71,24 +73,51 @@ public class MazeTaskState extends TaskState {
 
     private void sendClientMazeLines() {
         startUpEntities();
-        List<NewEntityState> newEntityStates = getNewEntityStateList(getCollidableMazeLines());
-        ConnectionServer.sendTCP(new AddNestedPane(newEntityStates, 50, 50, 400, 250), player.getConnectionID());
+        ConnectionServer.sendTCP(createNestedPanePacket(), player.getConnectionID());
     }
 
-    private List<CollidableRect> getCollidableMazeLines() {
-        ArrayList<CollidableRect> collidableRects = new ArrayList<>(maze.createLineState());
-        this.entities.addAll(collidableRects);
-        return collidableRects;
+    private AddNestedPane createNestedPanePacket() {
+        return new AddNestedPane.Builder(50, 50, 400, 250)
+                .withNode(new NodeInfo(NodeType.CANVAS, 0, 0, 400, 250))
+                .withNodes(getLines())
+                .withNewEntityState(mazePlayer.adaptToNewAnimatedEntityState(true))
+                .build();
     }
 
-    private List<NewEntityState> getNewEntityStateList(List<CollidableRect> collidableRects) {
-        ArrayList<NewEntityState> newEntityStates = new ArrayList<>(EntityReturnBuffer.adaptCollectionToNewLineStates(collidableRects));
-        newEntityStates.add(mazePlayer.adaptToNewAnimatedEntityState());
-        return newEntityStates;
+//    private List<CollidableRect> getCollidableMazeLines() {
+//        ArrayList<CollidableRect> collidableRects = new ArrayList<>(maze.createLines());
+//        this.entities.addAll(collidableRects);
+//        return collidableRects;
+//    }
+
+    private List<NodeInfo> getLines() {
+//        return mazeLines.stream()
+//                .map(collidableRect -> {
+//                    PosComp posComp = collidableRect.getComponent(PosComp.class);
+//                    NodeInfo nodeInfo = new NodeInfo(NodeType.LINE, posComp.getPos().getX(), posComp.getPos().getY(), posComp.getWidth(), posComp.getHeight());
+//                    nodeInfo.setWidth(5);
+//                    return nodeInfo;
+//                }).collect(Collectors.toList());
+
+        List<NodeInfo> nodes = new ArrayList<>();
+        for (CollidableRect collidableRect : mazeLines) {
+            PosComp posComp = collidableRect.getComponent(PosComp.class);
+            NodeInfo nodeInfo = new NodeInfo(NodeType.LINE, posComp.getPos().getX(), posComp.getPos().getY(), posComp.getWidth(), posComp.getHeight());
+            nodeInfo.setLineWidth(5);
+            nodes.add(nodeInfo);
+        }
+        return nodes;
     }
+
+//    private List<NewAnimatedEntityState> getNewEntityStateList(List<CollidableRect> collidableRects) {
+//        ArrayList<NewAnimatedEntityState> newEntityStates = new ArrayList<NewAnimatedEntityState>(EntityReturnBuffer.adaptCollectionToNewLineStates(collidableRects));
+//        newEntityStates.add(mazePlayer.adaptToNewAnimatedEntityState());
+//        return newEntityStates;
+//    }
 
     private void startUpEntities() {
-        entities.addAll(maze.createLineState());
+        mazeLines.addAll(maze.createLines());
+        entities.addAll(mazeLines);
     }
 
     @Override

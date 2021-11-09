@@ -27,6 +27,12 @@ public class Pos {
         this.y = pos.getY();
     }
 
+    @Override
+    public String toString() {
+        return "x: "+x +
+                " y: "+y;
+    }
+
     public void incrementX(double distance){
         this.x+=distance;
     }

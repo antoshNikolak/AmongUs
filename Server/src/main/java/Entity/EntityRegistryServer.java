@@ -1,11 +1,10 @@
 package Entity;
 
+import ConnectionServer.ConnectionServer;
+import Packet.Position.ClearEntityReturn;
 import Utils.CollectionUtils;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -22,9 +21,33 @@ public class EntityRegistryServer {
         entityIDMap.put(getFreeID(), entity);
     }
 
-    public static void removeEntity(int id){
+    public static void unregisterEntity(int id){
         entityIDMap.remove(id);
     }
+
+    public static void removeEntity(int entityID){
+        ConnectionServer.sendTCPToAllPlayers(new ClearEntityReturn(entityID));
+        EntityRegistryServer.unregisterEntity(entityID);
+    }
+
+    public static void removeEntity(Entity entity){
+        removeEntity(getEntityID(entity));
+    }
+
+    public static void removeEntities(ArrayList<Entity> entities){
+        for (Entity entity : entities){
+            removeEntity(entity);
+        }
+    }
+
+
+    public static void removeEntities(List<Integer> entityIDs){
+        ConnectionServer.sendTCPToAllPlayers(new ClearEntityReturn(entityIDs));
+        for (Integer ID: entityIDs) {
+            EntityRegistryServer.unregisterEntity(ID);
+        }
+    }
+
 
 
     public static Entity getEntity(int id) {

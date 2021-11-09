@@ -6,6 +6,7 @@ module Client {
     requires kryo;
 
     requires Shared;
+    requires java.desktop;
 
     opens StartUp;
     opens Screen;

@@ -21,6 +21,14 @@ module Shared {
     opens Packet.EntityState;
     exports Packet.AddEntityReturn;
     opens Packet.AddEntityReturn;
+    exports SudokuPacket;
+    opens SudokuPacket;
+    exports Packet.NestedPane;
+    opens Packet.NestedPane;
+    exports Packet.Sound;
+    opens Packet.Sound;
+    exports Voting;
+    opens Voting;
 
 
 }

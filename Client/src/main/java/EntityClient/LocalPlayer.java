@@ -19,14 +19,10 @@ public class LocalPlayer extends Entity {
 
     public void sendInput() {
         PosRequest request = createPosRequest();
-        if (hasUserInput(request) || hasMovementInputChanged(request) || hasUserInputSpecialMove(request)) {
+        if (hasUserInput(request) || hasMovementInputChanged(request)) {
             ConnectionClient.sendUDP(request);
         }
         this.prevRequest = request;
-    }
-
-    private boolean hasUserInputSpecialMove(PosRequest posRequest){
-        return posRequest.isKillKey() || posRequest.isTaskKey();
     }
 
     private boolean hasMovementInputChanged(PosRequest posRequest) {
@@ -52,6 +48,9 @@ public class LocalPlayer extends Entity {
         if (KeyManager.isTaskKeyPressed()){
             posRequest.setTaskKey(true);
         }
+        if (KeyManager.isReportKeyPressed()){
+            posRequest.setReportKey(true);
+        }
     }
 
     private void checkVerticalMovement(PosRequest request) {
@@ -72,17 +71,11 @@ public class LocalPlayer extends Entity {
 
     private boolean hasUserInput(PosRequest request) {
         return request.isDown() || request.isLeft() ||
-                request.isUp() || request.isRight();
+                request.isUp() || request.isRight() ||
+                request.isKillKey() || request.isTaskKey()||
+                request.isReportKey();
     }
 
-//    @Override
-//    public void render(GraphicsContext gc) {
-//        if (scrollingEnabled) {
-//            System.out.println("scrolling");
-//            ScreenManager.getScreen(GameScreen.class).getCamera().centreOnEntity(this);
-//        }
-//        super.render(gc);
-//    }
 
     @Override
     public void render(GraphicsContext gc, Camera camera) {

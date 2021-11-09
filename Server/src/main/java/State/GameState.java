@@ -1,14 +1,16 @@
 package State;
 
 import Client.Client;
+import Component.AnimationComp;
 import Component.ColourComp;
 import Component.ImposterComp;
 import Component.PosComp;
 import ConnectionServer.ConnectionServer;
 import Entity.EntityRegistryServer;
 import Entity.Tile;
+import Packet.AddEntityReturn.AddEntityReturn;
 import Packet.Position.ClearEntityReturn;
-import Packet.AddEntityReturn.AddStationaryEntityReturn;
+//import Packet.AddEntityReturn.AddStationaryEntityReturn;
 import Packet.EntityState.NewEntityState;
 import Packet.Camera.ScrollingEnableReturn;
 import Position.Pos;
@@ -21,13 +23,13 @@ import Entity.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-public class GameState extends State {
-
-    protected World world;
+public class GameState extends PlayingState {
+    private TaskBar taskBar;
 
     public GameState() {
-        super(false);
+        super();
     }
 
     @Override
@@ -36,16 +38,24 @@ public class GameState extends State {
         this.addSystem(new TextureSystem());
         this.addSystem(new TaskSystem());
         this.addSystem(new ImposterActionsSystem());
+        this.addSystem(new ReportBodySystem());
     }
 
     @Override
     public void init() {
         startSystems();
         addPlayersAsEntities();
-        createWord();
+        createWorld();
         sendWorldDataToAllPlayers();
         selectImpostor();
         enableClientScreenScrolling();
+        addTaskBar();
+    }
+
+    private void addTaskBar(){
+        this.taskBar = new TaskBar();
+        this.entities.add(taskBar);
+        ConnectionServer.sendTCPToAllPlayers(new AddEntityReturn(taskBar.adaptToNewAnimatedEntityState(false)));
     }
 
     private void enableClientScreenScrolling(){
@@ -62,9 +72,6 @@ public class GameState extends State {
                 player.addComponent(new ImposterComp());
                 System.out.println(player.getComponent(ColourComp.class).getColour() + "is the impostor");
             }
-//            else {
-//                player.addComponent(new RoleComp(Role.CREWMATE));
-//            }
         }
     }
 
@@ -74,58 +81,59 @@ public class GameState extends State {
         return players.get(index);
     }
 
-    protected void createWord() {
-        this.world = new World("World/game-map.txt");
-        System.out.println("world created");
-    }
+
 
     private void addPlayersAsEntities() {
         entities.addAll(AppServer.currentGame.getPlayers());
-//        AppServer.currentGame.getClients().stream().
-//                map(client -> client.getPlayer()).
-//                forEach(player ->{
-//                    System.out.println("adding player");
-//                    entities.add(player);
-//                } );
     }
 
-    public void close() {
-        clearWorldData();
+//    public void close() {
+//        clearWorldData();
+//    }
+//
+//    private void clearWorldData() {
+//        ConnectionServer.sendTCPToAllPlayers(new ClearEntityReturn(world.getTileIDs()));
+//        for (Integer ID: world.getTileIDs()) {
+//            EntityRegistryServer.removeEntity(ID);
+//        }
+//    }
+
+//    private void sendWorldDataToAllPlayers() {
+//        List<NewEntityState> newEntities = createEntityStatesFromTiles();
+//        ConnectionServer.sendTCPToAllPlayers(new AddStationaryEntityReturn(newEntities));
+//    }
+//
+//    protected void sendWorldData(int connectionID) {
+//        List<NewEntityState> newEntities = createEntityStatesFromTiles();
+//        ConnectionServer.sendTCP(new AddStationaryEntityReturn(newEntities), connectionID);
+//    }
+
+//    private List<NewEntityState> createEntityStatesFromTiles() {
+//        List<NewEntityState> newEntities = new ArrayList<>();
+//        for (Tile tile : world.getTiles()) {
+//            newEntities.add(tile.adaptToNewAnimatedEntityState());
+//        }
+//        return newEntities;
+//    }
+
+    @Override
+    protected void createWorld() {
+        this.world = new World("World/game-map.txt");
     }
 
-    private void clearWorldData() {
-        ConnectionServer.sendTCPToAllPlayers(new ClearEntityReturn(world.getTileIDs()));
-        for (Integer ID: world.getTileIDs()) {
-            EntityRegistryServer.removeEntity(ID);
-        }
+    public TaskBar getTaskBar() {
+        return taskBar;
     }
 
-    private void sendWorldDataToAllPlayers() {
-        List<NewEntityState> newEntities = createEntityStatesFromTiles();
-        ConnectionServer.sendTCPToAllPlayers(new AddStationaryEntityReturn(newEntities));
+    public void setTaskBar(TaskBar taskBar) {
+        this.taskBar = taskBar;
     }
-
-    protected void sendWorldData(int connectionID) {
-        List<NewEntityState> newEntities = createEntityStatesFromTiles();
-        ConnectionServer.sendTCP(new AddStationaryEntityReturn(newEntities), connectionID);
-    }
-
-    private List<NewEntityState> createEntityStatesFromTiles() {
-        List<NewEntityState> newEntities = new ArrayList<>();
-        for (Tile tile : world.getTiles()) {
-            newEntities.add(tile.adaptToNewAnimatedEntityState());
-        }
-        return newEntities;
-    }
-
 
     @Override
     public void removeClient(Client client) {
         //todo
     }
 
-    public World getWorld() {
-        return world;
-    }
+
 
 }

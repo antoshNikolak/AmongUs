@@ -31,28 +31,17 @@ public class Maze {
         graph = new SquareGraph(width, height, cellDimension);
         graph.init();
         Set<Edge> minimalSpanningTree = graph.createSpanningTree();
-        createConnectionsBetweenCells(graph, minimalSpanningTree);
+        removeWallsBetweenCells(graph, minimalSpanningTree);
         createStartFinish();
     }
 
-    public List<CollidableRect> createLineState() {
+    public List<CollidableRect> createLines() {
         return graph.createLinesStates(cells);
     }
 
     private void createStartFinish() {
         createStartCell();
         createEndCell();
-//        Random random = new Random();
-
-//        int startCellHeight = random.nextInt(height);
-//        Cell startCell = cells [startCellHeight][0];
-//        startCell.setLeftWall(false);
-//        this.startPos = new Pos(0, startCellHeight*cellDimension);
-
-//        int endCellHeight = random.nextInt(height);
-//        Cell endCell = cells [endCellHeight][width-1];
-//        endCell.setRightWall(false);
-//        this.endPos = new Pos((width-1)* cellDimension, endCellHeight * cellDimension);
     }
 
     private void createStartCell(){
@@ -72,34 +61,33 @@ public class Maze {
     }
 
 
-    private void creatVerticalOpening(Random random) {
-        int startY = 0;
-        int startX = random.nextInt(width - 1);
-        int endY = width - 1;
-        int endX = random.nextInt(width - 1);
-        Cell startCell = cells[startY][startX];
-        Cell endCell = cells[endY][endX];
-        startCell.setTopWall(false);
-        endCell.setBottomWall(false);
-    }
+//    private void creatVerticalOpening(Random random) {
+//        int startY = 0;
+//        int startX = random.nextInt(width - 1);
+//        int endY = width - 1;
+//        int endX = random.nextInt(width - 1);
+//        Cell startCell = cells[startY][startX];
+//        Cell endCell = cells[endY][endX];
+//        startCell.setTopWall(false);
+//        endCell.setBottomWall(false);
+//    }
+//
+//    private void createHorizontalOpenings(Random random) {
+//        int startX = 0;
+//        int startY = random.nextInt(width - 1);
+//        int endX = width - 1;
+//        int endY = random.nextInt(width - 1);
+//        Cell startCell = cells[startY][startX];
+//        Cell endCell = cells[endY][endX];
+//        startCell.setLeftWall(false);
+//        endCell.setRightWall(false);
+//    }
 
-    private void createHorizontalOpenings(Random random) {
-        int startX = 0;
-        int startY = random.nextInt(width - 1);
-        int endX = width - 1;
-        int endY = random.nextInt(width - 1);
-        Cell startCell = cells[startY][startX];
-        Cell endCell = cells[endY][endX];
-        startCell.setLeftWall(false);
-        endCell.setRightWall(false);
-    }
-
-    private void createConnectionsBetweenCells(SquareGraph graph, Set<Edge> MSM) {
+    private void removeWallsBetweenCells(SquareGraph graph, Set<Edge> MSM) {
         Vertex[][] vertices = graph.create2DArray();
-
         for (Edge edge : MSM) {
             Pos arrayPos1 = getPosInArray(vertices, edge.getVertex1());
-            Pos arrayPos2 = getPosInArray(vertices, edge.getVertex2());//or we could base this on their s co ordinate
+            Pos arrayPos2 = getPosInArray(vertices, edge.getVertex2());
             assert arrayPos1 != null && arrayPos2 != null;
 
             Cell cell1 = cells[(int) arrayPos1.getY()][(int) arrayPos1.getX()];

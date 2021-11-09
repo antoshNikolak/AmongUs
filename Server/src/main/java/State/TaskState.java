@@ -1,17 +1,26 @@
 package State;
 
-import Client.Client;
 import ConnectionServer.ConnectionServer;
+import Entity.EntityRegistryServer;
 import Entity.Player;
-import Packet.AddEntityReturn.AddNestedPane;
+import Entity.TaskBar;
+import Packet.NestedPane.RemoveNestedScreen;
+import Packet.Position.TaskBarUpdate;
+import StartUpServer.AppServer;
 
 public abstract class TaskState extends State{
 
     protected Player player;
 
+    protected void endState(){
+        player.setCurrentTask(null);
+//        this.entities.clear();
+        ConnectionServer.sendTCP(new RemoveNestedScreen(), player.getConnectionID());
+    }
+
 
     public TaskState() {
-        super(false);
+        super();
     }
 
     public Player getClient() {
@@ -21,4 +30,14 @@ public abstract class TaskState extends State{
     public void setPlayer(Player client) {
         this.player = client;
     }//solution allows for only 1 client to play a task at a time
+
+    protected void incrementTaskBar() {
+        TaskBar taskBar = AppServer.currentGame.getStateManager().getState(GameState.class).getTaskBar();
+        taskBar.incrementProgressBar(40);
+        int registrationID = EntityRegistryServer.getEntityID(taskBar);
+        ConnectionServer.sendTCPToAllPlayers(new TaskBarUpdate(registrationID, taskBar.getProgressBarWidth()));
+        if (taskBar.isFull()){
+//            handleImpostorWin();
+        }
+    }
 }

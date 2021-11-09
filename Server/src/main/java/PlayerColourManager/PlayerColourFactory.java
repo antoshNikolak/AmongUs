@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 public class PlayerColourFactory {
-    private static List<String> availableColours = new ArrayList<>();
+    private final static List<String> availableColours;
 
     static {
         String [] playerColours = new String[]{"green", "blue", "orange", "cyan", "yellow", "pink", "red"};

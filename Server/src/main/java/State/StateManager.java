@@ -4,43 +4,42 @@ import java.util.*;
 
 public class StateManager {
 
-    private final Stack<GameState> states = new Stack<>();//wont allow duplicates
-    
-    public void updateTop() {
+    private final Stack<PlayingState> states = new Stack<>();//wont allow duplicates
+
+    public synchronized void updateTop() {
         states.peek().update();
     }
 
-    public void update() {
-        ListIterator<GameState> stateItr = states.listIterator(states.size());
-        while (stateItr.hasPrevious()){
-            GameState state = stateItr.previous();
-            if (!state.isBlocksUpdate()){
-                state.update();
-            }else {
-                break;
-            }
+    public synchronized void update() {
+        ListIterator<PlayingState> stateItr = states.listIterator(states.size());
+        while (stateItr.hasPrevious()) {
+            PlayingState state = stateItr.previous();
+            state.update();
         }
     }
 
-    public void pushState(GameState state) {
+    public void pushState(PlayingState state) {
         if (states.contains(state)) return;
-        states.add(state);
+        synchronized (this) {
+            states.add(state);
+        }
         state.init();
     }
 
-    public void popState() {
+    public synchronized void popState() {
         states.pop().close();
     }
 
-    public GameState getCurrentState() {
+    public synchronized PlayingState getCurrentState() {
         return states.peek();
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends State> T getState(Class<T> stateClass) {
+    public synchronized <T extends State> T getState(Class<T> stateClass) {
         for (State state : states) {
             if (state.getClass().isAssignableFrom(stateClass)) {
-                return (T) state;
+                    return (T) state;
+
             }
         }
         return null;
