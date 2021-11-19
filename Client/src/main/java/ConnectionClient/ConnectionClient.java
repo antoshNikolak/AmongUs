@@ -32,12 +32,14 @@ import Voting.ElectionReturn;
 import Voting.ImpostorVote;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.minlog.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 
 public final class ConnectionClient {
     private final static Client client = new Client(1000000, 1000000);
@@ -51,6 +53,8 @@ public final class ConnectionClient {
     }
 
     static {
+
+//        Log.set(Log.LEVEL_DEBUG);//print all level above and including debug
         startConnection();
         registerPackets();
         client.addListener(new PacketListenerClient());

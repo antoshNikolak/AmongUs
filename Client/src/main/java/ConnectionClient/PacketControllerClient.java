@@ -83,8 +83,6 @@ public class PacketControllerClient {
             if (newEntityState instanceof NewAnimatedEntityState) {
                 Entity entity = new Entity((NewAnimatedEntityState) newEntityState);
                 entity.setScrollable(((NewAnimatedEntityState) newEntityState).isScrollable());
-//                System.out.println("scrollable: "+((NewAnimatedEntityState) newEntityState).isScrollable());
-
                 ScreenManager.getScreen(GameScreen.class).getEntities().add(entity);
             }
 
@@ -97,7 +95,6 @@ public class PacketControllerClient {
                 Line line = new Line(newLineState.getStartPos().getX(), newLineState.getStartPos().getY(), newLineState.getFinalPos().getX(), newLineState.getFinalPos().getY());
                 ScreenManager.getCurrentScreen().getPane().getChildren().add(line);
             });
-
         }
     }
 
@@ -117,6 +114,7 @@ public class PacketControllerClient {
     }
 
     private final Counter gameStartCounter = new Counter(300, 200, 50);
+
     public void handleGameStartTimerReturn(GameStartTimer packet) {
         Platform.runLater(() -> gameStartCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
@@ -124,6 +122,7 @@ public class PacketControllerClient {
 //    private KillCoolDownCounter killCoolDownCounter = new KillCoolDownCounter();
 
     private final Counter killCoolDownCounter = new Counter(500, 350, 50);
+
     public void handleKillCoolDownTimer(KillCoolDownTimer packet) {
         Platform.runLater(() -> killCoolDownCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
@@ -141,41 +140,13 @@ public class PacketControllerClient {
         AppClient.currentGame.getMyPlayer().setScrollingEnabled(packet.isScrollingEnabled());
     }
 
-    public void handleAddNestedPane(AddNestedPane packet) {//use boolean to check, if has canvas and where, create node info object
-        Platform.runLater(() -> {
-            NestedScreenHandler.createGameScreen(packet);
-//            createEntity(packet.getNewEntityStates(), gameScreen);
-        });
+    public void handleAddNestedPane(AddNestedPane packet) {
+        Platform.runLater(() -> NestedScreenHandler.createGameScreen(packet));
     }
-
-    private void createEntities() {
-
-    }
-
-
-//
-//    private void createEntity(List<? extends NewEntityState> newEntityStates, GameScreen gameScreen) {
-//        for (NewEntityState newEntityState : newEntityStates) {
-//            if (newEntityState instanceof NewAnimatedEntityState) {
-//                gameScreen.getEntities().add(new Entity((NewAnimatedEntityState) newEntityState));
-//            } else if (newEntityState instanceof NewLineState) {
-//                gameScreen.addNode(createLine((NewLineState) newEntityState));
-//
-//            }
-//        }
-//    }
-
-    private Line createLine(NewLineState lineState) {
-        Line line = new Line(lineState.getStartPos().getX(), lineState.getStartPos().getY(), lineState.getFinalPos().getX(), lineState.getFinalPos().getY());
-        line.setStrokeWidth(lineState.getWidth());
-        return line;
-    }
-
 
     public void removeNestedScreen() {
         Platform.runLater(() -> ScreenManager.getScreen(GameScreen.class).removeNestedScreen());
     }
-
 
     public void handleAddSudokuPane(AddSudokuPane packet) {
         Platform.runLater(() -> SudokuHandler.addSudokuToScreen(packet));
@@ -222,7 +193,8 @@ public class PacketControllerClient {
     }
 
 
-    private  VotingPaneHandler votingPaneHandler = new VotingPaneHandler();
+    private VotingPaneHandler votingPaneHandler = new VotingPaneHandler();
+
     public void handleAddVotingPane(AddVotingPane packet) {
         Platform.runLater(() -> {
             killCoolDownCounter.setTimerOn(false);
@@ -239,27 +211,27 @@ public class PacketControllerClient {
             public void run() {
                 killCoolDownCounter.setTimerOn(true);
                 removeNestedScreen();
-                ConnectionClient.sendTCP(new AnimationOver());
             }
         }, 2000);
     }
 
     private final Counter votingTimerCounter = new Counter(250, 250, 50);
+
     public void handleVotingTimer(VotingTimer packet) {
         Platform.runLater(() -> votingTimerCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
 
     public void handleTaskBarUpdate(TaskBarUpdate packet) {
         Entity taskBar = EntityRegistryClient.getEntity(packet.getRegistrationID());
-        double fillStartX = taskBar.getPos().getX()+ 7;//add 10 to compensate for the frame of the bar
+        double fillStartX = taskBar.getPos().getX() + 7;//add 10 to compensate for the frame of the bar
         double fillEndX = taskBar.getPos().getX() + 7 + packet.getNewWidth();
         double taskBarHeight = TextureManager.getTexture("task-bar").getHeight();
 
-        Rectangle rectangle = new Rectangle(fillEndX - fillStartX, taskBarHeight -18);
+        Rectangle rectangle = new Rectangle(fillEndX - fillStartX, taskBarHeight - 18);
         rectangle.setFill(Color.GREEN);
         rectangle.setX(fillStartX);
-        rectangle.setY(taskBar.getPos().getY()+ 10);
-        Platform.runLater(()->ScreenManager.getCurrentScreen().addNode(rectangle));
+        rectangle.setY(taskBar.getPos().getY() + 10);
+        Platform.runLater(() -> ScreenManager.getCurrentScreen().addNode(rectangle));
 
 
     }

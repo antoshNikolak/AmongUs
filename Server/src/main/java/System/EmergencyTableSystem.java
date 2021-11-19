@@ -45,8 +45,13 @@ public class EmergencyTableSystem extends BaseSystem {
     private void startTimeToVoteTimer(){
         TimerStarter.startTimer("VotingTimer", 5, ()->{
             ConnectionServer.sendTCPToAllPlayers(new RemoveVotingScreen(getPlayerAnimationMap(playerVoteMap)));
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    onAnimationOver();
+                }
+            }, 2000);//however long the animation takes
         });
-        //when this timer ends, votes will be counted up, and the elected impostor is sent to clients
     }
 
     public void onAnimationOver(){
@@ -54,6 +59,11 @@ public class EmergencyTableSystem extends BaseSystem {
         playerOptional.ifPresent(this::ejectPlayer);
         mobilisePlayers();
         disableVoiceChat();
+        removeThisFromSystems();
+    }
+
+    public void removeThisFromSystems(){
+        AppServer.currentGame.getStateManager().getCurrentState().removeSystem(getClass());
     }
 
     private Map<String, String> getPlayerAnimationMap(Map<Player, Player> playerMap){
@@ -63,15 +73,6 @@ public class EmergencyTableSystem extends BaseSystem {
         }
         return playerAnimationMap;
     }
-
-//    private void removeElectedPlayer(){
-//        Player player = getPlayerWithMostVotes();
-//        ejectPlayer(player);
-//
-////        ConnectionServer.sendTCPToAllPlayers(new ElectionReturn(getPlayerAnimationID(player)));
-////        AppServer.currentGame.getStateManager().getCurrentState().getEntities().remove(player);
-////        EntityRegistryServer.removeEntity(player);
-//    }
 
     private void ejectPlayer(Player player){
         ImposterActionsSystem killHandler = AppServer.currentGame.getStateManager().getCurrentState().getSystem(ImposterActionsSystem.class);
@@ -143,12 +144,6 @@ public class EmergencyTableSystem extends BaseSystem {
         List<String> playerAnims = new ArrayList<>();
         for (Player player : AppServer.currentGame.getPlayers()) {
             playerAnims.add(getPlayerAnimationID(player));
-//            AnimationComp animationComp = player.getComponent(AnimationComp.class);
-//            if (player.getComponent(AliveComp.class).isAlive()) {
-//                playerAnims.add(animationComp.getAnimation(AnimState.RIGHT).getFrames()[0]);
-//            } else {
-//                playerAnims.add(animationComp.getAnimation(AnimState.GHOST_RIGHT).getFrames()[0]);
-//            }
         }
         return playerAnims;
     }

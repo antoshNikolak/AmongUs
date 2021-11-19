@@ -5,7 +5,9 @@ import Screen.EntryScreen;
 import Screen.ScreenManager;
 import Screen.TextureManager;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -29,6 +31,5 @@ public class AppClient  extends Application {
         ScreenManager.activate(EntryScreen.class);
         stage.show();
         TextureManager.init();
-//        TextureManager.getTexture("green-dead");
     }
 }

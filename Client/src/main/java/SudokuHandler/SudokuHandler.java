@@ -15,13 +15,14 @@ import javafx.scene.text.Text;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
-public class SudokuHandler {//todo remove static
-    private static HashMap<TextField, Pos> inputPositionMap = new HashMap<>();
+public class SudokuHandler {
+    private static HashMap<TextField, Pos> inputPositionMap = new HashMap<>();//static is ok because a client cant open 2 sudokus at once
 
     public static void addSudokuToScreen(AddSudokuPane packet) {
+        System.out.println("adding sudoku to pane");
         GameScreen gameScreen = NestedScreenHandler.createGameScreen(packet);
-//        addWhiteBackground(gameScreen);
         drawLines(gameScreen);
         addNumbersAndInput(gameScreen, packet.getSudoku());
         addCheckButton(gameScreen, packet.getSudoku());
@@ -36,20 +37,26 @@ public class SudokuHandler {//todo remove static
     }
 
     public static void verifySudoku(Integer[][] sudoku) {
-        Integer[][] sudokuCopy = Arrays.stream(sudoku).map(Integer[]::clone).toArray(Integer[][]::new);
-        boolean sudokuCompleted = completeSudokuWithUserInputs(sudokuCopy);
-        if (sudokuCompleted) {
-            ConnectionClient.sendTCP(new VerifySudokuRequest(sudokuCopy));
+        boolean sudokuCompleted = checkUserInputComplete();
+        plugInUserInputValues(sudoku);
+        if (sudokuCompleted) {//if method returns false dont send, because user hasn't completed the sudoku, so not worth checking
+            ConnectionClient.sendTCP(new VerifySudokuRequest(sudoku));
         }
     }
 
-    private static boolean completeSudokuWithUserInputs(Integer[][] sudoku) {
+    private static void plugInUserInputValues(Integer [][] sudoku){
+        for (Map.Entry<TextField, Pos> entry : inputPositionMap.entrySet()){
+            int input = Integer.parseInt(entry.getKey().getText());
+            Pos pos = entry.getValue();
+            sudoku[(int)pos.getY()][(int)pos.getX()]= input;
+        }
+    }
+
+    private static boolean checkUserInputComplete() {
         for (TextField textField : inputPositionMap.keySet()) {
-            Pos pos = inputPositionMap.get(textField);
             try {
-                sudoku[(int) pos.getX()][(int) pos.getY()] = Integer.parseInt(textField.getText());
+                Integer.parseInt(textField.getText());//text field is filled out so the sudoku is worth checking
             } catch (NumberFormatException e) {
-//                sudoku[(int) pos.getX()][(int) pos.getY()] = 0;
                 return false; //if text field is empty, or not a number, false is returned
             }
         }
@@ -63,14 +70,11 @@ public class SudokuHandler {//todo remove static
                     createTextField(gameScreen, x, y);
                 } else {
                     addSudokuNumber(gameScreen, sudoku, x, y);
-                    Text text = new Text(String.valueOf(sudoku[y][x]));
-                    text.setX(x * 40 + 17);
-                    text.setY(y * 40 + 17);
-                    gameScreen.addNode(text);
                 }
             }
         }
     }
+
 
     private static void addSudokuNumber(GameScreen gameScreen, Integer[][] sudoku, int x, int y) {
         Text text = new Text(String.valueOf(sudoku[y][x]));

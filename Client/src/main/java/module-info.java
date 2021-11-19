@@ -4,6 +4,7 @@ module Client {
 
     requires kryonet;
     requires kryo;
+    requires minlog;
 
     requires Shared;
     requires java.desktop;
@@ -13,4 +14,6 @@ module Client {
     opens ScreenController;
     opens Texture;
     opens ScreenCounter;
+
+    exports Node to javafx.fxml;
 }

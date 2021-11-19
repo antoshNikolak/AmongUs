@@ -18,37 +18,39 @@ public abstract class State implements ClientOperator {
     protected final List<Entity> entities = new CopyOnWriteArrayList<>();
 
 
-    public State() {}
+    public State() {
+    }
 
-    public void addSystem(BaseSystem system){
+    public void addSystem(BaseSystem system) {
         this.systems.put(system.getClass(), system);
     }
 
-    public void removeSystem(Class<? extends BaseSystem> baseSystemClass){
+    public void removeSystem(Class<? extends BaseSystem> baseSystemClass) {
         this.systems.remove(baseSystemClass);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends  BaseSystem> T getSystem( Class<T> system) {
-        return  (T) systems.get(system);
+    public <T extends BaseSystem> T getSystem(Class<T> system) {
+        return (T) systems.get(system);
     }
 
-    public boolean hasSystem( Class<? extends BaseSystem> system) {
-        return  systems.containsKey(system);
+    public boolean hasSystem(Class<? extends BaseSystem> system) {
+        return systems.containsKey(system);
     }
 
 
-    public void clearSystems(){
+    public void clearSystems() {
         this.systems.clear();
     }
 
-    public void update(){
-        for (BaseSystem system: systems.values()){
+    public void update() {
+        for (BaseSystem system : systems.values()) {
             system.update();
         }
     }
 
     public abstract void init();
+
     protected abstract void startSystems();
 
     public List<Entity> getEntities() {
@@ -70,14 +72,23 @@ public abstract class State implements ClientOperator {
         if (hasSystem(ImposterActionsSystem.class)) {
             getSystem(ImposterActionsSystem.class).handleSpecialActions(player, packet);
         }
-        if (hasSystem(CrewMateActionSystem.class)){
+        if (hasSystem(CrewMateActionSystem.class)) {
             getSystem(CrewMateActionSystem.class).handleSpecialAction(player, packet);
         }
-        if (hasSystem(ReportBodySystem.class)){
+        if (hasSystem(ReportBodySystem.class)) {
             getSystem(ReportBodySystem.class).handleReport(player, packet);
         }
         if (hasSystem(TaskSystem.class)) {
             getSystem(TaskSystem.class).handleTaskAction(player, packet);
+        }
+        if (packet.isEmergencyMeetingKey()) {
+            //search for table near
+            if (!hasSystem(EmergencyTableSystem.class)) {//so emergency meeting cant be called 2x
+                EmergencyTableSystem emergencyTableSystem = new EmergencyTableSystem();
+//                System.out.println("adding system to: "+ this);
+                addSystem(emergencyTableSystem);
+                emergencyTableSystem.activate();
+            }
         }
     }
 

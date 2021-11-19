@@ -8,9 +8,9 @@ public class Sudoku {
 
 
     private void init() {
-        for (int column = 0; column < 9; column++) {
-            for (int row = 0; row < 9; row++) {
-                cells[column][row] = new Cell(column, row);
+        for (int y = 0; y < 9; y++) {
+            for (int x = 0; x < 9; x++) {//change
+                cells[y][x] = new Cell(x, y);
             }
         }
     }
@@ -31,7 +31,7 @@ public class Sudoku {
             }
 
         }
-        removeValue(4);
+        removeValue();
     }
 
 
@@ -55,41 +55,44 @@ public class Sudoku {
         return cellOriginalValue;
     }
 
-    private Cell getFirstCell() {
+    private Cell peakInvisivleCells() {
         Cell firstCell = invisibleCells.peek();
         assert firstCell != null : "first cell is null";
         return firstCell;
     }
 
-    private Queue<Cell> invisibleCells = new LinkedList<>();
+    private final Deque<Cell> invisibleCells = new LinkedList<>();
 
     //invisible cell is a cell that the user must input to complete
-    private void removeValue(int cellsToTakeOut) {
+    private void removeValue() {
+        final int cellsToTakeOut = 25;
+        List<Cell> cellList = getShuffledCellList();
+        int counter = 0;
         do {
-            Cell cell = findRandomVisibleCell();
-            System.out.println("invis cell made");
+            Cell cell = cellList.get(counter);
             int cellOriginalValue = addNewInvisibleCell(cell);
-            Cell firstCell = getFirstCell();
+            Cell firstCell = peakInvisivleCells();
             int solutions = getNumberOfSolutions(new LinkedList<>(invisibleCells), 0, firstCell);//runs sudoku solver
             if (solutions > 1) {//put cell back where where it was
-                System.out.println("cell being added back");
                 cell.setValue(cellOriginalValue);
                 invisibleCells.remove(cell);
+            } else {
+                counter++;
             }
         } while (invisibleCells.size() != cellsToTakeOut);
-        //todo find why does last cell not get set to 0
-//        invisibleCells.
-//        System.out.println("invis cell size: "+ invisibleCells.size());
-//        for (Cell cell : invisibleCells){
-//            System.out.println("cell x "+cell.getX());
-//            System.out.println("cell y "+cell.getY());
-//            System.out.println("cell value: "+ cell.getValue());
-//
-//        }
+        invisibleCells.getLast().setValue(0);
     }
 
+    private List<Cell> getShuffledCellList() {
+        List<Cell> cellList = new ArrayList<>();
+        for (int y = 0; y < 9; y++) {
+            cellList.addAll(Arrays.asList(cells[y]).subList(0, 9));
+        }
+        Collections.shuffle(cellList);
+        return cellList;
+    }
 
-    private int getNumberOfSolutions(LinkedList<Cell> invisibleCells, int possibleSolutions, Cell currentCell) {
+    private int getNumberOfSolutions(LinkedList<Cell> emptyCells, int possibleSolutions, Cell currentCell) {
         while (true) {
             ArrayList<Integer> valuesAvailable = currentCell.getValuesAvailable();
             if (valuesAvailable.size() == 0) {//all available values have been previously guessed
@@ -98,7 +101,7 @@ public class Sudoku {
                 return possibleSolutions;//back track
             }
 
-            int randomItem = valuesAvailable.get(new Random().nextInt(valuesAvailable.size()));//get a random value that is available from the list
+            int randomItem = valuesAvailable.get(0);//solver doesnt have to be random
             currentCell.setValue(randomItem);
             currentCell.getValuesAvailable().remove(Integer.valueOf(randomItem));//remove this random value from the list so it wont be guessed again
 
@@ -106,17 +109,16 @@ public class Sudoku {
                 continue;//try again for same cell with different values
             }
 
-            Cell nextCell = invisibleCells.poll();
+            Cell nextCell = emptyCells.poll();
             if (nextCell == null) {//this is the last invisible cell to solve that's in the list
                 return possibleSolutions + 1;
             }
-            possibleSolutions = getNumberOfSolutions(invisibleCells, possibleSolutions, nextCell);
+            possibleSolutions = getNumberOfSolutions(new LinkedList<>(emptyCells), possibleSolutions, nextCell);
             if (possibleSolutions == 0 || possibleSolutions == 1) {//hasn't been solved keep trying
                 continue;//try again
             }
-            return possibleSolutions;//base case,
+            return possibleSolutions;//sudoku solved, return
         }
-
     }
 
 
@@ -125,7 +127,7 @@ public class Sudoku {
             Random random = new Random();
             int x = random.nextInt(cells.length);
             int y = random.nextInt(cells.length);
-            if ((cells[y][x].getValue() == 0)) {//already invisible
+            if ((invisibleCells.contains(cells[y][x]))) {//check cell is invisible
                 continue;
             }
             return cells[y][x];
@@ -135,14 +137,12 @@ public class Sudoku {
     }
 
     private boolean addValue(int y, int x) {
-        System.out.println("forawrd");
         while (true) {
             Cell currentCell = cells[y][x];
             ArrayList<Integer> valuesAvailable = currentCell.getValuesAvailable();
             if (currentCell.getValuesAvailable().size() == 0) {//no more values are left to guess
                 currentCell.replenishValuesAvailable();
                 currentCell.setValue(0);
-                System.out.println("backtrack");
                 return false;//backtrack
             }
             int randomItem = valuesAvailable.get(new Random().nextInt(valuesAvailable.size()));
@@ -226,33 +226,12 @@ public class Sudoku {
         List<Integer> rowValues = new ArrayList<>(Arrays.asList(trimRowArray(sudoku, row)));
         rowValues.removeIf(value -> value == 0);
         return checkDuplicates(rowValues);
-//        Integer[] rowCells = trimRowArray(sudoku, row);
-////        ArrayList<Integer> rowValues = new ArrayList<>();
-////
-////        for (Integer cell : rowCells) {
-////            if (cell != 0) rowValues.add(cell);
-////        }
-////
-////        Set<Integer> uniqueValues = new HashSet<>(rowValues);
-////        return uniqueValues.size() < rowValues.size();
-//
     }
 
     public static boolean checkColumnDuplicates(Integer[][] sudoku, int column) {
-//        Integer[] columnCells = trimColumnArray(sudoku, column);
         List<Integer> columnValues = new ArrayList<>(Arrays.asList(trimColumnArray(sudoku, column)));
         columnValues.removeIf(value -> value == 0);
         return checkDuplicates(columnValues);
-//        if (duplicates) {
-//            for (int y = 0; y < 9; y++) {
-//                for (int x = 0; x < 9; x++) {
-//                    System.out.print(sudoku[y][x]);
-//                }
-//                System.out.println();
-//            }
-//            System.out.println("------------");
-//        }
-//        return duplicates;
     }
 
     public Integer[][] getIntegerMatrix() {

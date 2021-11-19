@@ -65,7 +65,7 @@ public class ImposterActionsSystem extends BaseSystem {
 
     private void registerDeadBody(DeadPlayer deadPlayer) {
         AppServer.currentGame.getStateManager().getCurrentState().getSystem(ReportBodySystem.class).getDeadBodies().add(deadPlayer);//todo remember we changed it
-    }
+    }//todo this acc puts the real player, or his pos at least
 
     public  void stopCrewMateTask(Player crewMate) {
         if (crewMate.getCurrentTask() != null) {
@@ -121,54 +121,12 @@ public class ImposterActionsSystem extends BaseSystem {
     private void sendDeadBodyToClients(Player crewMate) {
         ColourComp colourComp = crewMate.getComponent(ColourComp.class);
         PosComp posComp = crewMate.getComponent(PosComp.class);
-        DeadPlayer deadPlayer = new DeadPlayer(colourComp.getColour(), posComp);
+        DeadPlayer deadPlayer = new DeadPlayer(colourComp.getColour(), new PosComp(posComp.getPos(), posComp.getWidth(), posComp.getHeight()));//todo add this to the diary
         ConnectionServer.sendTCPToAllPlayers(new AddEntityReturn(deadPlayer.adaptToNewAnimatedEntityState(true)));
         registerDeadBody(deadPlayer);
     }
 
-//    private Optional<Player> getClosestCrewMate(Player impostor) {
-//        PriorityQueue<EntityDistance<Player, Player>> smallestDistances = new PriorityQueue<>();
-//        addToSmallestDistancesQueue(smallestDistances, impostor);
-//        return Optional.ofNullable(popClosestPlayer(smallestDistances));
-//    }
-//
-//    private void addToSmallestDistancesQueue(PriorityQueue<EntityDistance<Player, Player>> smallestDistances, Player impostor) {
-//        AppServer.currentGame.getPlayers().stream().
-//                filter(player -> checkPlayerCanDie(player, impostor)).
-//                forEach(player -> smallestDistances.add(DistanceFinder.getDistanceBetweenEntities(player, impostor)));
-//    }
-//
-//    private Player popClosestPlayer(PriorityQueue<EntityDistance<Player, Player>> smallestDistances) {
-//        while (true) {
-//            EntityDistance<Player, Player> entityDistance = smallestDistances.poll();
-//            if (entityDistance != null && entityDistance.getDistance() < 300) {
-//                return entityDistance.getEntity();
-//            } else {
-//                return null;
-//            }
-//        }
-//    }
-
-//    private static <T extends Entity> EntityDistance<T> getDistanceBetweenEntities(T e1, T e2) {
-////        if (!e1.hasComponent(PosComp.class) || !e2.hasComponent(PosComp.class)) {
-////            return null;
-////        }
-//        checkEntitiesHavePosComps(e1, e2);
-//        Pos pos1 = e1.getComponent(PosComp.class).getPos();
-//        Pos pos2 = e2.getComponent(PosComp.class).getPos();
-//        double deltaX = pos1.getX() - pos2.getX();
-//        double deltaY = pos1.getY() - pos2.getY();
-//        return new EntityDistance<T>(e1, e2, Math.sqrt(deltaX * deltaX + deltaY * deltaY));
-//    }
-
-
-//    private static void checkEntitiesHavePosComps(Entity ... entities){
-//        for (Entity entity: entities){
-//            if (!entity.hasComponent(PosComp.class)){
-//                throw new IllegalArgumentException("entity doesnt have pos comp");
-//            }
-//        }
-//    }
+    //        DeadPlayer deadPlayer = new DeadPlayer(colourComp.getColour(), new PosComp(posComp.getPos(), posComp.getWidth(), posComp.getHeight()));//todo add this to the diary
 
     private boolean checkPlayerCanDie(Player player, Player impostor) {
         return player != impostor && player.getComponent(AliveComp.class).isAlive();

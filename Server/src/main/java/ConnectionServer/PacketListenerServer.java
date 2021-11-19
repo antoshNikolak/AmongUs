@@ -39,7 +39,7 @@ public class PacketListenerServer extends Listener {
         }else if (packet instanceof ImpostorVote){
             packetController.handleImpostorVote((ImpostorVote) packet, connection.getID());
         }else if (packet instanceof AnimationOver){
-            packetController.handleAnimationOver((AnimationOver) packet, connection.getID());
+//            packetController.handleAnimationOver((AnimationOver) packet, connection.getID());
         }
     }
 }

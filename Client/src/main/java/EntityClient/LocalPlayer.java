@@ -51,6 +51,9 @@ public class LocalPlayer extends Entity {
         if (KeyManager.isReportKeyPressed()){
             posRequest.setReportKey(true);
         }
+        if (KeyManager.isEmergencyMeetingKeyPressed()){
+            posRequest.setEmergencyMeetingKey(true);
+        }
     }
 
     private void checkVerticalMovement(PosRequest request) {
@@ -73,7 +76,7 @@ public class LocalPlayer extends Entity {
         return request.isDown() || request.isLeft() ||
                 request.isUp() || request.isRight() ||
                 request.isKillKey() || request.isTaskKey()||
-                request.isReportKey();
+                request.isReportKey() || request.isEmergencyMeetingKey();
     }
 
 

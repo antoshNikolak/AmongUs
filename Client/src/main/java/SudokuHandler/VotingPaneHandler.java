@@ -20,7 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 public class VotingPaneHandler {
-    private final Map<Button, String> buttonTextureMap = new HashMap<>();
+//    private final Map<Button, String> buttonTextureMap = new HashMap<>();
+    private final Map<String, Button> textureButtonMap = new HashMap<>();
+
     private GameScreen gameScreen;
 
     public void showVotes(Map<String, String> playerTextureMap) {
@@ -29,36 +31,57 @@ public class VotingPaneHandler {
             Button button = entry.getKey();
             int counter = 1;
             for (String texture : entry.getValue()) {
-                ImageView imageView = new ImageView(TextureManager.getTexture(texture));
-                imageView.setY(button.getLayoutY() + button.getPrefHeight()/3);
-                imageView.setX(button.getLayoutX() + button.getPrefWidth() + counter * 20);
-                imageView.setFitWidth(28);
-                imageView.setFitHeight(40);
-                Platform.runLater(() -> gameScreen.addNode(imageView));
+                placeVoterImage(button, texture, counter);
+                counter++;
             }
         }
+    }
 
+    private void placeVoterImage(Button button, String texture, int counter){
+        ImageView imageView = new ImageView(TextureManager.getTexture(texture));
+        imageView.setY(button.getLayoutY() + button.getPrefHeight()/3);
+        imageView.setX(button.getLayoutX() + button.getPrefWidth() + counter * 30);
+        imageView.setFitWidth(28);
+        imageView.setFitHeight(40);
+        Platform.runLater(() -> gameScreen.addNode(imageView));
     }
 
 
-    private Map<Button, List<String>> createButtonVotesMap(Map<String, String> playerTextureVoteMap) {//map show what player with what texture voted for what player
-        Map<Button, List<String>> buttonVoterTexturesMap = new HashMap<>(); //texture of player that will show next to the button
-        for (Button button : buttonTextureMap.keySet()) {
-            String buttonTexture = buttonTextureMap.get(button);
-            if (playerTextureVoteMap.containsKey(buttonTexture)) {
-
-                if (buttonVoterTexturesMap.containsKey(button)) {
-                    buttonVoterTexturesMap.get(button).add(buttonTexture);
-                } else {
-                    List<String> textureList = new ArrayList<>();
-                    textureList.add(playerTextureVoteMap.get(buttonTexture));
-                    textureList.add(buttonTexture);
-                    buttonVoterTexturesMap.put(button, textureList);
-                }
-
+    private Map<Button, List<String>> createButtonVotesMap(Map<String, String> playerVoteMap) {//map show what player with what texture voted for what player
+        playerVoteMap.entrySet().forEach(System.out::println);
+        Map<Button, List<String>> buttonVoterTexturesMap = new HashMap<>();
+        for (Map.Entry<String, String> playerVote: playerVoteMap.entrySet()) {
+            String voter = playerVote.getKey();
+            String suspect = playerVote.getValue();
+            Button suspectButton = textureButtonMap.get(suspect);
+            //add entry
+            if (buttonVoterTexturesMap.containsKey(suspectButton)) {
+                buttonVoterTexturesMap.get(suspectButton).add(voter);
+            } else {
+                List<String> textureList = new ArrayList<>();
+//                textureList.add(playerVoteMap.get(voter));
+                textureList.add(voter);
+                buttonVoterTexturesMap.put(suspectButton, textureList);
             }
-
         }
+//        for (Button button : buttonTextureMap.keySet()) {
+//            String buttonTexture = buttonTextureMap.get(button);//button texture = suspect
+//            if (playerVoteMap.containsValue(buttonTexture)){
+//                String voter = Ut
+//            }
+
+//            if (playerVoteMap.containsValue(buttonTexture)) {//change key to value
+//                //add entry
+//                if (buttonVoterTexturesMap.containsKey(button)) {
+//                    buttonVoterTexturesMap.get(button).add(buttonTexture);
+//                } else {
+//                    List<String> textureList = new ArrayList<>();
+//                    textureList.add(playerVoteMap.get(buttonTexture));
+//                    textureList.add(buttonTexture);
+//                    buttonVoterTexturesMap.put(button, textureList);
+//                }
+//            }
+//        }
         return buttonVoterTexturesMap;
     }
 
@@ -96,7 +119,7 @@ public class VotingPaneHandler {
         button.setGraphic(inButtonPane);
         button.setLayoutX(25 * (1 + Math.floor((double) counter / 3)));
         button.setLayoutY(counter * 70);
-        buttonTextureMap.put(button, texture);
+        textureButtonMap.put(texture, button);
         return button;
     }
 

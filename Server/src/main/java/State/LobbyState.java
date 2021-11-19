@@ -7,18 +7,17 @@ import Packet.AddEntityReturn.AddEntityReturn;
 import Packet.AddEntityReturn.AddLocalEntityReturn;
 //import Packet.AddEntityReturn.AddChangingEntityReturn;
 import Packet.EntityState.NewAnimatedEntityState;
-import Packet.EntityState.NewEntityState;
 import StartUpServer.AppServer;
 import World.World;
 import System.*;
 
-public class LobbyState extends PlayingState{
+public class LobbyState extends PlayingState {
 
     public LobbyState() {
         super();
     }
 
-    public void handleNewPlayerJoin(Client client){
+    public void handleNewPlayerJoin(Client client) {
         sendPlayerData(client);
         sendWorldData(client.getConnectionID());
         AppServer.currentGame.getClients().add(client);
@@ -42,30 +41,31 @@ public class LobbyState extends PlayingState{
         this.world = new World("World/lobby.txt");
     }
 
-    private void sendPlayerData(Client client){
+    private void sendPlayerData(Client client) {
         sendExistingPlayersToClient(client.getConnectionID());
-        sendNewPlayerToAll(client);
+        sendNewPlayerToExistingPlayers(client);
         client.setInGame(true);
     }
 
     private void sendExistingPlayersToClient(int connectionID) {
-        for (Client client: AppServer.currentGame.getClients()){
+        for (Player client : AppServer.currentGame.getPlayers()) {
 //            if (isClientInAGame(client)) {
-                ConnectionServer.sendTCP(new AddEntityReturn(client.getPlayer().adaptToNewAnimatedEntityState(true)), connectionID);
+            ConnectionServer.sendTCP(new AddEntityReturn(client.adaptToNewAnimatedEntityState(true)), connectionID);
 
         }
     }
 
-    private boolean isClientInAGame(Client client){
+    private boolean isClientInAGame(Client client) {
         return client.getPlayer() != null;
     }
 
-    private void sendNewPlayerToAll(Client client){
+    private void sendNewPlayerToExistingPlayers(Client client) {
         NewAnimatedEntityState playerState = client.getPlayer().adaptToNewAnimatedEntityState(true);
         ConnectionServer.sendTCP(new AddLocalEntityReturn(playerState), client.getConnectionID());
-        for (Client client1: AppServer.currentGame.getClients())
-            if (client1.getConnectionID() != client.getConnectionID() && client1.isInGame())
-        ConnectionServer.sendTCPToAllExcept(new AddEntityReturn(playerState), client.getConnectionID());
+        for (Player player : AppServer.currentGame.getPlayers())
+            if (player.getConnectionID() != client.getConnectionID()) {
+                ConnectionServer.sendTCP(new AddEntityReturn(playerState), player.getConnectionID());
+            }
     }
 
     @Override

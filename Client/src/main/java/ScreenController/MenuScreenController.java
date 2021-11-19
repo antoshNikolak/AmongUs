@@ -6,7 +6,7 @@ import Packet.GameStart.StartGameRequest;
 public class MenuScreenController {
 
     public void startGame() {
-        ConnectionClient.sendTCP(new StartGameRequest()); //remember to revieve it
+        ConnectionClient.sendTCP(new StartGameRequest());
     }
 
     public void showLeaderBoard() {

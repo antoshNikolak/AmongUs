@@ -19,7 +19,7 @@ public class CircleProperty {
 
     public double [] getXValues(double y){
         double b = -2 * centre.getX();
-        double c = (centre.getY() * centre.getY()) -(radius * radius) +  Math.pow(y - centre.getY(), 2);
+        double c = (centre.getX() * centre.getX()) -(radius * radius) +  Math.pow(y - centre.getY(), 2);
         return QuadraticSolver.getSolutions(1, b, c);
     }
 

@@ -12,6 +12,8 @@ public class KeyManager {
     private static boolean killKeyPressed = false;
     private static boolean taskKeyPressed = false;
     private static boolean reportKeyPressed = false;
+    private static boolean emergencyMeetingKeyPressed = false;
+
 
 
     static {
@@ -38,6 +40,10 @@ public class KeyManager {
             if (keyCode == KeyCode.R){
                 reportKeyPressed = true;
             }
+            if (keyCode == KeyCode.E){
+                emergencyMeetingKeyPressed = true;
+            }
+
         });
         ScreenManager.getScene().setOnKeyReleased(event -> {
             KeyCode keyCode = event.getCode();
@@ -61,6 +67,9 @@ public class KeyManager {
             }
             if (keyCode == KeyCode.R){
                 reportKeyPressed = false;
+            }
+            if (keyCode == KeyCode.E){
+                emergencyMeetingKeyPressed = false;
             }
         });
     }
@@ -91,5 +100,9 @@ public class KeyManager {
 
     public static boolean isReportKeyPressed() {
         return reportKeyPressed;
+    }
+
+    public static boolean isEmergencyMeetingKeyPressed() {
+        return emergencyMeetingKeyPressed;
     }
 }

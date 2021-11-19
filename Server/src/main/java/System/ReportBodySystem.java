@@ -1,5 +1,6 @@
 package System;
 
+import Component.AliveComp;
 import DistanceFinder.DistanceFinder;
 import Entity.DeadPlayer;
 import Entity.EntityRegistryServer;
@@ -21,7 +22,7 @@ public class ReportBodySystem extends BaseSystem{
     }
 
     public void handleReport(Player bodyFinder, PosRequest packet) {
-        if (packet.isReportKey()){
+        if (packet.isReportKey() && bodyFinder.getComponent(AliveComp.class).isAlive()){
             Optional<DeadPlayer> deadBodyOptional = getDeadBody(bodyFinder);
             deadBodyOptional.ifPresent(deadBody ->{
                 removeReportedBody(deadBody);
@@ -46,7 +47,7 @@ public class ReportBodySystem extends BaseSystem{
     }
 
     private Optional<DeadPlayer> getDeadBody(Player bodyFinder){
-        return DistanceFinder.getClosestEntity(bodyFinder, deadBodies);
+        return DistanceFinder.getClosestEntity(bodyFinder, deadBodies, 100);//todo add a range
     }
 
     public List<DeadPlayer> getDeadBodies() {

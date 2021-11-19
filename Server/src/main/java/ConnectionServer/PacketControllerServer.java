@@ -18,6 +18,7 @@ import Voting.ImpostorVote;
 
 import java.util.List;
 import java.util.Optional;
+
 import System.*;
 
 public class PacketControllerServer {
@@ -36,7 +37,6 @@ public class PacketControllerServer {
         Optional<Client> client = AuthorizationServer.getAuthorizedClient(connectionID);
         ConnectionServer.sendTCP(new StartGameReturn(client.isPresent()), connectionID);
         client.ifPresent(Client::prepareClientToPlay);
-
     }
 
     public void handlePosRequest(PosRequest packet, int connectionId) {
@@ -44,18 +44,6 @@ public class PacketControllerServer {
         if (optionalPlayer.isPresent()) {
             State state = getPlayerState(optionalPlayer.get());
             state.processInputSystems(optionalPlayer.get(), packet);
-//            if (state.hasSystem(PhysicsSystem.class)) {
-//                state.getSystem(PhysicsSystem.class).processPlayerMove(optionalPlayer.get(), packet);
-//            }
-//            if (state.hasSystem(ImposterActionsSystem.class)) {
-//                state.getSystem(ImposterActionsSystem.class).handleSpecialActions(optionalPlayer.get(), packet);
-//            }
-//            if (state.hasSystem(CrewMateActionSystem.class)){
-//                state.getSystem(CrewMateActionSystem.class).handleSpecialAction(optionalPlayer.get(), packet);
-//            }
-//            if (state.hasSystem(TaskSystem.class)) {
-//                state.getSystem(TaskSystem.class).handleTaskAction(optionalPlayer.get(), packet);
-//            }
         }
     }
 
@@ -87,7 +75,12 @@ public class PacketControllerServer {
     }
 
     public void handleAnimationOver(AnimationOver packet, int connectionID) {
-        AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class).onAnimationOver();
-        //maybe observer patter would be useful
+//        EmergencyTableSystem s = AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class);//todo NULL POINTER SYSTEM
+//        //s is null
+//        //todo this gets called twice, because each player sends an anim over request
+////        System.out.println("E"+s);
+////        System.out.println(AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class));
+//        s.onAnimationOver();
+//        AppServer.currentGame.getStateManager().getCurrentState().removeSystem(EmergencyTableSystem.class);
     }
 }

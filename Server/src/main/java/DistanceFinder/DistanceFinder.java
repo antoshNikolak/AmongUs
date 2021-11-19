@@ -8,26 +8,14 @@ import java.util.*;
 
 public class DistanceFinder {
 
-
-    public static <T extends Entity, S extends Entity> Optional<S> getClosestEntity(T e1, Collection<S> e2List) {
-        PriorityQueue<EntityDistance<S, T>> entities = getEntityDistanceQueue(e1, e2List);
-        if (entities.peek() != null) {
-            return Optional.of(entities.peek().getEntity());
-        } else {
-            return Optional.empty();
-        }
-    }
-
     public static <T extends Entity, S extends Entity> Optional<S> getClosestEntity(T e1, Collection<S> e2List, int range) {
         PriorityQueue<EntityDistance<S, T>> entities = getEntityDistanceQueue(e1, e2List);
         if (entities.peek() != null && entities.peek().getDistance() <= range) {
-//            EntityDistance<S, T> entityDistance = entities.peek();
             return Optional.of(entities.peek().getEntity());
         } else {
             return Optional.empty();
         }
     }
-
 
     private static <T extends Entity, S extends Entity> PriorityQueue<EntityDistance<S, T>> getEntityDistanceQueue(T e1, Collection<S> e2List) {
         PriorityQueue<EntityDistance<S, T>> entityDistanceQueue = new PriorityQueue<>();

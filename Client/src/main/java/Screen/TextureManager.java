@@ -34,7 +34,7 @@ public class TextureManager {
         loadImage("meeting-table", "Texture/meeting-table.png", 150, 150, false);
         loadImage("emergency-meeting", "Texture/emergency-meeting.png", 600, 200, true);
         loadImage("dead-body-reported", "Texture/dead-body-reported.png", 600, 200, true);
-        loadImage("task-bar", "Texture/task-bar.png", 500, 50, true);
+        loadImage("task-bar", "Texture/task-bar.png", 500, 35, true);
 
     }
 
