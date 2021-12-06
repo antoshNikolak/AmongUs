@@ -65,7 +65,7 @@ public class EntityReturnBuffer {
 //    }
 
     private List<Integer> getAllConnectionIDs() {
-        return AppServer.currentGame.getClients().stream().
+        return AppServer.getClients().stream().
                 map(Client::getConnectionID).
                 collect(Collectors.toList());
     }

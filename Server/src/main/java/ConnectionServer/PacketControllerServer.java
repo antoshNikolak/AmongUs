@@ -1,6 +1,5 @@
 package ConnectionServer;
 
-import Animation.AnimationOver;
 import AuthorizationServer.AuthorizationServer;
 import Client.Client;
 import Entity.Player;
@@ -14,6 +13,7 @@ import StartUpServer.AppServer;
 import State.State;
 import SudokuPacket.VerifySudokuRequest;
 import State.*;
+import UserData.UserData;
 import Voting.ImpostorVote;
 
 import java.util.List;
@@ -21,29 +21,56 @@ import java.util.Optional;
 
 import System.*;
 
+import static StartUpServer.AppServer.currentGame;
+
 public class PacketControllerServer {
 
     public void handleLogin(LoginRequest packet, int connectionID) {
-        RegistrationConfirmation confirmation = AuthorizationServer.handleLogin(packet.getUserData());
-        AuthorizationServer.handleRegistrationConfirmation(confirmation, connectionID);
+        if (ConnectionServer.getClientFromConnectionID(connectionID).isEmpty()) {//check this client has not already logged in
+            UserData userData = packet.getUserData();
+            RegistrationConfirmation confirmation = AuthorizationServer.handleLogin(userData);
+            AuthorizationServer.handleRegistrationConfirmation(confirmation, userData, connectionID);
+        }
     }
 
     public void handleSignup(SignupRequest packet, int connectionID) {
-        RegistrationConfirmation confirmation = AuthorizationServer.handleSignup(packet.getUserData());
-        AuthorizationServer.handleRegistrationConfirmation(confirmation, connectionID);
+        UserData userData = packet.getUserData();
+        RegistrationConfirmation confirmation = AuthorizationServer.handleSignup(userData);
+        AuthorizationServer.handleRegistrationConfirmation(confirmation, userData, connectionID);
     }
 
-    public void handleStartGameRequest(int connectionID) {
-        Optional<Client> client = AuthorizationServer.getAuthorizedClient(connectionID);
-        ConnectionServer.sendTCP(new StartGameReturn(client.isPresent()), connectionID);
-        client.ifPresent(Client::prepareClientToPlay);
+    public void handleStartGameRequest(int connectionID) {//todo doc changes
+        if (currentGame != null && currentGame.getPlayers().size() == LobbyState.PLAYER_LIMIT){
+            return;//stops client from entering once game start
+        }
+        Optional<Client> clientOptional = ConnectionServer.getClientFromConnectionID(connectionID);
+        if (clientOptional.isPresent() && clientOptional.get().getPlayer() != null) {
+            return;//stops client from pressing button 2x to crash the game
+        }
+        ConnectionServer.sendTCP(new StartGameReturn(clientOptional.isPresent()), connectionID);//send back confirmation
+        clientOptional.ifPresent(client -> {
+            LobbyState.prepareGame();
+            currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
+        });
     }
+
+//    public void handleStartGameRequest(int connectionID) {
+//        Optional<Client> clientOptional = ConnectionServer.getClientFromConnectionID(connectionID);
+//        if (clientOptional.isPresent()) {
+//            Client client = clientOptional.get();
+//            if (client.getPlayer() != null) return;//BUG FIX - client can press button 2x to crash the game
+//            client.prepareClientToPlay(client);
+//        }
+//        ConnectionServer.sendTCP(new StartGameReturn(clientOptional.isPresent()), connectionID);//passing client opt is unnecessary?
+//
+//
+//    }
 
     public void handlePosRequest(PosRequest packet, int connectionId) {
-        Optional<Player> optionalPlayer = ConnectionServer.getPlayerFromConnectionID(AppServer.currentGame.getPlayers(), connectionId);
+        Optional<Player> optionalPlayer = ConnectionServer.getPlayerFromConnectionID(currentGame.getPlayers(), connectionId);
         if (optionalPlayer.isPresent()) {
             State state = getPlayerState(optionalPlayer.get());
-            state.processInputSystems(optionalPlayer.get(), packet);
+            state.processPlayingSystems(optionalPlayer.get(), packet);
         }
     }
 
@@ -51,36 +78,44 @@ public class PacketControllerServer {
         if (player.getCurrentTask() != null) {
             return player.getCurrentTask();
         }
-        return AppServer.currentGame.getStateManager().getCurrentState();
+        return currentGame.getStateManager().getCurrentState();
     }
 
     public void handleVerifySudokuRequest(VerifySudokuRequest packet, int connectionID) {
         Optional<Player> playerOptional = ConnectionServer.getPlayerFromConnectionID(connectionID);
         playerOptional.ifPresent(player -> {
             SudokuTaskState sudokuTaskState = (SudokuTaskState) player.getCurrentTask();
-            sudokuTaskState.handleCompletionVerification(packet.getSudoku());
+            sudokuTaskState.handleCompletionVerification(packet.getSudoku(), player.getClient());
         });
     }
 
     public void handleVoiceChat(Sound soundPacket, Integer connectionID) {
         List<Integer> connectionIDs = ConnectionServer.getClientConnectionIDs();
         connectionIDs.remove(connectionID);
-        ConnectionServer.sendUDPTo(soundPacket, connectionIDs);
+        ConnectionServer.sendUDP(soundPacket, connectionIDs);
     }
 
     public void handleImpostorVote(ImpostorVote packet, int connectionID) {
-        EmergencyTableSystem emergencyTableSystem = AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class);
+        EmergencyTableSystem emergencyTableSystem = currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class);
         Optional<Player> playerOptional = ConnectionServer.getPlayerFromConnectionID(connectionID);
-        playerOptional.ifPresent(player -> emergencyTableSystem.processVote(player, packet.getCandidateTexture()));
+        playerOptional.ifPresent(player -> emergencyTableSystem.getVoteHandler().registerVote(player, packet.getVoteOption()));
     }
 
-    public void handleAnimationOver(AnimationOver packet, int connectionID) {
-//        EmergencyTableSystem s = AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class);//todo NULL POINTER SYSTEM
-//        //s is null
-//        //todo this gets called twice, because each player sends an anim over request
-////        System.out.println("E"+s);
-////        System.out.println(AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class));
-//        s.onAnimationOver();
-//        AppServer.currentGame.getStateManager().getCurrentState().removeSystem(EmergencyTableSystem.class);
+    public void handleLogout(int id) {
+        Optional<Client> playerOptional = ConnectionServer.getClientFromConnectionID(id);
+        playerOptional.ifPresent(client -> {//todo redundant authorized client list
+            System.out.println("removing client");
+            AppServer.getClients().remove(client);
+        });
     }
+
+//    public void handleAnimationOver(AnimationOver packet, int connectionID) {
+////        EmergencyTableSystem s = AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class);//todo NULL POINTER SYSTEM
+////        //s is null
+////        //todo this gets called twice, because each player sends an anim over request
+//////        System.out.println("E"+s);
+//////        System.out.println(AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class));
+////        s.onAnimationOver();
+////        AppServer.currentGame.getStateManager().getCurrentState().removeSystem(EmergencyTableSystem.class);
+//    }
 }

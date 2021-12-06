@@ -9,6 +9,7 @@ import Entity.Player;
 //import Packet.AddEntityReturn.AddChangingEntityReturn;
 import Packet.AddEntityReturn.AddEntityReturn;
 import Packet.EntityState.NewEntityState;
+import Packet.GameEnd.ImpostorWin;
 import Packet.NestedPane.RemoveNestedScreen;
 import Packet.Position.*;
 import StartUpServer.AppServer;
@@ -16,10 +17,12 @@ import StartUpServer.AppServer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import Entity.DeadPlayer;
+import Entity.DeadBody;
 import Entity.EntityRegistryServer;
 import Entity.*;
 import TimerHandler.TimerStarter;
+
+import static StartUpServer.AppServer.currentGame;
 
 public class ImposterActionsSystem extends BaseSystem {
 
@@ -30,13 +33,30 @@ public class ImposterActionsSystem extends BaseSystem {
     public void update() {
     }
 
-    public void handleSpecialActions(Player player, PosRequest packet) {
+    @Override
+    public void handleAction(Player player, PosRequest packet) {
         if (packet.isKillKey() && player.hasComponent(ImposterComp.class)) {
             if (player.getComponent(ImposterComp.class).isAbleToKill()) {
                 handleKillAction(player);
+//                checkImpostorWin();
             }
         }
     }
+
+    private void checkImpostorWin() {
+        if (getAlivePlayers().size() == 2) {
+            ConnectionServer.sendTCPToAllPlayers(new ImpostorWin());
+            AppServer.currentGame.stopGame();
+        }
+    }
+
+//    public void handleSpecialActions(Player player, PosRequest packet) {
+//        if (packet.isKillKey() && player.hasComponent(ImposterComp.class)) {
+//            if (player.getComponent(ImposterComp.class).isAbleToKill()) {
+//                handleKillAction(player);
+//            }
+//        }
+//    }
 
     private void handleKillAction(Player imposter) {
         Optional<Player> crewMateOptional = getCrewMateToKill(imposter, getCrewMates());
@@ -63,11 +83,11 @@ public class ImposterActionsSystem extends BaseSystem {
         updateGhostForClients(crewMate);
     }
 
-    private void registerDeadBody(DeadPlayer deadPlayer) {
-        AppServer.currentGame.getStateManager().getCurrentState().getSystem(ReportBodySystem.class).getDeadBodies().add(deadPlayer);//todo remember we changed it
+    private void registerDeadBody(DeadBody deadBody) {
+        currentGame.getStateManager().getCurrentState().getSystem(ReportBodySystem.class).getDeadBodies().add(deadBody);
     }//todo this acc puts the real player, or his pos at least
 
-    public  void stopCrewMateTask(Player crewMate) {
+    public void stopCrewMateTask(Player crewMate) {
         if (crewMate.getCurrentTask() != null) {
             ConnectionServer.sendTCP(new RemoveNestedScreen(), crewMate.getConnectionID());
             crewMate.getCurrentTask().setPlayer(null);
@@ -92,7 +112,7 @@ public class ImposterActionsSystem extends BaseSystem {
     public void updateGhostForClients(Player ghost) {
         clearGhostsForAlivePlayers(ghost);
         sendNewGhostExistingGhosts(ghost);
-        AppServer.currentGame.getEntityReturnBuffer().putEntity(ghost, getGhostConnectionIDs());
+        currentGame.getEntityReturnBuffer().putEntity(ghost, getGhostConnectionIDs());
     }
 
     private void clearGhostsForAlivePlayers(Player ghost) {
@@ -121,9 +141,9 @@ public class ImposterActionsSystem extends BaseSystem {
     private void sendDeadBodyToClients(Player crewMate) {
         ColourComp colourComp = crewMate.getComponent(ColourComp.class);
         PosComp posComp = crewMate.getComponent(PosComp.class);
-        DeadPlayer deadPlayer = new DeadPlayer(colourComp.getColour(), new PosComp(posComp.getPos(), posComp.getWidth(), posComp.getHeight()));//todo add this to the diary
-        ConnectionServer.sendTCPToAllPlayers(new AddEntityReturn(deadPlayer.adaptToNewAnimatedEntityState(true)));
-        registerDeadBody(deadPlayer);
+        DeadBody deadBody = new DeadBody(colourComp.getColour(), new PosComp(posComp.getPos().getX(), posComp.getPos().getY(), posComp.getWidth(), posComp.getHeight()));//todo add this to the diary
+        ConnectionServer.sendTCPToAllPlayers(new AddEntityReturn(deadBody.adaptToNewAnimatedEntityState(true)));
+        registerDeadBody(deadBody);
     }
 
     //        DeadPlayer deadPlayer = new DeadPlayer(colourComp.getColour(), new PosComp(posComp.getPos(), posComp.getWidth(), posComp.getHeight()));//todo add this to the diary
@@ -133,7 +153,7 @@ public class ImposterActionsSystem extends BaseSystem {
     }
 
     public List<Player> getCrewMates() {
-        return AppServer.currentGame.getPlayers().stream().
+        return currentGame.getPlayers().stream().
                 filter(player -> !player.hasComponent(ImposterComp.class)).
                 collect(Collectors.toList());
 
@@ -144,7 +164,7 @@ public class ImposterActionsSystem extends BaseSystem {
     }
 
     private static List<Player> getGhostPlayers() {
-        return AppServer.currentGame.getClients().stream().
+        return AppServer.getClients().stream().
                 map(Client::getPlayer).
                 filter(player -> !player.getComponent(AliveComp.class).isAlive()).
                 collect(Collectors.toList());
@@ -156,7 +176,7 @@ public class ImposterActionsSystem extends BaseSystem {
     }
 
     private static List<Player> getAlivePlayers() {
-        return AppServer.currentGame.getPlayers().stream().
+        return currentGame.getPlayers().stream().
                 filter(player -> player.getComponent(AliveComp.class).isAlive()).
                 collect(Collectors.toList());
     }

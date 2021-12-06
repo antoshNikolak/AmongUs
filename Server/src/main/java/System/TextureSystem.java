@@ -5,10 +5,10 @@ import Component.AliveComp;
 import Component.AnimationComp;
 import Component.VelComp;
 import Entity.Entity;
+import Packet.Position.PosRequest;
 import StartUpServer.AppServer;
-import Entity.*;
+import Entity.Player;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class TextureSystem extends BaseSystem {
@@ -24,6 +24,9 @@ public class TextureSystem extends BaseSystem {
             }
         }
     }
+
+    @Override
+    public void handleAction(Player player, PosRequest packet) {}
 
     private void processEntityAnimation(AnimationComp animComp, VelComp velComp, Entity entity) {
         if (animComp.getCurrentAnimation().getIndexesPerFrame() != 0) {

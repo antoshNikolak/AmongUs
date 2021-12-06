@@ -3,22 +3,23 @@ package Entity;
 import Animation.AnimState;
 import Client.Client;
 import Component.*;
-import Position.Pos;
 import StartUpServer.AppServer;
-import State.GameState;
 import State.TaskState;
+
+import static StartUpServer.AppServer.currentGame;
 
 public class Player extends Entity {
     //each player must have its own state
     private TaskState currentTask;
-//    private Client client;
-
+    private final Client client;
     private final int connectionID;
 
 
-    public Player(String colour, int connectionID) {
+    public Player(Client client, String colour, int connectionID) {
         this.connectionID = connectionID;
+        this.client = client;
         startComps(new PosComp(100, 100, 50, 63), colour, connectionID);
+        currentGame.getPlayers().add(this);
     }
 
 //    public Player(String colour, int connectionID, PosComp posComp) {
@@ -70,5 +71,9 @@ public class Player extends Entity {
 
     public void setCurrentTask(TaskState currentTask) {
         this.currentTask = currentTask;
+    }
+
+    public Client getClient() {
+        return client;
     }
 }

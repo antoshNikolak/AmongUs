@@ -29,6 +29,7 @@ module Shared {
     opens Packet.Sound;
     exports Voting;
     opens Voting;
+    exports Packet.GameEnd;
 
 
 }

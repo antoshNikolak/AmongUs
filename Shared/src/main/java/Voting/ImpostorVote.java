@@ -3,20 +3,34 @@ package Voting;
 import Packet.Packet;
 
 public class ImpostorVote implements Packet {
-    private String voteTexture;
 
-    private ImpostorVote() {
+    private VoteOption voteOption;
+
+    public ImpostorVote() {}
+
+    public ImpostorVote(VoteOption voteOption) {
+        this.voteOption = voteOption;
     }
 
-    public ImpostorVote(String voteTexture) {
-        this.voteTexture = voteTexture;
+    public VoteOption getVoteOption() {
+        return voteOption;
     }
 
-    public String getCandidateTexture() {
-        return voteTexture;
+    public void setVoteOption(VoteOption voteOption) {
+        this.voteOption = voteOption;
     }
 
-    public void setVoteTexture(String voteTexture) {
-        this.voteTexture = voteTexture;
-    }
+
+
+    //    public ImpostorVote(String voteTexture) {
+//        this.voteTexture = voteTexture;
+//    }
+//
+//    public String getCandidateTexture() {
+//        return voteTexture;
+//    }
+//
+//    public void setVoteTexture(String voteTexture) {
+//        this.voteTexture = voteTexture;
+//    }
 }

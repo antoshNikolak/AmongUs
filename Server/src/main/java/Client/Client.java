@@ -1,6 +1,5 @@
 package Client;
 
-import Entity.GameClientHandler;
 import Entity.Player;
 import Game.Game;
 import PlayerColourManager.PlayerColourFactory;
@@ -9,41 +8,49 @@ import State.GameState;
 import State.LobbyState;
 import TimerHandler.TimerStarter;
 
-import java.util.concurrent.ConcurrentHashMap;
+import static StartUpServer.AppServer.currentGame;
+import static State.LobbyState.startGameState;
 
 public class Client {
 
     private final int connectionID;
     private Player player;
-    private boolean inGame = false;
+//    private boolean inGame = false;
 
-    public static void prepareClientToPlay(Client client) {
-        prepareGame();
-        client.createPlayer();
-        AppServer.currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
-        if (AppServer.currentGame.getClients().size() == 2) {
-            TimerStarter.startTimer("GameStartTimer", 5, () -> startGameState());
-        }
-    }
+//    public void prepareClientToPlay(Client client) {
+////            prepareGame();
+//            createPlayer();
+//            currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
+////        currentGame.getStateManager().getState(LobbyState.class).prepareClientToPlay(client);
+////        }
+////        if (AppServer.getClients().size() == 2) {
+////            TimerStarter.startTimer("GameStartTimer", 5, () -> startGameState());
+////        }
+//    }
 
-    public static void startGameState() {
-        synchronized (AppServer.currentGame.getStateManager()) {
-            AppServer.currentGame.getStateManager().popState();
-            AppServer.currentGame.getStateManager().pushState(new GameState());
-        }
-    }
+//    public static void startGameState() {
+//        synchronized (currentGame.getStateManager()) {
+//            currentGame.getStateManager().popState();
+//            currentGame.getStateManager().pushState(new GameState());
+//        }
+//    }
+//
 
-    private static void prepareGame() {
-        if (AppServer.currentGame == null) {
-            AppServer.currentGame = new Game();
-            AppServer.currentGame.startGame();
-        }
-    }
 
-    public void createPlayer() {
-        this.player = new Player(PlayerColourFactory.getRandomColour(), connectionID);
-        AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(player);
 
+
+
+//    private static void prepareGame() {
+//        if (currentGame == null) {
+//            currentGame = new Game();
+//            currentGame.startGame();
+//        }
+//    }
+
+    public void createPlayer() {//todo migrate to lobby state
+        PlayerColourFactory colourFactory = currentGame.getStateManager().getState(LobbyState.class).getPlayerColourFactory();
+        this.player = new Player(this, colourFactory.getRandomColour(), connectionID);
+        currentGame.getStateManager().getCurrentState().getEntities().add(player);
     }
 
     public Client(int connectionID) {
@@ -58,11 +65,15 @@ public class Client {
         return player;
     }
 
-    public boolean isInGame() {
-        return inGame;
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
-    public void setInGame(boolean inGame) {
-        this.inGame = inGame;
-    }
+    //    public boolean isInGame() {
+//        return inGame;
+//    }
+//
+//    public void setInGame(boolean inGame) {
+//        this.inGame = inGame;
+//    }
 }

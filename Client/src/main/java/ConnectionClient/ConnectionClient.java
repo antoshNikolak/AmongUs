@@ -10,11 +10,15 @@ import Packet.EntityState.ExistingEntityState;
 import Packet.EntityState.NewAnimatedEntityState;
 import Packet.EntityState.NewEntityState;
 import Packet.EntityState.NewLineState;
+import Packet.GameEnd.CrewWin;
+import Packet.GameEnd.ImpostorWin;
+import Packet.GameStart.RoleNotify;
 import Packet.GameStart.StartGameRequest;
 import Packet.GameStart.StartGameReturn;
 import Packet.NestedPane.*;
 import Packet.Position.*;
 import Packet.Registration.LoginRequest;
+import Packet.Registration.LogoutRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
 import Packet.Sound.CloseRecordHandler;
@@ -30,9 +34,9 @@ import SudokuPacket.VerifySudokuReturn;
 import UserData.UserData;
 import Voting.ElectionReturn;
 import Voting.ImpostorVote;
+import Voting.VoteOption;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.minlog.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,8 +67,8 @@ public final class ConnectionClient {
     private static void startConnection() {
         try {
             client.start();
-            client.connect(5000, "localhost", 49159, 65520);
-//            client.connect(5000, "192.168.1.73", 49158, 65529);
+//            client.connect(5000, "localhost", 49159, 65520);
+            client.connect(5000, "192.168.1.73", 49159, 65520);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -123,10 +127,15 @@ public final class ConnectionClient {
         kryo.register(ImpostorVote.class);
         kryo.register(VotingTimer.class);
         kryo.register(ElectionReturn.class);
-        kryo.register(RemoveVotingScreen.class);
+        kryo.register(DisplayVoteResults.class);
         kryo.register(HashMap.class);
         kryo.register(AnimationOver.class);
         kryo.register(TaskBarUpdate.class);
         kryo.register(AddEntityReturn.class);
+        kryo.register(VoteOption.class);
+        kryo.register(LogoutRequest.class);
+        kryo.register(RoleNotify.class);
+        kryo.register(CrewWin.class);
+        kryo.register(ImpostorWin.class);
     }
 }

@@ -15,6 +15,8 @@ public class World {
     public static final int TILE_WIDTH = 50;
     public static final int TILE_HEIGHT = 50;
     private WorldDimension dimension;
+    private MergeTileHandler mergeTileHandler;
+    private Tile mainTable;
 
     public World(String fileName) {
         createWorld(fileName);
@@ -26,7 +28,24 @@ public class World {
         String[][] tokenMatrix = create2DTokenArray(tokens);
         tileMatrix = new Tile[dimension.getHeight()][dimension.getWidth()];
         mapTokensToTiles(tokenMatrix);
-        new MergeTileHandler(tileMatrix, dimension).handleMergedTiles(tokenMatrix);
+        this.mergeTileHandler = new MergeTileHandler(tileMatrix, dimension);
+        createLargeTiles(tokenMatrix);
+        mergeTileHandler.handleMergingGroupedTiles();
+
+//        new MergeTileHandler(tileMatrix, dimension).handleMergedTiles(tokenMatrix);
+    }
+
+    private void createLargeTiles(String[][] tokens) {
+        for (int y = 0; y < dimension.getHeight(); y++) {
+            for (int x = 0; x < dimension.getWidth(); x++) {
+                Pos pos = new Pos(x * TILE_WIDTH, y * TILE_HEIGHT);
+                if (tokens[y][x].equals("5")) {
+                    Tile tile = TileFactory.createTile(pos, "meeting-table");
+                    mergeTileHandler.clusterGroupedTiles(tokens, tile, x, y, 5);
+                    this.mainTable = tile;
+                }
+            }
+        }
     }
 
     private void mapTokensToTiles(String [][] tokenMatrix){
@@ -91,4 +110,9 @@ public class World {
     public static int getTILE_HEIGHT() {
         return TILE_HEIGHT;
     }
+
+    public Tile getMainTable() {
+        return mainTable;
+    }
+
 }

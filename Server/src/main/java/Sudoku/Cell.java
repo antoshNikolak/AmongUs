@@ -26,17 +26,6 @@ public class Cell {
     }
 
 
-//    @Override
-//    public int compareTo(Cell cell) {
-//        if (this.row > cell.getRow()) {
-//            return -1;
-//        } else if (this.row < cell.getRow()) {
-//            return 1;
-//        } else {//both cells on the same row
-//            return Integer.compare(cell.getColumn(), this.column);
-//        }
-//    }
-
     public int getValue() {
         return value;
     }

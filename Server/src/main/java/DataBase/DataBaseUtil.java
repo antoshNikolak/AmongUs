@@ -59,10 +59,10 @@ public class DataBaseUtil {
     }
 
     public static List<UserData> getUserDataList(UserData userData) {
-        return queryWithPreparedStatement("SELECT username, password FROM dbo.Login " +
+        return queryWithPreparedStatement("SELECT username, password FROM dbo.Users " +
                         "where username = ?" +
                         "AND  password =  ?",
-        DataBaseUtil::createUserDataList, userData.getUserName(), userData.getPassword());
+                DataBaseUtil::createUserDataList, userData.getUserName(), userData.getPassword());
     }
 
     private static List<UserData> createUserDataList(ResultSet resultSet) throws SQLException {
@@ -80,7 +80,7 @@ public class DataBaseUtil {
     }
 
     public static Boolean doesUsernameExist(String username) {
-        return queryWithPreparedStatement("SELECT username FROM dbo.Login " +
+        return queryWithPreparedStatement("SELECT username FROM dbo.Users " +
                         "where username = ?",
                 DataBaseUtil::isResultSetEmpty, username);
     }
@@ -96,23 +96,49 @@ public class DataBaseUtil {
 
     public static void addUserToTable(UserData userData) {
         getStatement(statement -> {
-            statement.executeUpdate("INSERT INTO Login (username, password)" +
+            statement.executeUpdate("INSERT INTO Users (username, password)" +
                     "VALUES ('" + userData.getUserName() + "','" + userData.getPassword() + "')");
         });
     }
 
-    private static void closeConnection(Connection connection){
-       try {
-           if (connection != null) connection.close();
-       }catch (SQLException e){
-           e.printStackTrace();
-       }
+    public static void addTimeToSudokuAttempts(String userName, double time) {
+        int attemptNum = getAttemptNum(userName);
+        getStatement(statement -> {
+            statement.executeUpdate("INSERT INTO SudokuAttempts (username, timeTaken, attemptNum)" +
+                    "VALUES ('" + userName + "','" + time + "','" + (attemptNum+1) + "')");
+        });
     }
 
-    private static void closeStatement(Statement statement){
+    private static Integer getAttemptNum(String username) {
+        return queryWithPreparedStatement("SELECT attemptNum FROM dbo.SudokuAttempts " +
+                        "where username = ?",
+                DataBaseUtil::getMaxValue, username);
+    }
+
+    private static Integer getMaxValue(ResultSet resultSet) throws SQLException {
+        int maxValue = 0;
+        while (resultSet.next()) {
+            int value = resultSet.getInt("attemptNum");
+            if (value > maxValue) maxValue = value;
+        }
+        return maxValue;
+
+
+    }
+
+
+    private static void closeConnection(Connection connection) {
+        try {
+            if (connection != null) connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void closeStatement(Statement statement) {
         try {
             if (statement != null) statement.close();
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }

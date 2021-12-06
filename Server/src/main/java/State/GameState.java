@@ -1,18 +1,15 @@
 package State;
 
 import Client.Client;
-import Component.AnimationComp;
 import Component.ColourComp;
 import Component.ImposterComp;
 import Component.PosComp;
 import ConnectionServer.ConnectionServer;
-import Entity.EntityRegistryServer;
-import Entity.Tile;
 import Packet.AddEntityReturn.AddEntityReturn;
-import Packet.Position.ClearEntityReturn;
 //import Packet.AddEntityReturn.AddStationaryEntityReturn;
-import Packet.EntityState.NewEntityState;
 import Packet.Camera.ScrollingEnableReturn;
+import Packet.GameStart.RoleNotify;
+import Packet.Position.PosRequest;
 import Position.Pos;
 import StartUpServer.AppServer;
 import System.PhysicsSystem;
@@ -20,10 +17,10 @@ import World.World;
 import System.*;
 import Entity.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CopyOnWriteArrayList;
+
+import static StartUpServer.AppServer.currentGame;
 
 public class GameState extends PlayingState {
     private TaskBar taskBar;
@@ -52,14 +49,14 @@ public class GameState extends PlayingState {
         addTaskBar();
     }
 
-    private void addTaskBar(){
+    private void addTaskBar() {
         this.taskBar = new TaskBar();
         this.entities.add(taskBar);
         ConnectionServer.sendTCPToAllPlayers(new AddEntityReturn(taskBar.adaptToNewAnimatedEntityState(false)));
     }
 
-    private void enableClientScreenScrolling(){
-        for (Client client: AppServer.currentGame.getClients()){
+    private void enableClientScreenScrolling() {
+        for (Client client : AppServer.getClients()) {
             Pos pos = client.getPlayer().getComponent(PosComp.class).getPos();
             ConnectionServer.sendTCP(new ScrollingEnableReturn(pos), client.getConnectionID());
         }
@@ -67,73 +64,99 @@ public class GameState extends PlayingState {
 
     private void selectImpostor() {
         Player imposter = getRandomPlayer();
-        for (Player player: AppServer.currentGame.getPlayers()){
-            if (player == imposter){
-                player.addComponent(new ImposterComp());
-                System.out.println(player.getComponent(ColourComp.class).getColour() + "is the impostor");
-            }
-        }
+        imposter.addComponent(new ImposterComp());
+        System.out.println(imposter.getComponent(ColourComp.class).getColour() + "is the impostor");
+        ConnectionServer.sendTCP(new RoleNotify(true), imposter.getConnectionID());
+        ConnectionServer.sendTCPToAllExcept(new RoleNotify(false), imposter.getConnectionID());
+
+//        for (Player player : currentGame.getPlayers()) {
+//            if (player == imposter) {
+//                player.addComponent(new ImposterComp());
+//                System.out.println(player.getComponent(ColourComp.class).getColour() + "is the impostor");
+//            }
+//        }
     }
 
     private Player getRandomPlayer() {
-        List<Player> players = AppServer.currentGame.getPlayers();
+        List<Player> players = currentGame.getPlayers();
         int index = new Random().nextInt(players.size());
         return players.get(index);
     }
 
 
-
     private void addPlayersAsEntities() {
-        entities.addAll(AppServer.currentGame.getPlayers());
+        entities.addAll(currentGame.getPlayers());
     }
 
-//    public void close() {
-//        clearWorldData();
-//    }
-//
-//    private void clearWorldData() {
-//        ConnectionServer.sendTCPToAllPlayers(new ClearEntityReturn(world.getTileIDs()));
-//        for (Integer ID: world.getTileIDs()) {
-//            EntityRegistryServer.removeEntity(ID);
+
+//    @Override
+//    public void processPlayingSystems(Player player, PosRequest packet) {
+//        super.processPlayingSystems(player, packet);
+//        if (hasSystem(ImposterActionsSystem.class)) {
+//            getSystem(ImposterActionsSystem.class).handleSpecialActions(player, packet);
+//        }
+//        if (hasSystem(CrewMateActionSystem.class)) {
+//            getSystem(CrewMateActionSystem.class).handleSpecialAction(player, packet);
+//        }
+//        if (hasSystem(ReportBodySystem.class)) {
+//            getSystem(ReportBodySystem.class).handleReport(player, packet);
+//        }
+//        if (hasSystem(TaskSystem.class)) {
+//            getSystem(TaskSystem.class).handleTaskAction(player, packet);//maybe use polymorphism to have a handle method in each system
+//        }
+//        if (packet.isEmergencyMeetingKey()) {
+//            if (!hasSystem(EmergencyTableSystem.class)) {
+//                double distance = DistanceFinder.getDistanceBetweenEntities(player, AppServer.currentGame.getStateManager().getCurrentState().getWorld().getMainTable()).getDistance();
+//                if (distance < 100) {
+//                    EmergencyTableSystem emergencyTableSystem = new EmergencyTableSystem();
+//                    addSystem(emergencyTableSystem);
+//                    emergencyTableSystem.activate();
+//                }
+//            }
 //        }
 //    }
 
-//    private void sendWorldDataToAllPlayers() {
-//        List<NewEntityState> newEntities = createEntityStatesFromTiles();
-//        ConnectionServer.sendTCPToAllPlayers(new AddStationaryEntityReturn(newEntities));
-//    }
-//
-//    protected void sendWorldData(int connectionID) {
-//        List<NewEntityState> newEntities = createEntityStatesFromTiles();
-//        ConnectionServer.sendTCP(new AddStationaryEntityReturn(newEntities), connectionID);
-//    }
 
-//    private List<NewEntityState> createEntityStatesFromTiles() {
-//        List<NewEntityState> newEntities = new ArrayList<>();
-//        for (Tile tile : world.getTiles()) {
-//            newEntities.add(tile.adaptToNewAnimatedEntityState());
+//    @Override
+//    public void processPlayingSystems(Player player, PosRequest packet) {
+//        super.processPlayingSystems(player, packet);
+//        synchronized (this) {
+//            if (packet.isEmergencyMeetingKey()) {
+//                if (!hasSystem(EmergencyTableSystem.class)) {
+//                    EmergencyTableSystem emergencyTableSystem = new EmergencyTableSystem();
+//                    addSystem(emergencyTableSystem);
+//                    emergencyTableSystem.handleAction(player, packet);
+//                }
+//            }
 //        }
-//        return newEntities;
 //    }
 
+
     @Override
-    protected void createWorld() {
-        this.world = new World("World/game-map.txt");
-    }
-
-    public TaskBar getTaskBar() {
-        return taskBar;
-    }
-
-    public void setTaskBar(TaskBar taskBar) {
-        this.taskBar = taskBar;
+    public void processPlayingSystems(Player player, PosRequest packet) {
+        super.processPlayingSystems(player, packet);
+        if (packet.isEmergencyMeetingKey() && !hasSystem(EmergencyTableSystem.class)) {
+            new EmergencyTableSystem().handleAction(player, packet);
+        }
     }
 
     @Override
-    public void removeClient(Client client) {
-        //todo
+        protected void createWorld () {
+            this.world = new World("World/game-map.txt");
+        }
+
+        public TaskBar getTaskBar () {
+            return taskBar;
+        }
+
+        public void setTaskBar (TaskBar taskBar){
+            this.taskBar = taskBar;
+        }
+
+        @Override
+        public void removeClient (Client client){
+            //todo
+        }
+
+
     }
-
-
-
-}

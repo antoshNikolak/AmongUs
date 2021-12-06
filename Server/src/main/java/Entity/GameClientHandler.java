@@ -1,16 +1,5 @@
 package Entity;
 
-import Client.Client;
-import ConnectionServer.ConnectionServer;
-import Game.Game;
-import StartUpServer.AppServer;
-import State.GameState;
-import State.LobbyState;
-import TimerHandler.TimerFactory;
-import TimerHandler.TimerStarter;
-
-import java.util.TimerTask;
-
 public class GameClientHandler {
 
 //    public static void prepareClientToPlay(Client client) {

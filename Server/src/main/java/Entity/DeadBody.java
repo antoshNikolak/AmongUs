@@ -7,12 +7,12 @@ import Component.PosComp;
 import Component.VelComp;
 import Position.Pos;
 
-public class DeadPlayer extends Entity {
+public class DeadBody extends Entity {
 
-    public DeadPlayer(String colour, PosComp pos) {
+    public DeadBody(String colour, PosComp pos) {
         super();
         addComponent(new ColourComp(colour));
-        addComponent(new VelComp());
+//        addComponent(new VelComp());
         addComponent(pos);
         addComponent(configAnimationComp(colour));
     }

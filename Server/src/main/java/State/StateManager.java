@@ -30,6 +30,16 @@ public class StateManager {
         states.pop().close();
     }
 
+    public synchronized boolean hasState(Class<? extends PlayingState> playingStateClass) {
+        for (PlayingState playingState : states) {
+            if (playingStateClass.isAssignableFrom(playingState.getClass())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public synchronized PlayingState getCurrentState() {
         return states.peek();
     }
@@ -38,8 +48,7 @@ public class StateManager {
     public synchronized <T extends State> T getState(Class<T> stateClass) {
         for (State state : states) {
             if (state.getClass().isAssignableFrom(stateClass)) {
-                    return (T) state;
-
+                return (T) state;
             }
         }
         return null;

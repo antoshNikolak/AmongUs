@@ -18,10 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SudokuHandler {
-    private static HashMap<TextField, Pos> inputPositionMap = new HashMap<>();//static is ok because a client cant open 2 sudokus at once
+    private final static HashMap<TextField, Pos> inputPositionMap = new HashMap<>();
 
     public static void addSudokuToScreen(AddSudokuPane packet) {
-        System.out.println("adding sudoku to pane");
         GameScreen gameScreen = NestedScreenHandler.createGameScreen(packet);
         drawLines(gameScreen);
         addNumbersAndInput(gameScreen, packet.getSudoku());
@@ -30,8 +29,10 @@ public class SudokuHandler {
 
     private static void addCheckButton(GameScreen gameScreen, Integer[][] sudoku) {
         Button button = new Button("check sudoku");
-        button.setLayoutX(400);
-        button.setLayoutY(180);
+        button.setLayoutX((gameScreen.getPane().getPrefWidth()/2)- 60);
+        button.setLayoutY(390);
+        button.setPrefWidth(120);
+        button.setPrefHeight(50);
         button.setOnAction(b -> verifySudoku(sudoku));
         gameScreen.addNode(button);
     }

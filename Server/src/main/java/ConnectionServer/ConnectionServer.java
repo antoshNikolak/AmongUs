@@ -11,12 +11,16 @@ import Packet.EntityState.ExistingEntityState;
 import Packet.EntityState.NewAnimatedEntityState;
 import Packet.EntityState.NewEntityState;
 import Packet.EntityState.NewLineState;
+import Packet.GameEnd.CrewWin;
+import Packet.GameEnd.ImpostorWin;
+import Packet.GameStart.RoleNotify;
 import Packet.GameStart.StartGameRequest;
 import Packet.GameStart.StartGameReturn;
 import Packet.NestedPane.*;
 import Packet.Packet;
 import Packet.Position.*;
 import Packet.Registration.LoginRequest;
+import Packet.Registration.LogoutRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
 import Packet.Sound.CloseRecordHandler;
@@ -33,6 +37,7 @@ import SudokuPacket.VerifySudokuReturn;
 import UserData.UserData;
 import Voting.ElectionReturn;
 import Voting.ImpostorVote;
+import Voting.VoteOption;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Server;
 
@@ -41,6 +46,8 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import static StartUpServer.AppServer.currentGame;
+
 public final class ConnectionServer {
     private static final Server server = new Server(20000, 20000);
 
@@ -48,28 +55,27 @@ public final class ConnectionServer {
         server.sendToUDP(connectionID, packet);
     }
 
+    public static void sendTCP(Packet packet, int connectionID) {
+        server.sendToTCP(connectionID, packet);
+    }
+
+
+
     public static void sendUDPToAllPlayers(Packet packet){
-        sendUDPTo(packet, getClientConnectionIDs());
-//        for (Client client: AppServer.currentGame.getClients()){
-//            ConnectionServer.sendUDP(packet, client.getConnectionID());
-//        }
+        sendUDP(packet, getClientConnectionIDs());
     }
 
     public static void sendTCPToAllPlayers(Packet packet){
-        sendTCPTo(packet, getClientConnectionIDs());
-//        for (Client client: AppServer.currentGame.getClients()){
-//            ConnectionServer.sendTCP(packet, client.getConnectionID());
-//        }
-
+        sendTCP(packet, getPlayerConnectionIDs());
     }
 
-    public static void sendTCPTo(Packet packet, List<Integer> connectionIDs){
+    public static void sendTCP(Packet packet, List<Integer> connectionIDs){
         for (Integer connectionID: connectionIDs){
             ConnectionServer.sendTCP(packet, connectionID);
         }
     }
 
-    public static void sendUDPTo(Packet packet, List<Integer> connectionIDs){
+    public static void sendUDP(Packet packet, List<Integer> connectionIDs){
         for (Integer connectionID: connectionIDs){
             ConnectionServer.sendUDP(packet, connectionID);
         }
@@ -80,16 +86,13 @@ public final class ConnectionServer {
         server.sendToAllExceptUDP(connectionID, packet);
     }
 
-    public static void sendTCP(Packet packet, int connectionID) {
-        server.sendToTCP(connectionID, packet);
-    }
 
     public static void sendTCPToAllExcept(Packet packet, int connectionID) {
         server.sendToAllExceptTCP(connectionID, packet);
     }
 
     public static List<Integer> getClientConnectionIDs(){
-        return getClientConnectionIDs(AppServer.currentGame.getClients());
+        return getClientConnectionIDs(AppServer.getClients());
     }
 
     public static List<Integer> getClientConnectionIDs(List<Client> clients){
@@ -99,7 +102,7 @@ public final class ConnectionServer {
     }
 
     public static List<Integer> getPlayerConnectionIDs(){
-        return getPlayerConnectionIDs(AppServer.currentGame.getPlayers());
+        return getPlayerConnectionIDs(currentGame.getPlayers());
     }
 
     public static List<Integer> getPlayerConnectionIDs(List<Player> players){
@@ -146,6 +149,12 @@ public final class ConnectionServer {
         return Optional.empty();
     }
 
+    public static Optional<Client> getClientFromConnectionID(int connectionID){
+        return getClientFromConnectionID(AppServer.getClients(), connectionID);
+    }
+
+
+
     public static Optional<Player> getPlayerFromConnectionID(List<Player> players, int connectionID) {//should this return optional
         for (Player player: players){
             if (player.getConnectionID() == connectionID){
@@ -156,7 +165,7 @@ public final class ConnectionServer {
     }
 
     public static Optional<Player> getPlayerFromConnectionID( int connectionID) {//should this return optional
-        for (Player player: AppServer.currentGame.getPlayers()){
+        for (Player player: currentGame.getPlayers()){
             if (player.getConnectionID() == connectionID){
                 return Optional.of(player);
             }
@@ -165,7 +174,7 @@ public final class ConnectionServer {
     }
 
     public static int getConnectionIDFromPlayer(Player player){
-        for (Client client: AppServer.currentGame.getClients()){
+        for (Client client: AppServer.getClients()){
             if (player == client.getPlayer()){
                 return client.getConnectionID();
             }
@@ -226,11 +235,16 @@ public final class ConnectionServer {
         kryo.register(ImpostorVote.class);
         kryo.register(VotingTimer.class);
         kryo.register(ElectionReturn.class);
-        kryo.register(RemoveVotingScreen.class);
+        kryo.register(DisplayVoteResults.class);
         kryo.register(HashMap.class);
         kryo.register(AnimationOver.class);
         kryo.register(TaskBarUpdate.class);
         kryo.register(AddEntityReturn.class);
+        kryo.register(VoteOption.class);
+        kryo.register(LogoutRequest.class);
+        kryo.register(RoleNotify.class);
+        kryo.register(CrewWin.class);
+        kryo.register(ImpostorWin.class);
 
     }
 

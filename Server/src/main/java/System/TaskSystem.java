@@ -1,5 +1,6 @@
 package System;
 
+import Component.AliveComp;
 import Component.ImposterComp;
 import Component.TaskComp;
 import DistanceFinder.DistanceFinder;
@@ -11,22 +12,39 @@ import State.TaskState;
 
 import java.util.Optional;
 
+import static StartUpServer.AppServer.currentGame;
+
 public class TaskSystem extends BaseSystem {
 
     @Override
     public void update() {
-        for (Player player : AppServer.currentGame.getPlayers()) {
+        for (Player player : currentGame.getPlayers()) {
             if (player.getCurrentTask() != null) {
                 player.getCurrentTask().update();
             }
         }
     }
 
-    public void handleTaskAction(Player player, PosRequest posRequest) {
-        if (posRequest.isTaskKey() && !player.hasComponent(ImposterComp.class) && player.getCurrentTask() == null) {
-            Optional<Tile> closestTaskTile = DistanceFinder.getClosestEntity(player, AppServer.currentGame.getStateManager().getCurrentState().getWorld().getTilesWithTask(), 70);
+    @Override
+    public void handleAction(Player player, PosRequest posRequest) {
+        if (isPlayerEligibleToPlayerTask(player, posRequest)) {
+            Optional<Tile> closestTaskTile = DistanceFinder.getClosestEntity(player, currentGame.getStateManager().getCurrentState().getWorld().getTilesWithTask(), 70);
             closestTaskTile.ifPresent(tile -> createTaskPlayerRelation(player, tile));
         }
+    }
+
+//    public void handleTaskAction(Player player, PosRequest posRequest) {
+//        if (isPlayerEligibleToPlayerTask(player, posRequest)) {
+//            Optional<Tile> closestTaskTile = DistanceFinder.getClosestEntity(player, AppServer.currentGame.getStateManager().getCurrentState().getWorld().getTilesWithTask(), 70);
+//            closestTaskTile.ifPresent(tile -> createTaskPlayerRelation(player, tile));
+//        }
+//    }
+
+    private boolean isPlayerEligibleToPlayerTask(Player player, PosRequest posRequest) {
+        return posRequest.isTaskKey() &&
+                !player.hasComponent(ImposterComp.class) &&
+                player.getCurrentTask() == null &&
+                player.getComponent(AliveComp.class).isAlive();
     }
 
     private void createTaskPlayerRelation(Player player, Tile tile) {
@@ -34,32 +52,5 @@ public class TaskSystem extends BaseSystem {
         TaskState taskState = taskComp.createTaskState(player);
         player.setCurrentTask(taskState);
     }
-
-
-//    private Optional<Tile> getClosestTaskTile(Player player) {
-//        System.out.println("pre getplayer tile distance list");
-//        PriorityQueue<EntityDistance<Tile, Player>> tiles = getPlayerTileDistanceList(player);
-//        System.out.println("post get player tile distance list");
-//
-//        if (tiles.peek() != null) {
-//            return Optional.of(tiles.peek().getEntity());
-//        } else {
-//            return Optional.empty();
-//        }
-//    }
-
-//    private PriorityQueue<EntityDistance<Tile, Player>> getPlayerTileDistanceList(Player player) {
-//            PriorityQueue<EntityDistance<Tile, Player>> entityDistanceList = new PriorityQueue<>();
-//            for (Tile tile : AppServer.currentGame.getStateManager().getCurrentState().getWorld().getTiles()) {
-//                if (tile.hasComponent(TaskComp.class)) {
-//                    System.out.println("pre get distance between entites");
-//                    entityDistanceList.add(DistanceFinder.getDistanceBetweenEntities(tile, player));
-//                    System.out.println("post get distance between entites");
-//
-//                }
-//            }
-//            return entityDistanceList;
-//    }
-
 
 }

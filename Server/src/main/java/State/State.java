@@ -1,20 +1,22 @@
 package State;
 
 import Client.ClientOperator;
+import DistanceFinder.DistanceFinder;
 import Entity.Entity;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import Packet.Position.PosRequest;
+import StartUpServer.AppServer;
 import System.*;
 import Entity.*;
 
 public abstract class State implements ClientOperator {
 
     private final Map<Class<? extends BaseSystem>, BaseSystem> systems = new HashMap<>();
+    private final List<BaseSystem> systemRemoveBuffer = new ArrayList<>();
+    private final List<BaseSystem> addSystemBuffer = new ArrayList<>();
     protected final List<Entity> entities = new CopyOnWriteArrayList<>();
 
 
@@ -22,10 +24,16 @@ public abstract class State implements ClientOperator {
     }
 
     public void addSystem(BaseSystem system) {
+        if (system.getClass() == EmergencyTableSystem.class) {
+            System.out.println("adding system " + system.getClass() + " on thread: " + Thread.currentThread().getName());
+        }
         this.systems.put(system.getClass(), system);
     }
 
     public void removeSystem(Class<? extends BaseSystem> baseSystemClass) {
+        if (baseSystemClass == EmergencyTableSystem.class) {
+            System.out.println("removing system " + baseSystemClass + " on thread: " + Thread.currentThread().getName());
+        }
         this.systems.remove(baseSystemClass);
     }
 
@@ -44,9 +52,21 @@ public abstract class State implements ClientOperator {
     }
 
     public void update() {
-        for (BaseSystem system : systems.values()) {
+        for (BaseSystem system : new HashSet<>(systems.values())) {//new hashmap to remove concurrent sys modification
             system.update();
         }
+    }
+
+    public void processPlayingSystems(Player player, PosRequest packet) {
+        for (BaseSystem system : new HashSet<>(systems.values())) {
+            system.handleAction(player, packet);//this should exclude emergency system
+        }
+//        if (packet.isEmergencyMeetingKey() && !hasSystem(EmergencyTableSystem.class)) {
+//            new EmergencyTableSystem().handleAction(player, packet);
+////            EmergencyTableSystem emergencyTableSystem = new EmergencyTableSystem();
+////            emergencyTableSystem.handleAction(player, packet);
+//
+//        }
     }
 
     public abstract void init();
@@ -65,31 +85,6 @@ public abstract class State implements ClientOperator {
 //        this.blocksUpdate = blocksUpdate;
 //    }
 
-    public void processInputSystems(Player player, PosRequest packet) {
-        if (hasSystem(PhysicsSystem.class)) {
-            getSystem(PhysicsSystem.class).processPlayerMove(player, packet);
-        }
-        if (hasSystem(ImposterActionsSystem.class)) {
-            getSystem(ImposterActionsSystem.class).handleSpecialActions(player, packet);
-        }
-        if (hasSystem(CrewMateActionSystem.class)) {
-            getSystem(CrewMateActionSystem.class).handleSpecialAction(player, packet);
-        }
-        if (hasSystem(ReportBodySystem.class)) {
-            getSystem(ReportBodySystem.class).handleReport(player, packet);
-        }
-        if (hasSystem(TaskSystem.class)) {
-            getSystem(TaskSystem.class).handleTaskAction(player, packet);
-        }
-        if (packet.isEmergencyMeetingKey()) {
-            //search for table near
-            if (!hasSystem(EmergencyTableSystem.class)) {//so emergency meeting cant be called 2x
-                EmergencyTableSystem emergencyTableSystem = new EmergencyTableSystem();
-//                System.out.println("adding system to: "+ this);
-                addSystem(emergencyTableSystem);
-                emergencyTableSystem.activate();
-            }
-        }
-    }
 
 }
+

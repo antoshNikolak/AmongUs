@@ -4,7 +4,7 @@ package Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 
-public class SpaceButton extends Button {
+public class SpaceButton extends Button {//todo document including fxml
     public SpaceButton() {
         setStyle();
     }

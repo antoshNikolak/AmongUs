@@ -26,9 +26,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameScreen extends Screen {
     private int clearX1 = 0;
-    private int clearWidth = 600;
     private int clearY1 = 0;
-    private int clearHeight = 400;
+    private int clearWidth = ScreenManager.STAGE_WIDTH;
+    private int clearHeight = ScreenManager.STAGE_HEIGHT;
 
 
 
@@ -36,8 +36,8 @@ public class GameScreen extends Screen {
     private Camera camera;
 //    private Canvas canvas;
 //    private GraphicsContext gc;
-    private  List<Entity> entities = new CopyOnWriteArrayList<>();
-    private Map<NodeType, List<Node>> nodesMap = new HashMap<>();
+    private final List<Entity> entities;
+    private final Map<NodeType, List<Node>> nodesMap;
 
 
 
@@ -75,6 +75,11 @@ public class GameScreen extends Screen {
                 nestedScreen.render();
             }
         }
+    }
+
+    public void clear(){
+        GraphicsContext gc = ((Canvas) nodesMap.get(NodeType.CANVAS).get(0)).getGraphicsContext2D();//returns the same object that already exists
+        gc.clearRect(0, 0, clearWidth, clearHeight);
     }
 
     public void setNestedScreen(GameScreen nestedPane) {

@@ -28,7 +28,7 @@ public class TimerStarter {
             @Override
             public void run() {
                 int counter = atomicCounter.decrementAndGet();
-                ConnectionServer.sendTCPTo(TimerFactory.createTimerPacket(timerString, counter), new ArrayList<>(Arrays.asList(connectionIDs)));
+                ConnectionServer.sendTCP(TimerFactory.createTimerPacket(timerString, counter), new ArrayList<>(Arrays.asList(connectionIDs)));
                 if (counter == 0){
                     onTimerFinished.execute();
                     cancel();

@@ -4,8 +4,10 @@ import Animation.AnimationOver;
 import Packet.GameStart.StartGameRequest;
 import Packet.Position.PosRequest;
 import Packet.Registration.LoginRequest;
+import Packet.Registration.LogoutRequest;
 import Packet.Registration.SignupRequest;
 import Packet.Sound.Sound;
+import StartUpServer.AppServer;
 import SudokuPacket.VerifySudokuRequest;
 import Voting.ImpostorVote;
 import com.esotericsoftware.kryonet.Connection;
@@ -30,7 +32,11 @@ public class PacketListenerServer extends Listener {
             packetController.handleSignup((SignupRequest)packet, connection.getID());
         }else if (packet instanceof StartGameRequest){
             packetController.handleStartGameRequest(connection.getID());
-        }else if (packet instanceof PosRequest){ ;
+        } else if (packet instanceof LogoutRequest){
+            packetController.handleLogout(connection.getID());
+        }
+        if (AppServer.currentGame == null)return;
+        if (packet instanceof PosRequest){ ;
             packetController.handlePosRequest((PosRequest)packet, connection.getID());
         }else if(packet instanceof VerifySudokuRequest){
             packetController.handleVerifySudokuRequest((VerifySudokuRequest)packet, connection.getID());

@@ -6,6 +6,7 @@ import EntityClient.Entity;
 import EntityClient.LocalPlayer;
 import Node.SpaceButton;
 import StartUp.AppClient;
+import TaskBar.TaskBarHandler;
 import VoiceChat.RecordHandler;
 import javafx.animation.AnimationTimer;
 import Screen.*;
@@ -21,6 +22,8 @@ public class Game {
     private final List<Entity> changingEntities = new CopyOnWriteArrayList<>();
     private LocalPlayer myPlayer;
     private RecordHandler recordHandler = new RecordHandler();
+    private AnimationTimer animationTimer;
+    private boolean running = true;
 
 
     public Game() {
@@ -36,16 +39,45 @@ public class Game {
         startTimer();
     }
 
+//    public  void stop() {
+//        this.running = false;
+//        this.changingEntities.clear();
+//    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+        if (!running) {
+            stopGame();
+        }
+    }
 
     public void startTimer() {
-        new AnimationTimer() {
+        this.animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                myPlayer.sendInput();
-                interpolate(ScreenManager.getScreen(GameScreen.class));
-                ScreenManager.getScreen(GameScreen.class).render();
+                if (running) {
+                    myPlayer.sendInput();
+                    interpolate(ScreenManager.getScreen(GameScreen.class));
+                    ScreenManager.getScreen(GameScreen.class).render();
+                } else {
+//                    stopGame();
+                    this.stop();
+                }
+
             }
-        }.start();
+        };
+        this.animationTimer.start();
+    }
+
+    private void stopGame() {
+        ScreenManager.getScreen(GameScreen.class).getEntities().clear();
+//        ScreenManager.getScreen(GameScreen.class).getPane().getChildren().remove(TaskBarHandler.getTaskBarProgress());
+        TaskBarHandler.getTaskBarProgress().setWidth(0);
+        this.changingEntities.clear();
+        myPlayer = null;
+        System.out.println("STOPPED GAME");
+
+//        ScreenManager.getScreen(GameScreen.class).clear();//JUST CLEAR
     }
 
 
@@ -53,7 +85,7 @@ public class Game {
         for (Entity entity : gameScreen.getEntities()) {
             entity.interpolate();
         }
-        if (gameScreen.getNestedScreen() != null){
+        if (gameScreen.getNestedScreen() != null) {
             interpolate(gameScreen.getNestedScreen());
         }
     }

@@ -1,30 +1,29 @@
 package ConnectionClient;
 
 import Animation.AnimationDisplayReturn;
-import Animation.AnimationOver;
 import EntityClient.*;
 import Game.Game;
 import Packet.AddEntityReturn.*;
 import Packet.Camera.ScrollingEnableReturn;
 import Packet.EntityState.*;
+import Packet.GameEnd.GameEnd;
+import Packet.GameStart.RoleNotify;
 import Packet.GameStart.StartGameReturn;
 import Packet.NestedPane.AddNestedPane;
 import Packet.NestedPane.AddSudokuPane;
 import Packet.NestedPane.AddVotingPane;
-import Packet.NestedPane.RemoveVotingScreen;
+import Packet.NestedPane.DisplayVoteResults;
 import Packet.Position.*;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Sound.Sound;
 import Packet.Timer.GameStartTimer;
 import Packet.Timer.KillCoolDownTimer;
 import Packet.Timer.VotingTimer;
-import Screen.GameScreen;
-import Screen.MenuScreen;
-import Screen.ScreenManager;
-import Screen.TextureManager;
+import Screen.*;
 import StartUp.AppClient;
 import SudokuHandler.SudokuHandler;
 import SudokuPacket.VerifySudokuReturn;
+import TaskBar.TaskBarHandler;
 import javafx.application.Platform;
 import ScreenCounter.*;
 import SudokuHandler.*;
@@ -32,6 +31,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -204,7 +205,7 @@ public class PacketControllerClient {
 
     }
 
-    public void handleRemoveVotingScreen(RemoveVotingScreen packet) {
+    public void handleRemoveVotingScreen(DisplayVoteResults packet) {
         votingPaneHandler.showVotes(packet.getPlayerVoteInfo());
         new Timer().schedule(new TimerTask() {
             @Override
@@ -221,18 +222,64 @@ public class PacketControllerClient {
         Platform.runLater(() -> votingTimerCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
 
+    //add as a node
+//    private Rectangle taskBarProgress = new Rectangle(0, 0);
     public void handleTaskBarUpdate(TaskBarUpdate packet) {
         Entity taskBar = EntityRegistryClient.getEntity(packet.getRegistrationID());
-        double fillStartX = taskBar.getPos().getX() + 7;//add 10 to compensate for the frame of the bar
-        double fillEndX = taskBar.getPos().getX() + 7 + packet.getNewWidth();
-        double taskBarHeight = TextureManager.getTexture("task-bar").getHeight();
+        TaskBarHandler.updateTaskBar(taskBar, packet.getNewWidth());
 
-        Rectangle rectangle = new Rectangle(fillEndX - fillStartX, taskBarHeight - 18);
-        rectangle.setFill(Color.GREEN);
-        rectangle.setX(fillStartX);
-        rectangle.setY(taskBar.getPos().getY() + 10);
-        Platform.runLater(() -> ScreenManager.getCurrentScreen().addNode(rectangle));
 
+//        Entity taskBar = EntityRegistryClient.getEntity(packet.getRegistrationID());
+//        double fillStartX = taskBar.getPos().getX() + 7;//add 10 to compensate for the frame of the bar
+//        double fillEndX = taskBar.getPos().getX() + 7 + packet.getNewWidth();
+//        double taskBarHeight = TextureManager.getTexture("task-bar").getHeight();
+//        this.taskBarProgress = new Rectangle(fillEndX - fillStartX, taskBarHeight - 18);
+//
+////        Rectangle rectangle = new Rectangle(fillEndX - fillStartX, taskBarHeight - 18);
+//        taskBarProgress.setFill(Color.GREEN);
+//        taskBarProgress.setX(fillStartX);
+//        taskBarProgress.setY(taskBar.getPos().getY() + 10);
+//        if (taskBarProgress.getWidth() ==50) {
+//            Platform.runLater(() -> ScreenManager.getCurrentScreen().addNode(taskBarProgress));
+//        }
+    }
+
+    public void handleRoleNotify(RoleNotify packet) {
+        String role = packet.isImpostor() ? "impostor" : "crew";
+        Text text = new Text(200, 150, "ROLE: "+role);
+        text.setFont(Font.font(50));
+        Platform.runLater(()->ScreenManager.getCurrentScreen().addNode(text));
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(()->ScreenManager.getCurrentScreen().removeNode(text));
+            }
+        }, 5000);
+        System.out.println("ROLE: " + role);
+    }
+
+    public void handleCrewWin() {
+        ScreenManager.activate(CrewWinScreen.class);
+        AppClient.currentGame.setRunning(false);
+        revertToMenu();
+    }
+
+    public void handleImpostorWin() {
+        ScreenManager.activate(ImpostorWinScreen.class);
+        AppClient.currentGame.setRunning(false);
+        revertToMenu();
+    }
+
+    public void revertToMenu() {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                ScreenManager.activate(MenuScreen.class);
+            }
+        }, 3000);
+    }
+
+    public void handleGameEnd(GameEnd packet) {
 
     }
 

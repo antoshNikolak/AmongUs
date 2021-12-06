@@ -6,7 +6,9 @@ import Entity.Tile;
 import Position.Pos;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static World.World.TILE_HEIGHT;
 import static World.World.TILE_WIDTH;
@@ -22,10 +24,10 @@ public class MergeTileHandler {
         this.dimension = dimension;
     }
 
-    public void handleMergedTiles(String [][] tokens){
-        createLargeTiles(tokens);
-        handleMergingGroupedTiles();
-    }
+//    public void handleMergedTiles(String [][] tokens){
+//        createLargeTiles(tokens);
+//        handleMergingGroupedTiles();
+//    }
 
     public void createLargeTiles(String[][] tokens) {
         for (int y = 0; y < dimension.getHeight(); y++) {
@@ -39,7 +41,7 @@ public class MergeTileHandler {
         }
     }
 
-    private void handleMergingGroupedTiles() {
+    public void handleMergingGroupedTiles() {
         for (GroupedSquareTile groupedSquareTile : groupedTiles) {
             Tile tile = groupedSquareTile.mergeIntoTile();
             Pos pos = tile.getComponent(PosComp.class).getPos();
@@ -49,7 +51,7 @@ public class MergeTileHandler {
         }
     }
 
-    private void clusterGroupedTiles(String[][] tokens, Tile tile, int x, int y, int id) {
+    public void clusterGroupedTiles(String[][] tokens, Tile tile, int x, int y, int id) {
         if (Integer.parseInt(tokens[y - 1][x]) == id) {
             addDisplacedTile(tile, x, y, 0, -1);
         } else if (Integer.parseInt(tokens[y][x - 1]) == id) {

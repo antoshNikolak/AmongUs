@@ -9,8 +9,8 @@ public class TaskBar extends Entity{
     private final int widthWithoutFrame;
 
     public TaskBar() {
-        this.widthWithoutFrame = 500 - 20;
-        addComponent(new PosComp(10, 2, 500, 35));
+        this.widthWithoutFrame = 400 - 20;
+        addComponent(new PosComp(10, 2, 400, 35));
         addComponent(getAnimationComp());
 
     }

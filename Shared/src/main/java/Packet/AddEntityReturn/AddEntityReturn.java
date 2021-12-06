@@ -20,7 +20,7 @@ public class AddEntityReturn implements Packet {
         this.newEntityStates = new ArrayList<>(Arrays.asList(entityStates));
     }
 
-    public AddEntityReturn() { }
+    private AddEntityReturn() { }
 
     @SuppressWarnings("unchecked")
     public List<? extends NewEntityState> getNewEntityStates() {

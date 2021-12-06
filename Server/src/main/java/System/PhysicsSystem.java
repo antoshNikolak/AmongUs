@@ -1,8 +1,6 @@
 package System;
 
-import Client.Client;
 import Component.*;
-import ConnectionServer.ConnectionServer;
 import Entity.Entity;
 import Entity.Player;
 import Entity.*;
@@ -10,10 +8,7 @@ import Packet.Position.PosRequest;
 import StartUpServer.AppServer;
 import State.MazeTaskState;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class PhysicsSystem extends BaseSystem {
     private List<Entity> entitiesToCollideWith;
@@ -25,6 +20,13 @@ public class PhysicsSystem extends BaseSystem {
     @Override
     public void update() {
 
+    }
+
+    @Override
+    public void handleAction(Player player, PosRequest packet) {
+        Entity playerForm = getPlayersMovingForm(player);
+        applyPacketToPlayer(playerForm, packet);
+        handleClientReturn(playerForm);
     }
 
 
@@ -40,11 +42,11 @@ public class PhysicsSystem extends BaseSystem {
 //    }
 
 
-    public void processPlayerMove(Player player, PosRequest packet) {
-        Entity playerForm = getPlayersMovingForm(player);
-        applyPacketToPlayer(playerForm, packet);
-        handleClientReturn(playerForm);
-    }
+//    public void processPlayerMove(Player player, PosRequest packet) {
+//        Entity playerForm = getPlayersMovingForm(player);
+//        applyPacketToPlayer(playerForm, packet);
+//        handleClientReturn(playerForm);
+//    }
 
     private Entity getPlayersMovingForm(Player player) {
         if (player.getCurrentTask() != null) {
@@ -55,7 +57,7 @@ public class PhysicsSystem extends BaseSystem {
         return player;
     }
 
-    private void handleClientReturn(Entity player) {
+    private void handleClientReturn(Entity player) {//todo migrate
         if (player.hasComponent(TaskPlayerComp.class)) {
             AppServer.currentGame.getEntityReturnBuffer().putEntity(player, player.getComponent(TaskPlayerComp.class).getConnectionID());
         } else if (player.getComponent(AliveComp.class).isAlive()) {

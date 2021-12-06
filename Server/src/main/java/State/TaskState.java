@@ -4,6 +4,7 @@ import ConnectionServer.ConnectionServer;
 import Entity.EntityRegistryServer;
 import Entity.Player;
 import Entity.TaskBar;
+import Packet.GameEnd.CrewWin;
 import Packet.NestedPane.RemoveNestedScreen;
 import Packet.Position.TaskBarUpdate;
 import StartUpServer.AppServer;
@@ -33,11 +34,16 @@ public abstract class TaskState extends State{
 
     protected void incrementTaskBar() {
         TaskBar taskBar = AppServer.currentGame.getStateManager().getState(GameState.class).getTaskBar();
-        taskBar.incrementProgressBar(40);
+        taskBar.incrementProgressBar(50);
         int registrationID = EntityRegistryServer.getEntityID(taskBar);
         ConnectionServer.sendTCPToAllPlayers(new TaskBarUpdate(registrationID, taskBar.getProgressBarWidth()));
         if (taskBar.isFull()){
-//            handleImpostorWin();
+            handleCrewWin();
         }
+    }
+
+    private void handleCrewWin(){
+        ConnectionServer.sendTCPToAllPlayers(new CrewWin());
+        AppServer.currentGame.stopGame();
     }
 }

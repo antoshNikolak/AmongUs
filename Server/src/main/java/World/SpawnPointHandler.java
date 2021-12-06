@@ -4,11 +4,11 @@ import Component.PosComp;
 import Component.RespawnComp;
 import Entity.Player;
 import Position.Pos;
-import StartUpServer.AppServer;
 import Math.*;
 
 import java.util.List;
 
+import static StartUpServer.AppServer.currentGame;
 import static World.World.TILE_WIDTH;
 
 public class SpawnPointHandler {
@@ -26,7 +26,7 @@ public class SpawnPointHandler {
     }
 
     private static void assignPlayerRespawnComps(Pos[] placements, Pos tableCentre) {
-        List<Player> players = AppServer.currentGame.getPlayers();
+        List<Player> players = currentGame.getPlayers();
         for (int i = 0; i < players.size(); i++) {
             Player player = players.get(i);
             PosComp playerPosComp = player.getComponent(PosComp.class);

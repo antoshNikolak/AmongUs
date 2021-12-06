@@ -3,6 +3,10 @@ package ConnectionClient;
 import Animation.AnimationDisplayReturn;
 import Packet.AddEntityReturn.*;
 import Packet.Camera.ScrollingEnableReturn;
+import Packet.GameEnd.CrewWin;
+import Packet.GameEnd.GameEnd;
+import Packet.GameEnd.ImpostorWin;
+import Packet.GameStart.RoleNotify;
 import Packet.GameStart.StartGameReturn;
 import Packet.NestedPane.*;
 import Packet.Position.*;
@@ -79,13 +83,24 @@ public class PacketListenerClient extends Listener {
             packetController.handleCloseMicAndSpeaker();
         }else if (object instanceof ElectionReturn){
 //            packetController.handleElectionReturn((ElectionReturn) object);
-        }else if (object instanceof RemoveVotingScreen){
-            packetController.handleRemoveVotingScreen((RemoveVotingScreen) object);
+        }else if (object instanceof DisplayVoteResults){
+            packetController.handleRemoveVotingScreen((DisplayVoteResults) object);
         }else if (object instanceof VotingTimer){
             packetController.handleVotingTimer((VotingTimer) object);
         }else if (object instanceof TaskBarUpdate){
             packetController.handleTaskBarUpdate((TaskBarUpdate) object);
+        }else if (object instanceof RoleNotify){
+            packetController.handleRoleNotify((RoleNotify)object);
+        }else if (object instanceof GameEnd){
+            packetController.handleGameEnd((GameEnd)object);
+        }else if (object instanceof CrewWin){
+            packetController.handleCrewWin();
+        }else if (object instanceof ImpostorWin){
+            packetController.handleImpostorWin();
         }
+//        else if (object instanceof LogoutReturn){
+//
+//        }
     }
 
 }

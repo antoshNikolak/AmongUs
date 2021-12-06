@@ -3,9 +3,7 @@ package Screen;
 import Packet.NestedPane.NodeInfo;
 import Packet.NestedPane.NodeType;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
@@ -16,6 +14,10 @@ public final class ScreenManager {
     private final static Map<Class<? extends Screen>, Screen> screens = new HashMap<>();
     private static Screen currentScreen;
     private static Scene scene;
+
+    public static final int STAGE_WIDTH =800;
+    public static final int STAGE_HEIGHT =450;
+
 
     static { //todo metntion refactoring, and this is more efficient in terms of performance, less scalable
 //        List<Class<? extends Screen>> screens = getScreenClassObjects();
@@ -29,8 +31,14 @@ public final class ScreenManager {
         Pane entryPane = loadPane("EntryScreen");
         addScreen(new EntryScreen(entryPane));
 
+        Pane crewWinPane = loadPane("CrewWinScreen");
+        addScreen(new CrewWinScreen(crewWinPane));
+
+        Pane impostorWinPane = loadPane("ImpostorWinScreen");
+        addScreen(new ImpostorWinScreen(impostorWinPane));
+
         Pane gamePane = loadPane("GameScreen");
-        addScreen(new GameScreen.Builder(gamePane).withNode(new NodeInfo(NodeType.CANVAS, 0, 0, 600, 400)).build());
+        addScreen(new GameScreen.Builder(gamePane).withNode(new NodeInfo(NodeType.CANVAS, 0, 0, STAGE_WIDTH, STAGE_HEIGHT)).build());
     }
 
     private static Pane loadPane(String paneName) {

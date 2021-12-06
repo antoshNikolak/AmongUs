@@ -25,7 +25,7 @@ public class AppClient  extends Application {
     }
 
     private void setUpStage(Stage stage){
-        Scene scene = new Scene(new Pane(), 600, 400);
+        Scene scene = new Scene(new Pane(), ScreenManager.STAGE_WIDTH, ScreenManager.STAGE_HEIGHT);//16:9 aspect ratio
         stage.setScene(scene);
         ScreenManager.setScene(scene);
         ScreenManager.activate(EntryScreen.class);

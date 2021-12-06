@@ -5,7 +5,11 @@ import java.util.*;
 
 public class Sudoku {
     private final Cell[][] cells = new Cell[9][9]; //dimensions of standard sudoku
+    private final int cellsToTakeOut;
 
+    public Sudoku(int cellsToTakeOut) {
+        this.cellsToTakeOut = cellsToTakeOut;
+    }
 
     private void init() {
         for (int y = 0; y < 9; y++) {
@@ -36,13 +40,13 @@ public class Sudoku {
 
 
     private void clearInvisCells() {
-        for (Cell cell : invisibleCells) {
+        for (Cell cell : emptyCells) {
             cell.setValue(0);
         }
     }
 
     private void setupInvisCells() {
-        for (Cell cell : invisibleCells) {
+        for (Cell cell : emptyCells) {
             cell.setValue(0);
             cell.replenishValuesAvailable();
         }
@@ -50,37 +54,38 @@ public class Sudoku {
 
     private int addNewInvisibleCell(Cell cell) {
         int cellOriginalValue = cell.getValue();
-        invisibleCells.add(cell);
+        emptyCells.add(cell);
         setupInvisCells();
         return cellOriginalValue;
     }
 
-    private Cell peakInvisivleCells() {
-        Cell firstCell = invisibleCells.peek();
-        assert firstCell != null : "first cell is null";
-        return firstCell;
+    private Cell peakEmptyCell() {
+        return emptyCells.peek();
     }
 
-    private final Deque<Cell> invisibleCells = new LinkedList<>();
+    private final Deque<Cell> emptyCells = new LinkedList<>();
 
-    //invisible cell is a cell that the user must input to complete
     private void removeValue() {
-        final int cellsToTakeOut = 25;
         List<Cell> cellList = getShuffledCellList();
         int counter = 0;
         do {
             Cell cell = cellList.get(counter);
             int cellOriginalValue = addNewInvisibleCell(cell);
-            Cell firstCell = peakInvisivleCells();
-            int solutions = getNumberOfSolutions(new LinkedList<>(invisibleCells), 0, firstCell);//runs sudoku solver
+            Cell firstCell = peakEmptyCell();
+            int solutions = getNumberOfSolutions(new LinkedList<>(emptyCells), 0, firstCell);//runs sudoku solver
             if (solutions > 1) {//put cell back where where it was
-                cell.setValue(cellOriginalValue);
-                invisibleCells.remove(cell);
+                reverseCell(cell, cellOriginalValue);
             } else {
                 counter++;
             }
-        } while (invisibleCells.size() != cellsToTakeOut);
-        invisibleCells.getLast().setValue(0);
+        } while (emptyCells.size() != cellsToTakeOut);
+        emptyCells.getLast().setValue(0);
+    }
+
+
+    private void reverseCell(Cell cell, int cellOriginalValue) {
+        cell.setValue(cellOriginalValue);
+        emptyCells.remove(cell);
     }
 
     private List<Cell> getShuffledCellList() {
@@ -127,7 +132,7 @@ public class Sudoku {
             Random random = new Random();
             int x = random.nextInt(cells.length);
             int y = random.nextInt(cells.length);
-            if ((invisibleCells.contains(cells[y][x]))) {//check cell is invisible
+            if ((emptyCells.contains(cells[y][x]))) {//check cell is invisible
                 continue;
             }
             return cells[y][x];

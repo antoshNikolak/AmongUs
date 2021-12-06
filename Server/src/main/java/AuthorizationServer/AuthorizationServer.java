@@ -4,19 +4,23 @@ import Client.Client;
 import ConnectionServer.ConnectionServer;
 import DataBase.DataBaseUtil;
 import Packet.Registration.RegistrationConfirmation;
+import StartUpServer.AppServer;
 import UserData.UserData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import Client.ClientOperator;
 
 public final class AuthorizationServer implements ClientOperator {
 
-    private static final List<Client> authorizedUsers = new ArrayList<>();
+//    private static final List<Client> authorizedUsers = new ArrayList<>();
+    public static final Map<Client, UserData> clientUserDataMap = new HashMap<>();
 
     public static RegistrationConfirmation handleLogin(UserData userData) {
+//        boolean isRegistered = doesAccountAlreadyExists(userData);
         return new RegistrationConfirmation(doesAccountAlreadyExists(userData));
     }
 
@@ -31,14 +35,24 @@ public final class AuthorizationServer implements ClientOperator {
         return new RegistrationConfirmation(usernameAvailable);
     }
 
-    public static void handleRegistrationConfirmation(RegistrationConfirmation registrationConfirmation, int connectionID) {
-        if (registrationConfirmation.isAuthorized()) authorizedUsers.add(new Client(connectionID));
+    public static void handleRegistrationConfirmation(RegistrationConfirmation registrationConfirmation, UserData userData, int connectionID) {
+        if (registrationConfirmation.isAuthorized()) {
+            Client client = new Client(connectionID);
+            AppServer.getClients().add(client);
+            clientUserDataMap.put(client, userData);
+        }
         ConnectionServer.sendTCP(registrationConfirmation, connectionID);
     }
 
-    public static Optional<Client> getAuthorizedClient(int connectionID) {
-        return ConnectionServer.getClientFromConnectionID(authorizedUsers, connectionID);
-    }
+//    public static Optional<Client> getAuthorizedClient(int connectionID) {
+//        return ConnectionServer.getClientFromConnectionID(authorizedUsers, connectionID);
+//    }
+
+//    public static void removeAuthorizedClient(Client client) {
+//        authorizedUsers.remove(client);
+//    }
+
+
 
 
 
@@ -49,7 +63,7 @@ public final class AuthorizationServer implements ClientOperator {
 
     @Override
     public void removeClient(Client client) {
-        authorizedUsers.remove(client);
+//        authorizedUsers.remove(client);
     }
 
 }
