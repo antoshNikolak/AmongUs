@@ -18,7 +18,7 @@ public class NestedScreenHandler {
                 .build();
 
         addNestedScreen(gameScreen);
-        gameScreen.setClearBoundaries(0, 0, packet.getPaneWidth(), packet.getPaneHeight());
+//        gameScreen.setClearBoundaries(0, 0, packet.getPaneWidth(), packet.getPaneHeight());
         return gameScreen;
     }
 

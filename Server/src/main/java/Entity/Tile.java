@@ -1,10 +1,9 @@
 package Entity;
 
-import Animation.AnimState;
+import Packet.Animation.AnimState;
 import Component.AnimationComp;
 import Component.HitBoxComp;
 import Component.PosComp;
-import StartUpServer.AppServer;
 
 public class Tile extends Entity {
 

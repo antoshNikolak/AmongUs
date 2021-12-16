@@ -1,4 +1,4 @@
-package Animation;
+package Packet.Animation;
 
 public class NewAnimationReturn {
 

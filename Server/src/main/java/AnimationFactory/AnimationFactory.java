@@ -1,6 +1,6 @@
 package AnimationFactory;
 
-import Animation.AnimationDisplayReturn;
+import Packet.Animation.AnimationDisplayReturn;
 import Position.Pos;
 
 public class AnimationFactory {

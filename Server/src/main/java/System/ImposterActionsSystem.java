@@ -1,6 +1,7 @@
 package System;
 
-import Animation.AnimState;
+import EndGameHandler.EndGameHandler;
+import Packet.Animation.AnimState;
 import Client.Client;
 import Component.*;
 import ConnectionServer.ConnectionServer;
@@ -38,17 +39,21 @@ public class ImposterActionsSystem extends BaseSystem {
         if (packet.isKillKey() && player.hasComponent(ImposterComp.class)) {
             if (player.getComponent(ImposterComp.class).isAbleToKill()) {
                 handleKillAction(player);
-//                checkImpostorWin();
+//                EndGameHandler.checkImpostorWin(getAlivePlayers().size());
             }
         }
     }
 
-    private void checkImpostorWin() {
-        if (getAlivePlayers().size() == 2) {
-            ConnectionServer.sendTCPToAllPlayers(new ImpostorWin());
-            AppServer.currentGame.stopGame();
-        }
-    }
+//    private void checkImpostorWin() {
+//        if (getAlivePlayers().size() == 2) {
+//            System.out.println("IMPOSTOR WON");
+//            recordImpostorWin();
+//            ConnectionServer.sendTCPToAllPlayers(new ImpostorWin());
+//            AppServer.currentGame.stopGame();
+//        }
+//    }
+
+
 
 //    public void handleSpecialActions(Player player, PosRequest packet) {
 //        if (packet.isKillKey() && player.hasComponent(ImposterComp.class)) {
@@ -63,6 +68,7 @@ public class ImposterActionsSystem extends BaseSystem {
         crewMateOptional.ifPresent(crewMate -> {
             killCrewMate(crewMate);
             startKillImposterCoolDown(imposter);
+            EndGameHandler.checkImpostorWin(getAlivePlayers().size());
         });
     }
 
@@ -76,8 +82,8 @@ public class ImposterActionsSystem extends BaseSystem {
     }
 
     public void killCrewMate(Player crewMate) {
-        stopCrewMateTask(crewMate);
         setGhostAttributes(crewMate);
+        stopCrewMateTask(crewMate);
         sendDeadBodyToClients(crewMate);
         raiseGhost(crewMate);
         updateGhostForClients(crewMate);
@@ -98,7 +104,7 @@ public class ImposterActionsSystem extends BaseSystem {
     private void startKillImposterCoolDown(Player imposter) {
         ImposterComp imposterComp = imposter.getComponent(ImposterComp.class);
         imposterComp.setAbleToKill(false);
-        TimerStarter.startTimer("KillCoolDownTimer", 5, () -> imposterComp.setAbleToKill(true), imposter.getConnectionID());
+        TimerStarter.startTimer("KillCoolDownTimer", 40, () -> imposterComp.setAbleToKill(true), imposter.getConnectionID());
     }
 
     public void setGhostAttributes(Player crewMate) {
@@ -112,22 +118,22 @@ public class ImposterActionsSystem extends BaseSystem {
     public void updateGhostForClients(Player ghost) {
         clearGhostsForAlivePlayers(ghost);
         sendNewGhostExistingGhosts(ghost);
+        System.out.println("Placing ghost in entity buffer");
+        System.out.println("number of existing ghosts: "+ getGhostConnectionIDs().size());
         currentGame.getEntityReturnBuffer().putEntity(ghost, getGhostConnectionIDs());
     }
 
     private void clearGhostsForAlivePlayers(Player ghost) {
-        for (Integer connectionID : getAliveConnectionIDs()) {
-            ConnectionServer.sendTCP(new ClearEntityReturn(EntityRegistryServer.getEntityID(ghost)), connectionID);
+        for (Player player: getAlivePlayers()) {
+            ConnectionServer.sendTCP(new ClearEntityReturn(EntityRegistryServer.getEntityID(ghost)), player.getConnectionID());
         }
     }
 
     private void sendNewGhostExistingGhosts(Player ghost) {
-        int connectionID = ConnectionServer.getConnectionIDFromPlayer(ghost);
         List<Player> otherGhosts = getGhostPlayers();
         otherGhosts.remove(ghost);
         List<NewEntityState> newEntityStates = new ArrayList<>(EntityReturnBuffer.adaptCollectionToNewEntityStates(otherGhosts));
-//        ConnectionServer.sendTCP(new AddChangingEntityReturn(newEntityStates), connectionID);
-        ConnectionServer.sendTCP(new AddEntityReturn(newEntityStates), connectionID);
+        ConnectionServer.sendTCP(new AddEntityReturn(newEntityStates),ghost.getConnectionID());
 
     }
 

@@ -47,7 +47,7 @@ public class Client {
 //        }
 //    }
 
-    public void createPlayer() {//todo migrate to lobby state
+    public void createPlayer() {
         PlayerColourFactory colourFactory = currentGame.getStateManager().getState(LobbyState.class).getPlayerColourFactory();
         this.player = new Player(this, colourFactory.getRandomColour(), connectionID);
         currentGame.getStateManager().getCurrentState().getEntities().add(player);

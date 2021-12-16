@@ -1,11 +1,11 @@
 package Packet.NestedPane;
 
-public class NodeInfo  {//todo investigate
+public class NodeInfo  {
     private NodeType nodeType;
     private double x, y, width, height;
     private String text;
     private int lineWidth;
-    private String onActionID;
+//    private String onActionID;
 
     public NodeInfo(NodeType nodeType, double x, double y, double width, double height) {
         this.nodeType = nodeType;
@@ -75,11 +75,11 @@ public class NodeInfo  {//todo investigate
         this.height = height;
     }
 
-    public String getOnActionID() {
-        return onActionID;
-    }
-
-    public void setOnActionID(String onActionID) {
-        this.onActionID = onActionID;
-    }
+//    public String getOnActionID() {
+//        return onActionID;
+//    }
+//
+//    public void setOnActionID(String onActionID) {
+//        this.onActionID = onActionID;
+//    }
 }

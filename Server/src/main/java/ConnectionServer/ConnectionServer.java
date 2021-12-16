@@ -1,11 +1,12 @@
 package ConnectionServer;
 
-import Animation.AnimState;
-import Animation.AnimationDisplayReturn;
-import Animation.AnimationOver;
+import Packet.Animation.AnimState;
+import Packet.Animation.AnimationDisplayReturn;
+import Packet.Animation.AnimationOver;
 import Client.Client;
 import Entity.Player;
 import Packet.AddEntityReturn.*;
+import Packet.Animation.NewAnimationReturn;
 import Packet.Camera.ScrollingEnableReturn;
 import Packet.EntityState.ExistingEntityState;
 import Packet.EntityState.NewAnimatedEntityState;
@@ -23,21 +24,23 @@ import Packet.Registration.LoginRequest;
 import Packet.Registration.LogoutRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
+import Packet.ScreenData.ScreenInfo;
 import Packet.Sound.CloseRecordHandler;
 import Packet.Sound.OpenRecordHandler;
 import Packet.Sound.Sound;
+import Packet.SudokuPacket.SudokuFailedReturn;
 import Packet.Timer.GameStartTimer;
 import Packet.Timer.KillCoolDownTimer;
 import Packet.Timer.Timer;
 import Packet.Timer.VotingTimer;
 import Position.Pos;
 import StartUpServer.AppServer;
-import SudokuPacket.VerifySudokuRequest;
-import SudokuPacket.VerifySudokuReturn;
-import UserData.UserData;
-import Voting.ElectionReturn;
-import Voting.ImpostorVote;
-import Voting.VoteOption;
+import Packet.SudokuPacket.VerifySudokuRequest;
+import Packet.SudokuPacket.VerifySudokuReturn;
+import Packet.UserData.UserData;
+import Packet.Voting.ElectionReturn;
+import Packet.Voting.ImpostorVote;
+import Packet.Voting.VoteOption;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Server;
 
@@ -202,8 +205,8 @@ public final class ConnectionServer {
         kryo.register(HashSet.class);
         kryo.register(NewEntityState.class);
         kryo.register(String[].class);
-        kryo.register(Animation.NewAnimationReturn[].class);
-        kryo.register(Animation.NewAnimationReturn.class);
+        kryo.register(NewAnimationReturn[].class);
+        kryo.register(NewAnimationReturn.class);
         kryo.register(AnimState.class);
         kryo.register(Timer.class);
         kryo.register(ClearEntityReturn.class);
@@ -245,6 +248,8 @@ public final class ConnectionServer {
         kryo.register(RoleNotify.class);
         kryo.register(CrewWin.class);
         kryo.register(ImpostorWin.class);
+        kryo.register(ScreenInfo.class);
+        kryo.register(SudokuFailedReturn.class);
 
     }
 

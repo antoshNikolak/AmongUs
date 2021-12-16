@@ -1,7 +1,7 @@
 package Packet.EntityState;
 
-import Animation.AnimState;
-import Animation.NewAnimationReturn;
+import Packet.Animation.AnimState;
+import Packet.Animation.NewAnimationReturn;
 import Position.Pos;
 
 import java.util.List;
@@ -11,6 +11,7 @@ public class NewAnimatedEntityState extends NewEntityState{
     private List<NewAnimationReturn> newAnimationReturns;
     private AnimState currentState;
     private boolean scrollable = true;
+    private String nameTag;
 
 
     public NewAnimatedEntityState(int registrationID, Pos pos, List<NewAnimationReturn> newAnimationReturns, AnimState currentState) {
@@ -42,5 +43,13 @@ public class NewAnimatedEntityState extends NewEntityState{
 
     public void setScrollable(boolean scrollable) {
         this.scrollable = scrollable;
+    }
+
+    public String getNameTag() {
+        return nameTag;
+    }
+
+    public void setNameTag(String nameTag) {
+        this.nameTag = nameTag;
     }
 }

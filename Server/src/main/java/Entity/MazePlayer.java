@@ -1,6 +1,6 @@
 package Entity;
 
-import Animation.AnimState;
+import Packet.Animation.AnimState;
 import Component.*;
 import State.TaskState;
 

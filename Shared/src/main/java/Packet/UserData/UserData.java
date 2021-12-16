@@ -1,4 +1,4 @@
-package UserData;
+package Packet.UserData;
 
 public class UserData {
 

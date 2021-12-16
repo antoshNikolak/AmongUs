@@ -6,6 +6,7 @@ import ConnectionServer.ConnectionServer;
 import DistanceFinder.DistanceFinder;
 import Entity.Player;
 //import Packet.NestedPane.AddVotingPane;
+import Packet.GameEnd.CrewWin;
 import Packet.Position.PosRequest;
 import Packet.Sound.CloseRecordHandler;
 import Packet.Sound.OpenRecordHandler;
@@ -23,10 +24,14 @@ import static StartUpServer.AppServer.currentGame;
 public class EmergencyTableSystem extends BaseSystem {
     private VoteHandler voteHandler;
 
-    public EmergencyTableSystem() {}
+    //todo sudoku in lobby state
+
+    public EmergencyTableSystem() {
+    }
 
     @Override
-    public void update() {}
+    public void update() {
+    }
 
     @Override
     public void handleAction(Player player, PosRequest packet) {
@@ -34,7 +39,7 @@ public class EmergencyTableSystem extends BaseSystem {
         if (state.hasSystem(getClass())) return;
         Tile mainTable = state.getWorld().getMainTable();
         double distance = DistanceFinder.getDistanceBetweenEntities(player, mainTable).getDistance();
-        if (distance <= 250) {
+        if (distance <= 250 && player.getComponent(AliveComp.class).isAlive()) {
             activate();
         }
     }
@@ -43,10 +48,23 @@ public class EmergencyTableSystem extends BaseSystem {
         currentGame.getStateManager().getCurrentState().addSystem(this);
         teleportPlayersToEmergencyTable();
         immobilisePlayers();
-        broadcastDeadBodyReportedAnimation();
+        eraseDeadBodies();
+        stopPlayerTasks();
+//        broadcastDeadBodyReportedAnimation();
         broadcastVotingPanel();
         enableVoiceChat();
     }
+
+    private void eraseDeadBodies() {
+        currentGame.getStateManager().getCurrentState().getSystem(ReportBodySystem.class).removeDeadBodies();
+    }
+
+    private void stopPlayerTasks() {
+        for (Player player : currentGame.getPlayers()) {
+            currentGame.getStateManager().getCurrentState().getSystem(ImposterActionsSystem.class).stopCrewMateTask(player);
+        }
+    }
+
 
     private void startUpVoteHandler() {
         this.voteHandler = new VoteHandler(this);
@@ -66,9 +84,14 @@ public class EmergencyTableSystem extends BaseSystem {
     }
 
     private void ejectPlayer(Player player) {
+        if (player.hasComponent(ImposterComp.class)) {
+            ConnectionServer.sendTCPToAllPlayers(new CrewWin());
+            AppServer.currentGame.stopGame();//todo duplicate code
+        }
         ImposterActionsSystem killHandler = currentGame.getStateManager().getCurrentState().getSystem(ImposterActionsSystem.class);
         killHandler.setGhostAttributes(player);
         killHandler.updateGhostForClients(player);
+
     }
 
     private void teleportPlayersToEmergencyTable() {

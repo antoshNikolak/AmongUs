@@ -2,8 +2,6 @@ package Packet.EntityState;
 
 public class NewEntityState extends EntityState {
 
-
-
     public NewEntityState(int registrationID) {
         super(registrationID);
 

@@ -1,6 +1,7 @@
 package State;
 
 import Client.Client;
+import ClientScreenTracker.ScreenData;
 import Component.PosComp;
 import ConnectionServer.ConnectionServer;
 import Entity.CollidableRect;
@@ -28,8 +29,8 @@ public class MazeTaskState extends TaskState {
 
     public MazeTaskState() {
         super();
-        this.mazeHeight = 5;
-        this.mazeWidth = 8;
+        this.mazeHeight = 7;
+        this.mazeWidth = 12;
         this.cellDimension = 50;
     }
 
@@ -76,8 +77,12 @@ public class MazeTaskState extends TaskState {
     }
 
     private AddNestedPane createNestedPanePacket() {
-        return new AddNestedPane.Builder(50, 50, 400, 250)
-                .withNode(new NodeInfo(NodeType.CANVAS, 0, 0, 400, 250))
+        int mazePixelWidth = mazeWidth* cellDimension;
+        int mazePixelHeight = mazeHeight* cellDimension;
+        int x = (ScreenData.WIDTH / 2) - (mazePixelWidth / 2);
+        int y = (ScreenData.HEIGHT / 2) - (mazePixelHeight / 2);
+        return new AddNestedPane.Builder(x, y, mazePixelWidth, mazePixelHeight)
+                .withNode(new NodeInfo(NodeType.CANVAS, 0, 0, mazePixelWidth, mazePixelHeight))
                 .withNodes(getLines())
                 .withNewEntityState(mazePlayer.adaptToNewAnimatedEntityState(true))
                 .build();
@@ -90,14 +95,6 @@ public class MazeTaskState extends TaskState {
 //    }
 
     private List<NodeInfo> getLines() {
-//        return mazeLines.stream()
-//                .map(collidableRect -> {
-//                    PosComp posComp = collidableRect.getComponent(PosComp.class);
-//                    NodeInfo nodeInfo = new NodeInfo(NodeType.LINE, posComp.getPos().getX(), posComp.getPos().getY(), posComp.getWidth(), posComp.getHeight());
-//                    nodeInfo.setWidth(5);
-//                    return nodeInfo;
-//                }).collect(Collectors.toList());
-
         List<NodeInfo> nodes = new ArrayList<>();
         for (CollidableRect collidableRect : mazeLines) {
             PosComp posComp = collidableRect.getComponent(PosComp.class);

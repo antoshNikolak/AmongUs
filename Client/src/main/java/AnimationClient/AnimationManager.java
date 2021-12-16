@@ -1,9 +1,8 @@
 package AnimationClient;
 
-import Animation.AnimState;
-import Animation.NewAnimationReturn;
+import Packet.Animation.AnimState;
+import Packet.Animation.NewAnimationReturn;
 import Packet.EntityState.NewAnimatedEntityState;
-import Packet.EntityState.NewEntityState;
 
 import java.util.EnumMap;
 import java.util.List;

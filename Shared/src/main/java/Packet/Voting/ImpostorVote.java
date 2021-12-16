@@ -1,4 +1,4 @@
-package Voting;
+package Packet.Voting;
 
 import Packet.Packet;
 

@@ -25,61 +25,32 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameScreen extends Screen {
-    private int clearX1 = 0;
-    private int clearY1 = 0;
-    private int clearWidth = ScreenManager.STAGE_WIDTH;
-    private int clearHeight = ScreenManager.STAGE_HEIGHT;
-
-
-
     private GameScreen nestedScreen;
     private Camera camera;
-//    private Canvas canvas;
-//    private GraphicsContext gc;
     private final List<Entity> entities;
     private final Map<NodeType, List<Node>> nodesMap;
 
-
-
-
-//    public GameScreen(Pane pane) {
-//        super(pane);
-//        this.canvas = new Canvas(pane.getPrefWidth(), pane.getPrefHeight());
-//        canvas.setLayoutX(0);
-//        canvas.setLayoutY(0);
-//        this.gc = canvas.getGraphicsContext2D();
-//        pane.getChildren().add(canvas);
-//    }
-
-    public GameScreen (Builder builder){//todo make private
+    private GameScreen (Builder builder){
         super(builder.pane);
         this.nodesMap = builder.nodesMap;
         this.entities = builder.entites;
-
-
     }
 
     public void render() {
-        //todo task bar cant be rendered because its being rendereed with camera
         if (nodesMap.containsKey(NodeType.CANVAS)) {
             GraphicsContext gc = ((Canvas) nodesMap.get(NodeType.CANVAS).get(0)).getGraphicsContext2D();//returns the same object that already exists
-            gc.clearRect(clearX1, clearY1, clearWidth, clearHeight);
+            gc.clearRect(0, 0, pane.getPrefWidth(), pane.getPrefHeight());//clears entire screen
             for (Entity entity : entities) {
                 if (camera != null && entity.isScrollable()) {
-                    entity.render(gc, camera);
+                    entity.render(gc, camera);//entity rendered relative to top left corner of map
                 } else{
-                    entity.render(gc);//camera is null for task, so theres no scrolling
+                    entity.render(gc);//entity rendered relative to top left corner of screen
                 }
             }
-            if (nestedScreen != null) {
-                nestedScreen.render();
-            }
         }
-    }
-
-    public void clear(){
-        GraphicsContext gc = ((Canvas) nodesMap.get(NodeType.CANVAS).get(0)).getGraphicsContext2D();//returns the same object that already exists
-        gc.clearRect(0, 0, clearWidth, clearHeight);
+        if (nestedScreen != null) {
+            nestedScreen.render();
+        }
     }
 
     public void setNestedScreen(GameScreen nestedPane) {
@@ -92,12 +63,12 @@ public class GameScreen extends Screen {
         this.nestedScreen = null;
     }
 
-    public void setClearBoundaries(int x1, int y1, int width, int height) {
-        this.clearX1 = x1;
-        this.clearY1 = y1;
-        this.clearWidth = width;
-        this.clearHeight = height;
-    }
+//    public void setClearBoundaries(int x1, int y1, int width, int height) {
+//        this.clearX1 = x1;
+//        this.clearY1 = y1;
+//        this.clearWidth = width;
+//        this.clearHeight = height;
+//    }
 
     public List<Entity> getEntities() {
         return entities;
@@ -152,12 +123,12 @@ public class GameScreen extends Screen {
                     line.setStrokeWidth(nodeInfo.getLineWidth());
                     addNodeToMap(nodeInfo, line);
                     break;
-                case BUTTON:
-                    Button button = new Button(nodeInfo.getText());
-                    setNodeLayout(button, nodeInfo);
-                    button.setOnAction(event-> ConnectionClient.sendTCP(new ActionEvent(nodeInfo.getOnActionID())));
-                    addNodeToMap(nodeInfo, button);
-                    break;
+//                case BUTTON:
+//                    Button button = new Button(nodeInfo.getText());
+//                    setNodeLayout(button, nodeInfo);
+//                    button.setOnAction(event-> ConnectionClient.sendTCP(new ActionEvent(nodeInfo.getOnActionID())));
+//                    addNodeToMap(nodeInfo, button);
+//                    break;
                 case TEXT_FIELD:
                     TextField textField = new TextField();
                     setNodeLayout(textField, nodeInfo);
@@ -188,28 +159,6 @@ public class GameScreen extends Screen {
             return this;
         }
 
-
-
-//        private void createEntity(List<? extends NewEntityState> newEntityStates, GameScreen gameScreen) {//todo confusing
-//            for (NewEntityState newEntityState : newEntityStates) {
-//                if (newEntityState instanceof NewAnimatedEntityState) {
-//                    return new Entity((NewAnimatedEntityState) newEntityState);
-//                }
-////                else if (newEntityState instanceof NewLineState) {
-////                    return createLine((NewLineState) newEntityState);
-////
-////                }
-//            }
-//        }
-
-
-
-//        private Line createLine(NewLineState lineState) {
-//            Line line = new Line(lineState.getStartPos().getX(), lineState.getStartPos().getY(), lineState.getFinalPos().getX(), lineState.getFinalPos().getY());
-//            line.setStrokeWidth(lineState.getWidth());
-//            return line;
-//        }
-
         public GameScreen build(){
             for (List<Node> nodes: nodesMap.values()){
                 for (Node node: nodes){
@@ -217,15 +166,6 @@ public class GameScreen extends Screen {
                 }
             }
             return new GameScreen(this);
-
-//            gameScreen.
-//            addNestedPane.nodes = this.nodes;
-//            addNestedPane.newEntityStates = this.newEntityStates;
-//            addNestedPane.paneWidth = this.paneWidth;
-//            addNestedPane.paneHeight = this.paneHeight;
-//            addNestedPane.paneX = this.paneX;
-//            addNestedPane.paneY = this.paneY;
-//            return addNestedPane;
         }
 
 

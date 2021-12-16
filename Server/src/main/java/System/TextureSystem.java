@@ -1,6 +1,6 @@
 package System;
 
-import Animation.AnimState;
+import Packet.Animation.AnimState;
 import Component.AliveComp;
 import Component.AnimationComp;
 import Component.VelComp;

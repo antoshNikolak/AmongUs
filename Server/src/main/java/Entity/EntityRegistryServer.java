@@ -2,11 +2,10 @@ package Entity;
 
 import ConnectionServer.ConnectionServer;
 import Packet.Position.ClearEntityReturn;
-import Utils.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import Utils.*;
 
 public class EntityRegistryServer {
     //    private static final Map<Integer, Entity> entityIDMap = new HashMap<>();
@@ -34,7 +33,7 @@ public class EntityRegistryServer {
         removeEntity(getEntityID(entity));
     }
 
-    public static void removeEntities(ArrayList<Entity> entities){
+    public static void removeEntities(Collection<DeadBody> entities){
         for (Entity entity : entities){
             removeEntity(entity);
         }

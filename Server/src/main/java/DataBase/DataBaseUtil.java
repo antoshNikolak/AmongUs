@@ -1,10 +1,11 @@
 package DataBase;
 
-import UserData.UserData;
+import Packet.UserData.UserData;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DataBaseUtil {
 
@@ -58,10 +59,11 @@ public class DataBaseUtil {
         }
     }
 
+    //todo doc change by collation
     public static List<UserData> getUserDataList(UserData userData) {
-        return queryWithPreparedStatement("SELECT username, password FROM dbo.Users " +
-                        "where username = ?" +
-                        "AND  password =  ?",
+        return queryWithPreparedStatement("SELECT username, password FROM [UserData] " +
+                        "where username = ? " +
+                        "AND password = ?",
                 DataBaseUtil::createUserDataList, userData.getUserName(), userData.getPassword());
     }
 
@@ -80,13 +82,13 @@ public class DataBaseUtil {
     }
 
     public static Boolean doesUsernameExist(String username) {
-        return queryWithPreparedStatement("SELECT username FROM dbo.Users " +
+        return !Objects.requireNonNull(queryWithPreparedStatement("SELECT username FROM UserData " +
                         "where username = ?",
-                DataBaseUtil::isResultSetEmpty, username);
+                DataBaseUtil::isResultSetEmpty, username));
     }
 
     public static boolean isResultSetEmpty(ResultSet resultSet) throws SQLException {
-        return resultSet.next();
+        return !resultSet.next();//return false if no more valid records in table
     }
 
     private static Connection getSQLConnection() throws SQLException {
@@ -96,7 +98,7 @@ public class DataBaseUtil {
 
     public static void addUserToTable(UserData userData) {
         getStatement(statement -> {
-            statement.executeUpdate("INSERT INTO Users (username, password)" +
+            statement.executeUpdate("INSERT INTO [UserData] (username, password)" +
                     "VALUES ('" + userData.getUserName() + "','" + userData.getPassword() + "')");
         });
     }
@@ -104,13 +106,13 @@ public class DataBaseUtil {
     public static void addTimeToSudokuAttempts(String userName, double time) {
         int attemptNum = getAttemptNum(userName);
         getStatement(statement -> {
-            statement.executeUpdate("INSERT INTO SudokuAttempts (username, timeTaken, attemptNum)" +
+            statement.executeUpdate("INSERT INTO SudokuAttempt (username, timeTaken, attemptNum)" +
                     "VALUES ('" + userName + "','" + time + "','" + (attemptNum+1) + "')");
         });
     }
 
     private static Integer getAttemptNum(String username) {
-        return queryWithPreparedStatement("SELECT attemptNum FROM dbo.SudokuAttempts " +
+        return queryWithPreparedStatement("SELECT attemptNum FROM dbo.SudokuAttempt " +
                         "where username = ?",
                 DataBaseUtil::getMaxValue, username);
     }
@@ -122,8 +124,6 @@ public class DataBaseUtil {
             if (value > maxValue) maxValue = value;
         }
         return maxValue;
-
-
     }
 
 

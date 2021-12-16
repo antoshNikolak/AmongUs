@@ -5,8 +5,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Set;
 
-import Animation.AnimState;
-import Animation.NewAnimationReturn;
+import Packet.Animation.AnimState;
+import Packet.Animation.NewAnimationReturn;
 
 public class AnimationComp implements Component {
     private Animation currentAnimation;

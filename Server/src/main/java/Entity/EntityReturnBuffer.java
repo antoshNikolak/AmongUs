@@ -6,18 +6,21 @@ import Packet.EntityState.ExistingEntityState;
 import Packet.EntityState.NewEntityState;
 import Packet.EntityState.NewLineState;
 import Packet.Position.StateReturn;
+import Packet.UserData.UserData;
+import Packet.UserTag.UserTagState;
 import StartUpServer.AppServer;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class EntityReturnBuffer {
     private final Map<Entity, List<Integer>> entityDestinationsReturnBuffer = new ConcurrentHashMap<>();
 
-
     public void sendGameState() {
         Map<Integer, Set<ExistingEntityState>> connectionEntityMap = new HashMap<>();
+        //connection id entity state hash map
 
         for (Entity entity : entityDestinationsReturnBuffer.keySet()) {
             List<Integer> connectionIDs = entityDestinationsReturnBuffer.get(entity);
@@ -49,20 +52,6 @@ public class EntityReturnBuffer {
                 collect(Collectors.toSet());
     }
 
-//    public static <T extends  Collection <? extends Entity>> T adaptCollectionToNewEntityStates(T entities){
-//        Collection collection = entities;
-//        for (Entity entity: entities){
-//
-//        }
-//    }
-
-
-//    private Set<EntityState> getEntityReturnStates() {
-//        return adaptCollectionToNewEntityStates(entityDestinationsReturnBuffer.keySet());
-////        return entityDestinationsReturnBuffer.keySet().stream().
-////                map(entity -> entity.adaptToEntityState()).
-////                collect(Collectors.toSet());
-//    }
 
     private List<Integer> getAllConnectionIDs() {
         return AppServer.getClients().stream().
@@ -81,6 +70,10 @@ public class EntityReturnBuffer {
     public void putEntity(Entity entity, Integer ... connectionIDs){
         entityDestinationsReturnBuffer.put(entity, Arrays.asList(connectionIDs));
     }
+
+//    public void addUserTag(UserTagState userTagState){
+//        userTags.add(userTagState);
+//    }
 
 
 }

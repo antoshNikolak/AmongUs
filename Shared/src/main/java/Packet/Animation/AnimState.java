@@ -1,4 +1,4 @@
-package Animation;
+package Packet.Animation;
 
 public enum AnimState {
     LEFT,

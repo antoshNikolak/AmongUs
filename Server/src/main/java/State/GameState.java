@@ -13,6 +13,7 @@ import Packet.Position.PosRequest;
 import Position.Pos;
 import StartUpServer.AppServer;
 import System.PhysicsSystem;
+import TimerHandler.StopWatch;
 import World.World;
 import System.*;
 import Entity.*;
@@ -24,6 +25,7 @@ import static StartUpServer.AppServer.currentGame;
 
 public class GameState extends PlayingState {
     private TaskBar taskBar;
+    private StopWatch stopWatch;
 
     public GameState() {
         super();
@@ -36,6 +38,8 @@ public class GameState extends PlayingState {
         this.addSystem(new TaskSystem());
         this.addSystem(new ImposterActionsSystem());
         this.addSystem(new ReportBodySystem());
+        this.addSystem(new NameTagSystem());
+
     }
 
     @Override
@@ -47,6 +51,18 @@ public class GameState extends PlayingState {
         selectImpostor();
         enableClientScreenScrolling();
         addTaskBar();
+        startTimer();
+    }
+
+    private void startTimer(){
+        this.stopWatch = new StopWatch();
+        this.stopWatch.start();
+    }
+
+    private void stopTimer(Player player){
+        double time = stopWatch.stop();
+        //todo add time
+
     }
 
     private void addTaskBar() {
@@ -57,7 +73,7 @@ public class GameState extends PlayingState {
 
     private void enableClientScreenScrolling() {
         for (Client client : AppServer.getClients()) {
-            Pos pos = client.getPlayer().getComponent(PosComp.class).getPos();
+            Pos pos = client.getPlayer().getComponent(PosComp.class).getPos();//todo crash from game state 48
             ConnectionServer.sendTCP(new ScrollingEnableReturn(pos), client.getConnectionID());
         }
     }

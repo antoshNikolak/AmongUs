@@ -1,6 +1,6 @@
 package Packet.EntityState;
 
-import Animation.AnimState;
+import Packet.Animation.AnimState;
 import Position.Pos;
 
 public class ExistingEntityState extends EntityState {
@@ -11,6 +11,7 @@ public class ExistingEntityState extends EntityState {
 
     private AnimState animState;
     private Integer animationIndex;
+    private String nameTag;
 
     public ExistingEntityState(int registrationID, Pos pos, AnimState animState, Integer animationIndex) {
         super(registrationID);
@@ -43,5 +44,13 @@ public class ExistingEntityState extends EntityState {
 
     public AnimState getAnimState() {
         return animState;
+    }
+
+    public String getNameTag() {
+        return nameTag;
+    }
+
+    public void setNameTag(String nameTag) {
+        this.nameTag = nameTag;
     }
 }

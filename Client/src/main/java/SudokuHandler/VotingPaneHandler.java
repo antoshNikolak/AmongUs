@@ -4,8 +4,8 @@ import ConnectionClient.ConnectionClient;
 import Packet.NestedPane.AddVotingPane;
 import Screen.GameScreen;
 import Screen.TextureManager;
-import Voting.ImpostorVote;
-import Voting.VoteOption;
+import Packet.Voting.ImpostorVote;
+import Packet.Voting.VoteOption;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -28,10 +28,8 @@ public class VotingPaneHandler {
         Map<Button, List<String>> buttonVotesMap = createButtonVotesMap(voterSuspectMap);
         for (Map.Entry<Button, List<String>> entry : buttonVotesMap.entrySet()) {
             Button button = entry.getKey();
-            System.out.println("button: "+button);
             int counter = 0;
             for (String texture : entry.getValue()) {
-//                System.out.println("texture: "+ texture);
                 placeVoterImage(button, texture, counter);
                 counter++;
             }
@@ -43,7 +41,7 @@ public class VotingPaneHandler {
         imageView.setY(button.getLayoutY() + button.getHeight() / 3);
         imageView.setX(button.getLayoutX() + button.getWidth() + counter * 30+ 7);//maybe add 10
         imageView.setFitWidth(28);
-        imageView.setFitHeight(40);
+        imageView.setFitHeight(30);
         Platform.runLater(() -> gameScreen.addNode(imageView));
     }
 
@@ -95,12 +93,6 @@ public class VotingPaneHandler {
 
     }
 
-
-
-
-
-
-
 //    private VoteOption getVoteOption(String playerTexture) {
 //        for (VoteOption voteOption : VoteOption.values()) {
 //            if (playerTexture.contains(voteOption.getColour())) {
@@ -134,11 +126,11 @@ public class VotingPaneHandler {
 
     private Button createVoteButton(Pane inButtonPane, String texture, int counter) {
         Button button = new Button();
-        button.setPrefWidth(90);
-        button.setPrefHeight(70);
+        button.setPrefWidth(70);//90 to 80
+        button.setPrefHeight(50);//70 to 50
         button.setGraphic(inButtonPane);
         button.setLayoutX(25 * (1 + Math.floor((double) counter / 3)));
-        button.setLayoutY(counter * 70);
+        button.setLayoutY(counter * 50);
         suspectButtonMap.put(getVoteOption(texture), button);
         customiseButton(button, inButtonPane, texture);
         return button;
@@ -155,6 +147,9 @@ public class VotingPaneHandler {
 
     private ImageView createPlayerImageView(String textureName) {
         ImageView imageView = new ImageView(TextureManager.getTexture(textureName));
+        imageView.setFitWidth(40);
+        imageView.setFitHeight(40);
+
         imageView.setX(10);
         imageView.setY(5);
         return imageView;
@@ -162,8 +157,8 @@ public class VotingPaneHandler {
 
     private Pane createInButtonPane(ImageView imageView) {
         Pane inButtonPane = new Pane();
-        inButtonPane.setPrefWidth(90);
-        inButtonPane.setPrefHeight(70);
+        inButtonPane.setPrefWidth(70);
+        inButtonPane.setPrefHeight(50);
         inButtonPane.getChildren().add(imageView);
         return inButtonPane;
     }

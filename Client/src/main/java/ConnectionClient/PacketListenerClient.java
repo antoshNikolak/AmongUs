@@ -1,6 +1,6 @@
 package ConnectionClient;
 
-import Animation.AnimationDisplayReturn;
+import Packet.Animation.AnimationDisplayReturn;
 import Packet.AddEntityReturn.*;
 import Packet.Camera.ScrollingEnableReturn;
 import Packet.GameEnd.CrewWin;
@@ -17,8 +17,9 @@ import Packet.Sound.Sound;
 import Packet.Timer.GameStartTimer;
 import Packet.Timer.KillCoolDownTimer;
 import Packet.Timer.VotingTimer;
-import SudokuPacket.VerifySudokuReturn;
-import Voting.ElectionReturn;
+import Packet.SudokuPacket.SudokuFailedReturn;
+import Packet.SudokuPacket.VerifySudokuReturn;
+import Packet.Voting.ElectionReturn;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
@@ -97,6 +98,8 @@ public class PacketListenerClient extends Listener {
             packetController.handleCrewWin();
         }else if (object instanceof ImpostorWin){
             packetController.handleImpostorWin();
+        }else if (object instanceof SudokuFailedReturn){
+            packetController.handleSudokuFailedReturn((SudokuFailedReturn)object);
         }
 //        else if (object instanceof LogoutReturn){
 //

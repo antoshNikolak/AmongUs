@@ -5,8 +5,5 @@ public  enum NodeType {
     BUTTON,
     LINE,
     TEXT_FIELD,
-    TEXT;
-
-
-
+    TEXT
 }

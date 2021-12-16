@@ -18,7 +18,7 @@ import static StartUpServer.AppServer.currentGame;
 
 public class LobbyState extends PlayingState {
 
-    public static final int PLAYER_LIMIT = 7;
+    public static final int PLAYER_LIMIT = 2;
     private final PlayerColourFactory playerColourFactory = new PlayerColourFactory();
 
     public LobbyState() {
@@ -67,6 +67,7 @@ public class LobbyState extends PlayingState {
         this.addSystem(new PhysicsSystem(entities));
         this.addSystem(new TextureSystem());
         this.addSystem(new ImposterActionsSystem());
+        this.addSystem(new NameTagSystem());
     }
 
     @Override
@@ -86,7 +87,6 @@ public class LobbyState extends PlayingState {
             }
         }
     }
-
 
     private void sendNewPlayerToAll(Client client) {
         NewAnimatedEntityState playerState = client.getPlayer().adaptToNewAnimatedEntityState(true);

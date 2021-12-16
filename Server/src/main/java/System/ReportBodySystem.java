@@ -3,11 +3,9 @@ package System;
 import Component.AliveComp;
 import DistanceFinder.DistanceFinder;
 import Entity.DeadBody;
-import Entity.Entity;
 import Entity.EntityRegistryServer;
 import Entity.Player;
 import Packet.Position.PosRequest;
-import StartUpServer.AppServer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +22,7 @@ public class ReportBodySystem extends BaseSystem{
         if (packet.isReportKey() && bodyFinder.getComponent(AliveComp.class).isAlive()){
             Optional<DeadBody> deadBodyOptional = getDeadBody(bodyFinder);
             deadBodyOptional.ifPresent(deadBody ->{
-                removeReportedBody(deadBody);
+//                removeDeadBodies();//todo redundant?
                 callMeeting();
             });
         }
@@ -51,9 +49,10 @@ public class ReportBodySystem extends BaseSystem{
     //ad emergency table system to state wheverever meeting is called
 
 
-    private void removeReportedBody(DeadBody deadBody){
-        this.deadBodies.remove(deadBody);
-        EntityRegistryServer.removeEntity(deadBody);
+    public void removeDeadBodies(){
+//        this.deadBodies.remove(deadBody);
+        EntityRegistryServer.removeEntities(deadBodies);
+        this.deadBodies.clear();
     }
 
     private Optional<DeadBody> getDeadBody(Player bodyFinder){

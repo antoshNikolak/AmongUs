@@ -1,7 +1,7 @@
 package Packet.NestedPane;
 
 import Packet.Packet;
-import Voting.VoteOption;
+import Packet.Voting.VoteOption;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package SudokuPacket;
+package Packet.SudokuPacket;
 
 import Packet.Packet;
 

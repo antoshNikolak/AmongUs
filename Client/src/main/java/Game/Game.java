@@ -71,13 +71,9 @@ public class Game {
 
     private void stopGame() {
         ScreenManager.getScreen(GameScreen.class).getEntities().clear();
-//        ScreenManager.getScreen(GameScreen.class).getPane().getChildren().remove(TaskBarHandler.getTaskBarProgress());
         TaskBarHandler.getTaskBarProgress().setWidth(0);
         this.changingEntities.clear();
         myPlayer = null;
-        System.out.println("STOPPED GAME");
-
-//        ScreenManager.getScreen(GameScreen.class).clear();//JUST CLEAR
     }
 
 

@@ -1,6 +1,6 @@
 package ConnectionClient;
 
-import Animation.AnimationDisplayReturn;
+import Packet.Animation.AnimationDisplayReturn;
 import EntityClient.*;
 import Game.Game;
 import Packet.AddEntityReturn.*;
@@ -19,18 +19,18 @@ import Packet.Sound.Sound;
 import Packet.Timer.GameStartTimer;
 import Packet.Timer.KillCoolDownTimer;
 import Packet.Timer.VotingTimer;
+import Position.Pos;
 import Screen.*;
 import StartUp.AppClient;
 import SudokuHandler.SudokuHandler;
-import SudokuPacket.VerifySudokuReturn;
+import Packet.SudokuPacket.SudokuFailedReturn;
+import Packet.SudokuPacket.VerifySudokuReturn;
 import TaskBar.TaskBarHandler;
 import javafx.application.Platform;
 import ScreenCounter.*;
 import SudokuHandler.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -48,7 +48,7 @@ public class PacketControllerClient {
         }//todo unnecessary?
     }
 
-    public void handleStartGameReturn(StartGameReturn packet) {//handle new stationary entity came first once, why?
+    public void handleStartGameReturn(StartGameReturn packet) {
         if (packet.isAuthorizedToStartGame()) {
             AppClient.currentGame = new Game();
             System.out.println("Game started");
@@ -56,28 +56,6 @@ public class PacketControllerClient {
             throw new IllegalStateException("client not registered to start game");
         }
     }
-
-//    public void handleNewStationaryEntityReturn(AddStationaryEntityReturn packet) {
-//        for (NewEntityState newEntityState : packet.getNewEntityStates()) {
-//            if (newEntityState instanceof NewAnimatedEntityState) {
-//                ScreenManager.getScreen(GameScreen.class).getEntities().add(new Entity((NewAnimatedEntityState) newEntityState));
-//            }
-//        }//todo re use code, make stationary class and changing class same thing
-//    }
-//
-//    public void handleAddChangingEntityReturn(AddChangingEntityReturn packet) {
-//        for (NewEntityState newEntityState : packet.getNewEntityStates()) {
-////            if (newEntityState == null) {//todo temp
-////                System.out.println("null new entity state");
-////                continue;
-////            }
-//            if (newEntityState instanceof NewAnimatedEntityState) {
-//                ScreenManager.getScreen(GameScreen.class).getEntities().add(new Entity((NewAnimatedEntityState) newEntityState));
-//                System.out.println("added new entity state");
-//            }
-//
-//        }
-//    }
 
     public void handleAddEntityReturn(AddEntityReturn packet) {
         for (NewEntityState newEntityState : packet.getNewEntityStates()) {
@@ -149,8 +127,10 @@ public class PacketControllerClient {
         Platform.runLater(() -> ScreenManager.getScreen(GameScreen.class).removeNestedScreen());
     }
 
+    private SudokuHandler sudokuHandler;
     public void handleAddSudokuPane(AddSudokuPane packet) {
-        Platform.runLater(() -> SudokuHandler.addSudokuToScreen(packet));
+        this.sudokuHandler = new SudokuHandler();
+        Platform.runLater(() -> sudokuHandler.addSudokuToScreen(packet));
     }
 
     public void handleVerifySudokuReturn(VerifySudokuReturn packet) {
@@ -281,6 +261,13 @@ public class PacketControllerClient {
 
     public void handleGameEnd(GameEnd packet) {
 
+    }
+
+    public void handleSudokuFailedReturn(SudokuFailedReturn packet) {
+        sudokuHandler.unhighlightAllErrors();
+        for (Pos pos: packet.errorsFound){
+            sudokuHandler.highlightError(pos);
+        }
     }
 
 //    public void handleElectionReturn(ElectionReturn packet) {

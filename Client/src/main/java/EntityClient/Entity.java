@@ -1,6 +1,6 @@
 package EntityClient;
 
-import Animation.AnimState;
+import Packet.Animation.AnimState;
 import AnimationClient.AnimationManager;
 import Camera.Camera;
 import Packet.EntityState.NewAnimatedEntityState;
@@ -11,6 +11,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Entity {
     private final LinkedList<Pos> positionReturns = new LinkedList<>();
@@ -19,6 +20,7 @@ public class Entity {
     protected Pos pos;
     protected AnimationManager animationManager;
     private boolean scrollable = true;
+    private final String nameTag;
 
     public Entity(NewAnimatedEntityState newEntityState) {
         if (newEntityState.getRegistrationID() != -1) {
@@ -26,6 +28,7 @@ public class Entity {
         }
         this.animationManager = new AnimationManager(newEntityState);
         this.pos = newEntityState.getPos();
+        this.nameTag = newEntityState.getNameTag();//null maybe>
         try {
             AppClient.currentGame.getEntites().add(this);
         }catch (NullPointerException e){
@@ -40,35 +43,29 @@ public class Entity {
     public void render(GraphicsContext gc, Camera camera) {
         Image image = TextureManager.getTexture(animationManager.getCurrentFrame());
         gc.drawImage(image, pos.getX() - camera.getOffsetX(), pos.getY() - camera.getOffsetY());
+        if (nameTag != null){
+            gc.strokeText(nameTag, pos.getX() - camera.getOffsetX(), pos.getY()-10 - camera.getOffsetY());
+        }
     }
 
     public void render(GraphicsContext gc) {
         Image image = TextureManager.getTexture(animationManager.getCurrentFrame());
-//        System.out.println(animationManager.getCurrentFrame());
-//
-//        if (animationManager.getCurrentFrame().contains("task")) {
-//            System.out.println(animationManager.getCurrentFrame());
-//        }
-//        if (image == null){
-//            System.out.println("image is null");
-//        }
         gc.drawImage(image, pos.getX(), pos.getY());
-    }
+        if (nameTag != null){
+            gc.strokeText(nameTag, pos.getX(), pos.getY()-10);
+        }
 
+    }
 
     public void interpolate() {
         if (positionReturns.size() != 2) return;
-        Pos oldPos = positionReturns.get(0);
-        Pos newPos = positionReturns.get(1);
-        if (oldPos == null){
-            System.out.println("position returns contents:");
-            positionReturns.forEach(pos -> {
-                System.out.println(pos.getX());
-                System.out.println(pos.getY());
-            });
+        Pos oldPos;
+        Pos newPos;
+        synchronized (this) {
+            oldPos = positionReturns.get(0);
+            newPos = positionReturns.get(1);
         }
-//        System.out.println("old pos: "+oldPos.getX());
-//        System.out.println("new pos: "+newPos.getX());
+
         double timeSinceLastPacket = getTimeSinceLastPacket();
         Pos currentPos = getCurrentPos(oldPos, newPos, timeSinceLastPacket, timeBetweenPackets);
         pos.setPos(currentPos);
@@ -99,10 +96,14 @@ public class Entity {
         return (System.nanoTime() - positionReturns.getLast().getTimeStamp()) / 10e9;
     }
 
+    //todo document synchronization
     public void updatePositionReturns(Pos pos) {
-        positionReturns.add(pos);
-        if (positionReturns.size() > 2) {
-            positionReturns.removeFirst();
+        if (pos == null)return;//LATEST ADDITION
+        synchronized (this) {
+            positionReturns.add(pos);
+            if (positionReturns.size() > 2) {
+                positionReturns.removeFirst();
+            }
         }
     }
 

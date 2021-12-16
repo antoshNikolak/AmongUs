@@ -1,10 +1,6 @@
 package Packet.EntityState;
 
-import Animation.AnimState;
-import Animation.NewAnimationReturn;
 import Position.Pos;
-
-import java.util.List;
 
 public class NewLineState extends NewEntityState {
 

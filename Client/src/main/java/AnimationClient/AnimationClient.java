@@ -1,7 +1,7 @@
 package AnimationClient;
 
 
-import Animation.NewAnimationReturn;
+import Packet.Animation.NewAnimationReturn;
 
 public class AnimationClient {
     //    private int index = 0;

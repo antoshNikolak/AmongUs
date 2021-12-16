@@ -1,6 +1,8 @@
 package VoteHandler;
 
-import Animation.AnimState;
+import ClientScreenTracker.ScreenData;
+import Utils.CollectionUtils;
+import Packet.Animation.AnimState;
 import Component.AliveComp;
 import Component.AnimationComp;
 import Component.ColourComp;
@@ -10,8 +12,8 @@ import Packet.NestedPane.AddVotingPane;
 import Packet.NestedPane.DisplayVoteResults;
 import System.EmergencyTableSystem;
 import TimerHandler.TimerStarter;
-import Utils.CollectionUtils;
-import Voting.VoteOption;
+import Packet.Voting.VoteOption;
+//import
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -92,7 +94,7 @@ public class VoteHandler {
 
 
     public void startVotingTimer() {
-        TimerStarter.startTimer("VotingTimer", 5, () -> {//time for players to vote
+        TimerStarter.startTimer("VotingTimer", 30, () -> {//time for players to vote
             ConnectionServer.sendTCPToAllPlayers(new DisplayVoteResults(playerVoteMap));
             //client will remove voting pane once vote results displayed
             new Timer().schedule(new TimerTask() {
@@ -104,23 +106,8 @@ public class VoteHandler {
         });
     }
 
-    //return texture to texture map
-    //voter to suspect map
-
-//    private Map<String, VoteOption> getVoterSuspectMap() {
-//        Map<String, VoteOption> voterSuspectMap = new HashMap<>();
-//        for (Map.Entry<String, VoteOption> voteEntry : playerVoteMap.entrySet()) {
-////            String voter = getPlayerAnimationID(voteEntry.getKey());
-//            String voter = voteEntry.getKey();
-//            VoteOption suspect = voteEntry.getValue();
-//            voterSuspectMap.put(voter, suspect);
-//        }
-//        return voterSuspectMap;
-//    }
-
-
     public AddVotingPane createVotingPane() {
-        return new AddVotingPane(getAllPlayerAnimationID(), 20, 20, 300, 300);
+        return new AddVotingPane(getAllPlayerAnimationID(), (ScreenData.WIDTH/2) - 600/2, (ScreenData.HEIGHT/2) - 300/2, 600, 300);
     }
 
     private String getPlayerAnimationID(Player player) {
@@ -131,7 +118,6 @@ public class VoteHandler {
             return animationComp.getAnimation(AnimState.GHOST_RIGHT).getFrames()[0];
         }
     }
-
 
     private List<String> getAllPlayerAnimationID() {
         return currentGame.getPlayers().stream().
@@ -154,7 +140,8 @@ public class VoteHandler {
 
     public void registerVote(Player voter, VoteOption suspect) {
         String animID = getPlayerAnimationID(voter);
-        if (!animID.contains("ghosts")) {
+//        if (!animID.contains("ghost") && !getPlayerAnimationID(suspect.getColour()).contains("ghost")) {//todo document changes
+        if (!animID.contains("ghost")){
             playerVoteMap.put(animID, suspect);
         }
     }

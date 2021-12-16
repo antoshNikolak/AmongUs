@@ -47,8 +47,8 @@ public class Maze {
     private void createStartCell(){
         Random random = new Random();
         int startCellHeight = random.nextInt(height);
-        Cell startCell = cells [startCellHeight][0];
-        startCell.setLeftWall(false);
+//        Cell startCell = cells [startCellHeight][0];
+//        startCell.setLeftWall(false);
         this.startPos = new Pos((double) cellDimension/2, startCellHeight*cellDimension + (double)cellDimension/2);
     }
 

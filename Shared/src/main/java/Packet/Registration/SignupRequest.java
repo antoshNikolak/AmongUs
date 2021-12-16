@@ -1,6 +1,6 @@
 package Packet.Registration;
 
-import UserData.UserData;
+import Packet.UserData.UserData;
 
 public class SignupRequest extends RegistrationRequest {
     public SignupRequest(UserData userData) {

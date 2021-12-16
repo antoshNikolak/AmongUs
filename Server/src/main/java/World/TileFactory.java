@@ -27,7 +27,7 @@ public class TileFactory {
             tile.addComponent(new TaskComp(MazeTaskState.class));
         } else if (id == 4) {
             tile = createTile(tilePos, "number-count-task");
-            tile.addComponent(new TaskComp(NumberCountTaskState.class));
+//            tile.addComponent(new TaskComp(NumberCountTaskState.class));
         } else if (id != 0 && id != 5) {
             throw new IllegalStateException("the world file nums are too big");
         }

@@ -61,15 +61,6 @@ public class Game {
                         sendGameState();
                     }
                 }
-
-//                    if (!this.isRunning()){
-//                        AppServer.currentGame = null;
-//                    }
-//                }
-//                else {
-//                    System.out.println("setting game to null");
-////                    AppServer.currentGame = null;
-//                }
             }
         };
         gameLoop.start();

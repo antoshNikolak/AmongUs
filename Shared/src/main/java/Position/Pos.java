@@ -1,5 +1,7 @@
 package Position;
 
+import java.util.Objects;
+
 public class Pos {
     private double x,y, timeStamp;
 
@@ -26,6 +28,26 @@ public class Pos {
         this.x = pos.getX();
         this.y = pos.getY();
     }
+
+    //todo document overriden .equals value, not comparing time stamp as it doesnt define this object
+    //I DID this because when verifying the sudoku in sudoku task state, I would add multiple positions with same pos
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pos pos = (Pos) o;
+        return Double.compare(pos.x, x) == 0 && Double.compare(pos.y, y) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
+    }
+
+    //    @Override
+//    public int hashCode() {
+//        return Objects.hash(x, y, timeStamp);
+//    }
 
     @Override
     public String toString() {

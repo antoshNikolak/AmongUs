@@ -2,19 +2,21 @@ package ConnectionServer;
 
 import AuthorizationServer.AuthorizationServer;
 import Client.Client;
+import ClientScreenTracker.ScreenData;
 import Entity.Player;
 import Packet.GameStart.StartGameReturn;
 import Packet.Position.PosRequest;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
+import Packet.ScreenData.ScreenInfo;
 import Packet.Sound.Sound;
 import StartUpServer.AppServer;
 import State.State;
-import SudokuPacket.VerifySudokuRequest;
+import Packet.SudokuPacket.VerifySudokuRequest;
 import State.*;
-import UserData.UserData;
-import Voting.ImpostorVote;
+import Packet.UserData.UserData;
+import Packet.Voting.ImpostorVote;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,8 +41,9 @@ public class PacketControllerServer {
         AuthorizationServer.handleRegistrationConfirmation(confirmation, userData, connectionID);
     }
 
-    public void handleStartGameRequest(int connectionID) {//todo doc changes
-        if (currentGame != null && currentGame.getPlayers().size() == LobbyState.PLAYER_LIMIT){
+    public void handleStartGameRequest(int connectionID) {
+        if (currentGame != null && currentGame.getPlayers().size() == LobbyState.PLAYER_LIMIT) {
+            ConnectionServer.sendTCP(new StartGameReturn(false), connectionID);//send back rejection
             return;//stops client from entering once game start
         }
         Optional<Client> clientOptional = ConnectionServer.getClientFromConnectionID(connectionID);
@@ -52,19 +55,24 @@ public class PacketControllerServer {
             LobbyState.prepareGame();
             currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
         });
+
+//        if (currentGame != null && currentGame.getPlayers().size() == LobbyState.PLAYER_LIMIT) {
+//            ConnectionServer.sendTCP(new StartGameReturn(false), connectionID);//send back rejection
+//            return;//stops client from entering once game start
+//        }
+//        Optional<Client> clientOptional = ConnectionServer.getClientFromConnectionID(connectionID);
+//        if (clientOptional.isPresent() && clientOptional.get().getPlayer() != null) {
+//            ConnectionServer.sendTCP(new StartGameReturn(false), connectionID);//send back rejection
+//            return;//stops client from pressing button 2x to crash the game
+//        }
+//        ConnectionServer.sendTCP(new StartGameReturn(clientOptional.isPresent()), connectionID);//send back confirmation
+//        clientOptional.ifPresent(client -> {
+//            LobbyState.prepareGame();
+//            currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
+//        });
     }
 
-//    public void handleStartGameRequest(int connectionID) {
-//        Optional<Client> clientOptional = ConnectionServer.getClientFromConnectionID(connectionID);
-//        if (clientOptional.isPresent()) {
-//            Client client = clientOptional.get();
-//            if (client.getPlayer() != null) return;//BUG FIX - client can press button 2x to crash the game
-//            client.prepareClientToPlay(client);
-//        }
-//        ConnectionServer.sendTCP(new StartGameReturn(clientOptional.isPresent()), connectionID);//passing client opt is unnecessary?
-//
-//
-//    }
+
 
     public void handlePosRequest(PosRequest packet, int connectionId) {
         Optional<Player> optionalPlayer = ConnectionServer.getPlayerFromConnectionID(currentGame.getPlayers(), connectionId);
@@ -107,6 +115,11 @@ public class PacketControllerServer {
             System.out.println("removing client");
             AppServer.getClients().remove(client);
         });
+    }
+
+    public void handleScreenInfo(ScreenInfo packet) {
+        ScreenData.HEIGHT = packet.getHeight();
+        ScreenData.WIDTH = packet.getWidth();
     }
 
 //    public void handleAnimationOver(AnimationOver packet, int connectionID) {

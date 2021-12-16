@@ -5,9 +5,8 @@ import ConnectionServer.ConnectionServer;
 import DataBase.DataBaseUtil;
 import Packet.Registration.RegistrationConfirmation;
 import StartUpServer.AppServer;
-import UserData.UserData;
+import Packet.UserData.UserData;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -1,6 +1,6 @@
 module Shared {
     exports Packet;
-    exports UserData;
+    exports Packet.UserData;
     exports Packet.Registration;
     exports Packet.Position;
     exports Packet.GameStart;
@@ -8,11 +8,11 @@ module Shared {
     opens Packet;
     opens Packet.Registration;
     opens Packet.GameStart;
-    opens UserData;
+    opens Packet.UserData;
     opens Packet.Position;
     opens Position;
-    exports Animation;
-    opens Animation;
+    exports Packet.Animation;
+    opens Packet.Animation;
     exports Packet.Timer;
     opens Packet.Timer;
     exports Packet.Camera;
@@ -21,15 +21,18 @@ module Shared {
     opens Packet.EntityState;
     exports Packet.AddEntityReturn;
     opens Packet.AddEntityReturn;
-    exports SudokuPacket;
-    opens SudokuPacket;
+    exports Packet.SudokuPacket;
+    opens Packet.SudokuPacket;
     exports Packet.NestedPane;
     opens Packet.NestedPane;
     exports Packet.Sound;
     opens Packet.Sound;
-    exports Voting;
-    opens Voting;
+    exports Packet.Voting;
+    opens Packet.Voting;
     exports Packet.GameEnd;
+    exports Packet.ScreenData;
+    exports Utils;
+    exports Packet.UserTag;
 
 
 }

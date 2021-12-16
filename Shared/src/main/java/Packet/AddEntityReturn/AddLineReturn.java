@@ -1,10 +1,6 @@
 package Packet.AddEntityReturn;
 
-import Animation.AnimState;
-import Animation.NewAnimationReturn;
-import Packet.EntityState.NewEntityState;
 import Packet.EntityState.NewLineState;
-import Position.Pos;
 
 import java.util.List;
 

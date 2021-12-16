@@ -1,4 +1,4 @@
-package Animation;
+package Packet.Animation;
 
 import Packet.Packet;
 import Position.Pos;

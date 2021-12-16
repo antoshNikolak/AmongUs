@@ -1,9 +1,10 @@
 package Entity;
 
-import Animation.AnimState;
+import AuthorizationServer.AuthorizationServer;
+import Packet.Animation.AnimState;
 import Client.Client;
 import Component.*;
-import StartUpServer.AppServer;
+import Packet.EntityState.NewAnimatedEntityState;
 import State.TaskState;
 
 import static StartUpServer.AppServer.currentGame;
@@ -13,11 +14,13 @@ public class Player extends Entity {
     private TaskState currentTask;
     private final Client client;
     private final int connectionID;
+    private final String nameTag;
 
 
     public Player(Client client, String colour, int connectionID) {
         this.connectionID = connectionID;
         this.client = client;
+        this.nameTag = AuthorizationServer.clientUserDataMap.get(client).getUserName();
         startComps(new PosComp(100, 100, 50, 63), colour, connectionID);
         currentGame.getPlayers().add(this);
     }
@@ -29,8 +32,20 @@ public class Player extends Entity {
 //    }
 
 
+    @Override
+    public NewAnimatedEntityState adaptToNewAnimatedEntityState(boolean scrollable) {
+        PosComp posComp = getComponent(PosComp.class);
+        AnimationComp animationComp = getComponent(AnimationComp.class);
+        int registrationID = EntityRegistryServer.getEntityID(this);
+        NewAnimatedEntityState newAnimatedEntityState = new NewAnimatedEntityState(registrationID, posComp.getPos(), animationComp.adaptToAllNewAnimations(), animationComp.getCurrentAnimationState());
+        newAnimatedEntityState.setScrollable(scrollable);
+        newAnimatedEntityState.setNameTag(this.nameTag);
+        return newAnimatedEntityState;//todo record in document and simplify
+    }
 
-
+    public String getNameTag() {
+        return nameTag;
+    }
 
     private AnimationComp configAnimation(){
         AnimationComp animationComp = new AnimationComp();

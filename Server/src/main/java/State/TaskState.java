@@ -1,6 +1,7 @@
 package State;
 
 import ConnectionServer.ConnectionServer;
+import EndGameHandler.EndGameHandler;
 import Entity.EntityRegistryServer;
 import Entity.Player;
 import Entity.TaskBar;
@@ -8,6 +9,8 @@ import Packet.GameEnd.CrewWin;
 import Packet.NestedPane.RemoveNestedScreen;
 import Packet.Position.TaskBarUpdate;
 import StartUpServer.AppServer;
+
+import static EndGameHandler.EndGameHandler.handleCrewWin;
 
 public abstract class TaskState extends State{
 
@@ -42,8 +45,8 @@ public abstract class TaskState extends State{
         }
     }
 
-    private void handleCrewWin(){
-        ConnectionServer.sendTCPToAllPlayers(new CrewWin());
-        AppServer.currentGame.stopGame();
-    }
+//    public void handleCrewWin(){
+//        ConnectionServer.sendTCPToAllPlayers(new CrewWin());
+//        AppServer.currentGame.stopGame();
+//    }
 }

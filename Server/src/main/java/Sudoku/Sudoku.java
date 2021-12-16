@@ -1,11 +1,14 @@
 package Sudoku;
 
 
+import Position.Pos;
+
 import java.util.*;
 
 public class Sudoku {
     private final Cell[][] cells = new Cell[9][9]; //dimensions of standard sudoku
     private final int cellsToTakeOut;
+    private final int [][] completedSudoku = new int[9][9];
 
     public Sudoku(int cellsToTakeOut) {
         this.cellsToTakeOut = cellsToTakeOut;
@@ -19,6 +22,7 @@ public class Sudoku {
         }
     }
 
+
     public void start() {
         init();
         createSudoku();
@@ -27,14 +31,6 @@ public class Sudoku {
 
     private void createSudoku() {
         addValue(0, 0);
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (!checkConstraints(i, j)) {
-                    throw new IllegalStateException("Sudoku invalid");
-                }
-            }
-
-        }
         removeValue();
     }
 
@@ -170,9 +166,12 @@ public class Sudoku {
 
     private boolean checkConstraints(int y, int x) {
         Integer[][] sudoku = transformCellToIntArray(cells);
-        return !(checkColumnDuplicates(sudoku, x) ||
-                checkRowDuplicates(sudoku, y) ||
+        return !(checkHorizontalDuplicates(sudoku, y) ||
+                checkVerticalDuplicates(sudoku, x) ||
                 checkGridDuplicates(sudoku, y, x));
+//        return !(checkHorizontalDuplicates(sudoku, x) ||
+//                checkVerticalDuplicates(sudoku, y) ||
+//                checkGridDuplicates(sudoku, y, x));
     }
 
     public static boolean checkGridDuplicates(Integer[][] sudoku, int y, int x) {
@@ -192,21 +191,29 @@ public class Sudoku {
     }
 
 
+
+
+
     private static int getGridCount(int num) {
         int multiplier = num / 3;
         return (multiplier) * 3;
     }
 
-    private static Integer[] trimRowArray(Integer[][] sudoku, int rowNum) {//todo remember is swapped
+    public static Integer[] trimVerticalArray(Integer[][] sudoku, int x) {//trim in y direction
         Integer[] row = new Integer[9];
-        System.arraycopy(sudoku[rowNum], 0, row, 0, 9);
+        for (int y = 0; y < 9; y++) {
+            row[y] = sudoku[y][x];
+        }
+
+//        System.arraycopy(sudoku[x], 0, row, 0, 9);
         return row;
     }
 
-    private static Integer[] trimColumnArray(Integer[][] sudoku, int colNum) {
+    public static Integer[] trimHorizontalArray(Integer[][] sudoku, int y) {//trim in x direction
         Integer[] col = new Integer[9];
-        for (int i = 0; i < sudoku.length; i++) {
-            col[i] = sudoku[i][colNum];
+        for (int x = 0; x < sudoku.length; x++) {
+//            col[i] = sudoku[i][y];
+            col[x] = sudoku[y][x];
         }
         return col;
     }
@@ -227,16 +234,16 @@ public class Sudoku {
         return sudoku;
     }
 
-    public static boolean checkRowDuplicates(Integer[][] sudoku, int row) {
-        List<Integer> rowValues = new ArrayList<>(Arrays.asList(trimRowArray(sudoku, row)));
-        rowValues.removeIf(value -> value == 0);
-        return checkDuplicates(rowValues);
+    public static boolean checkVerticalDuplicates(Integer[][] sudoku, int x) {
+        List<Integer> colValues = new ArrayList<>(Arrays.asList(trimVerticalArray(sudoku, x)));
+        colValues.removeIf(value -> value == 0);
+        return checkDuplicates(colValues);
     }
 
-    public static boolean checkColumnDuplicates(Integer[][] sudoku, int column) {
-        List<Integer> columnValues = new ArrayList<>(Arrays.asList(trimColumnArray(sudoku, column)));
-        columnValues.removeIf(value -> value == 0);
-        return checkDuplicates(columnValues);
+    public static boolean checkHorizontalDuplicates(Integer[][] sudoku, int y) {//duplicated horizontal
+        List<Integer> rowValues = new ArrayList<>(Arrays.asList(trimHorizontalArray(sudoku, y)));
+        rowValues.removeIf(value -> value == 0);
+        return checkDuplicates(rowValues);
     }
 
     public Integer[][] getIntegerMatrix() {
@@ -247,6 +254,10 @@ public class Sudoku {
             }
         }
         return sudoku;
+    }
+
+    public int[][] getCompletedSudoku() {
+        return completedSudoku;
     }
 }
 

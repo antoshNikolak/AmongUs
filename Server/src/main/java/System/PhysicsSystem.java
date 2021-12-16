@@ -61,7 +61,7 @@ public class PhysicsSystem extends BaseSystem {
         if (player.hasComponent(TaskPlayerComp.class)) {
             AppServer.currentGame.getEntityReturnBuffer().putEntity(player, player.getComponent(TaskPlayerComp.class).getConnectionID());
         } else if (player.getComponent(AliveComp.class).isAlive()) {
-            AppServer.currentGame.getEntityReturnBuffer().putEntity(player);
+            AppServer.currentGame.getEntityReturnBuffer().putEntity(player);//todo null
         } else {
             AppServer.currentGame.getEntityReturnBuffer().putEntity(player,
                     AppServer.currentGame.getStateManager().getCurrentState().getSystem(ImposterActionsSystem.class).getGhostConnectionIDs());

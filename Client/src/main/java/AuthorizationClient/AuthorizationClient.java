@@ -4,7 +4,7 @@ import Packet.Registration.LoginRequest;
 import Packet.Registration.SignupRequest;
 import Screen.LoginScreen;
 import Screen.ScreenManager;
-import UserData.UserData;
+import Packet.UserData.UserData;
 import ConnectionClient.ConnectionClient;
 import javafx.scene.control.TextField;
 

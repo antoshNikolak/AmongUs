@@ -1,11 +1,9 @@
 package Entity;
 
-import Animation.AnimState;
+import Packet.Animation.AnimState;
 import Component.AnimationComp;
 import Component.ColourComp;
 import Component.PosComp;
-import Component.VelComp;
-import Position.Pos;
 
 public class DeadBody extends Entity {
 

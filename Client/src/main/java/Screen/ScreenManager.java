@@ -1,7 +1,9 @@
 package Screen;
 
+import ConnectionClient.ConnectionClient;
 import Packet.NestedPane.NodeInfo;
 import Packet.NestedPane.NodeType;
+import Packet.ScreenData.ScreenInfo;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -22,6 +24,9 @@ public final class ScreenManager {
     static { //todo metntion refactoring, and this is more efficient in terms of performance, less scalable
 //        List<Class<? extends Screen>> screens = getScreenClassObjects();
 //        loadScreens(screens);
+
+        ConnectionClient.sendTCP(new ScreenInfo(STAGE_WIDTH, STAGE_HEIGHT));
+
         Pane loginPane = loadPane("LoginScreen");
         addScreen(new LoginScreen(loginPane));
 
