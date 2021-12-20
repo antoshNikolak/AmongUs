@@ -1,15 +1,10 @@
 package Client;
 
 import Entity.Player;
-import Game.Game;
 import PlayerColourManager.PlayerColourFactory;
-import StartUpServer.AppServer;
-import State.GameState;
 import State.LobbyState;
-import TimerHandler.TimerStarter;
 
 import static StartUpServer.AppServer.currentGame;
-import static State.LobbyState.startGameState;
 
 public class Client {
 
@@ -50,7 +45,7 @@ public class Client {
     public void createPlayer() {
         PlayerColourFactory colourFactory = currentGame.getStateManager().getState(LobbyState.class).getPlayerColourFactory();
         this.player = new Player(this, colourFactory.getRandomColour(), connectionID);
-        currentGame.getStateManager().getCurrentState().getEntities().add(player);
+        currentGame.getStateManager().getTopState().getEntities().add(player);
     }
 
     public Client(int connectionID) {

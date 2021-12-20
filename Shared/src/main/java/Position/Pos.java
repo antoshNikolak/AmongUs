@@ -29,8 +29,6 @@ public class Pos {
         this.y = pos.getY();
     }
 
-    //todo document overriden .equals value, not comparing time stamp as it doesnt define this object
-    //I DID this because when verifying the sudoku in sudoku task state, I would add multiple positions with same pos
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -43,11 +41,6 @@ public class Pos {
     public int hashCode() {
         return Objects.hash(x, y);
     }
-
-    //    @Override
-//    public int hashCode() {
-//        return Objects.hash(x, y, timeStamp);
-//    }
 
     @Override
     public String toString() {

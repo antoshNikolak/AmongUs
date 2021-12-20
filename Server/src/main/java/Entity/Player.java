@@ -1,10 +1,12 @@
 package Entity;
 
 import AuthorizationServer.AuthorizationServer;
+import ConnectionServer.ConnectionServer;
 import Packet.Animation.AnimState;
 import Client.Client;
 import Component.*;
 import Packet.EntityState.NewAnimatedEntityState;
+import Packet.NestedPane.RemoveNestedScreen;
 import State.TaskState;
 
 import static StartUpServer.AppServer.currentGame;
@@ -24,13 +26,6 @@ public class Player extends Entity {
         startComps(new PosComp(100, 100, 50, 63), colour, connectionID);
         currentGame.getPlayers().add(this);
     }
-
-//    public Player(String colour, int connectionID, PosComp posComp) {
-//        super();
-//        this.connectionID = connectionID;
-//        startComps(posComp, colour);
-//    }
-
 
     @Override
     public NewAnimatedEntityState adaptToNewAnimatedEntityState(boolean scrollable) {
@@ -74,6 +69,14 @@ public class Player extends Entity {
 
     private String[] getLeftFrames(String colour){
         return new String[]{ "standleft-" + colour, "left0-" + colour, "left1-" + colour, "left2-"+ colour, "left3-"+ colour};
+    }
+
+    public void stopTask() {
+        if (currentTask != null) {
+            ConnectionServer.sendTCP(new RemoveNestedScreen(), connectionID);
+            currentTask.setPlayer(null);
+            currentTask = null;
+        }
     }
 
     public int getConnectionID() {

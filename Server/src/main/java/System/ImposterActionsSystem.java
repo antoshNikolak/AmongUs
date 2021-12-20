@@ -2,7 +2,6 @@ package System;
 
 import EndGameHandler.EndGameHandler;
 import Packet.Animation.AnimState;
-import Client.Client;
 import Component.*;
 import ConnectionServer.ConnectionServer;
 import DistanceFinder.DistanceFinder;
@@ -10,10 +9,8 @@ import Entity.Player;
 //import Packet.AddEntityReturn.AddChangingEntityReturn;
 import Packet.AddEntityReturn.AddEntityReturn;
 import Packet.EntityState.NewEntityState;
-import Packet.GameEnd.ImpostorWin;
 import Packet.NestedPane.RemoveNestedScreen;
 import Packet.Position.*;
-import StartUpServer.AppServer;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -68,7 +65,7 @@ public class ImposterActionsSystem extends BaseSystem {
         crewMateOptional.ifPresent(crewMate -> {
             killCrewMate(crewMate);
             startKillImposterCoolDown(imposter);
-            EndGameHandler.checkImpostorWin(getAlivePlayers().size());
+            EndGameHandler.checkImpostorWin();
         });
     }
 
@@ -83,17 +80,18 @@ public class ImposterActionsSystem extends BaseSystem {
 
     public void killCrewMate(Player crewMate) {
         setGhostAttributes(crewMate);
-        stopCrewMateTask(crewMate);
+        crewMate.stopTask();
+//        stopCrewMateTask(crewMate);
         sendDeadBodyToClients(crewMate);
         raiseGhost(crewMate);
         updateGhostForClients(crewMate);
     }
 
     private void registerDeadBody(DeadBody deadBody) {
-        currentGame.getStateManager().getCurrentState().getSystem(ReportBodySystem.class).getDeadBodies().add(deadBody);
+        currentGame.getStateManager().getTopState().getSystem(ReportBodySystem.class).getDeadBodies().add(deadBody);
     }//todo this acc puts the real player, or his pos at least
 
-    public void stopCrewMateTask(Player crewMate) {
+    public void stopCrewMateTask(Player crewMate) {//MIGRATE TO PLAYER CLASS
         if (crewMate.getCurrentTask() != null) {
             ConnectionServer.sendTCP(new RemoveNestedScreen(), crewMate.getConnectionID());
             crewMate.getCurrentTask().setPlayer(null);
@@ -170,18 +168,21 @@ public class ImposterActionsSystem extends BaseSystem {
     }
 
     private static List<Player> getGhostPlayers() {
-        return AppServer.getClients().stream().
-                map(Client::getPlayer).
+        return currentGame.getPlayers().stream().
                 filter(player -> !player.getComponent(AliveComp.class).isAlive()).
                 collect(Collectors.toList());
+//        return A.stream().
+//                map(Client::getPlayer).
+//                filter(player -> !player.getComponent(AliveComp.class).isAlive()).
+//                collect(Collectors.toList());
     }
 
 
-    public static List<Integer> getAliveConnectionIDs() {
-        return ConnectionServer.getPlayerConnectionIDs(getAlivePlayers());
-    }
+//    public  List<Integer> getAliveConnectionIDs() {
+//        return ConnectionServer.getPlayerConnectionIDs(getAlivePlayers());
+//    }
 
-    private static List<Player> getAlivePlayers() {
+    public  List<Player> getAlivePlayers() {
         return currentGame.getPlayers().stream().
                 filter(player -> player.getComponent(AliveComp.class).isAlive()).
                 collect(Collectors.toList());

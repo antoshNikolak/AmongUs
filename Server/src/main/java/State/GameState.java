@@ -38,8 +38,6 @@ public class GameState extends PlayingState {
         this.addSystem(new TaskSystem());
         this.addSystem(new ImposterActionsSystem());
         this.addSystem(new ReportBodySystem());
-        this.addSystem(new NameTagSystem());
-
     }
 
     @Override
@@ -72,10 +70,15 @@ public class GameState extends PlayingState {
     }
 
     private void enableClientScreenScrolling() {
-        for (Client client : AppServer.getClients()) {
-            Pos pos = client.getPlayer().getComponent(PosComp.class).getPos();//todo crash from game state 48
-            ConnectionServer.sendTCP(new ScrollingEnableReturn(pos), client.getConnectionID());
+        for (Player player: currentGame.getPlayers()){
+            Pos pos = player.getComponent(PosComp.class).getPos();
+            ConnectionServer.sendTCP(new ScrollingEnableReturn(pos), player.getConnectionID());
         }
+//        for (Client client : AppServer.getClients()) {
+//            //todo player may be null
+//            Pos pos = client.getPlayer().getComponent(PosComp.class).getPos();//todo crash from game state 48
+//            ConnectionServer.sendTCP(new ScrollingEnableReturn(pos), client.getConnectionID());
+//        }
     }
 
     private void selectImpostor() {
@@ -94,6 +97,7 @@ public class GameState extends PlayingState {
     }
 
     private Player getRandomPlayer() {
+        System.out.println(currentGame.getPlayers().size());
         List<Player> players = currentGame.getPlayers();
         int index = new Random().nextInt(players.size());
         return players.get(index);
@@ -151,9 +155,9 @@ public class GameState extends PlayingState {
     @Override
     public void processPlayingSystems(Player player, PosRequest packet) {
         super.processPlayingSystems(player, packet);
-        if (packet.isEmergencyMeetingKey() && !hasSystem(EmergencyTableSystem.class)) {
-            new EmergencyTableSystem().handleAction(player, packet);
-        }
+//        if (packet.isEmergencyMeetingKey() && !hasSystem(EmergencyTableSystem.class)) {
+//            new EmergencyTableSystem().handleAction(player, packet);
+//        }
     }
 
     @Override

@@ -61,7 +61,7 @@ public class DataBaseUtil {
 
     //todo doc change by collation
     public static List<UserData> getUserDataList(UserData userData) {
-        return queryWithPreparedStatement("SELECT username, password FROM [UserData] " +
+        return queryWithPreparedStatement("SELECT username, password FROM UserData " +
                         "where username = ? " +
                         "AND password = ?",
                 DataBaseUtil::createUserDataList, userData.getUserName(), userData.getPassword());

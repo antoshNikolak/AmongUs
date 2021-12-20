@@ -3,27 +3,17 @@ package Packet.Registration;
 import Packet.Packet;
 
 public class RegistrationConfirmation implements Packet {
+    public String failMessage = "";
 
-    private boolean authorized;
-    private String failMessage;
-
-    public RegistrationConfirmation() {
-    }
-
-    public RegistrationConfirmation(boolean authorized) {
-        this.authorized = authorized;
-    }
+    public RegistrationConfirmation() {}
 
     public RegistrationConfirmation(String failMessage) {
-        this.authorized = false;
         this.failMessage = failMessage;
     }
 
-    public boolean isAuthorized() {
-        return authorized;
+    public boolean isAuthorized(){
+        return failMessage.isEmpty();
     }
 
-    public String getFailMessage() {
-        return failMessage;
-    }
+
 }

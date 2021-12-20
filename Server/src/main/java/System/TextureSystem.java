@@ -16,7 +16,7 @@ public class TextureSystem extends BaseSystem {
 
     @Override
     public void update() {
-        for (Entity entity : AppServer.currentGame.getStateManager().getCurrentState().getEntities()) {
+        for (Entity entity : AppServer.currentGame.getStateManager().getTopState().getEntities()) {
             if (super.checkEntityHasComponents(entity, AnimationComp.class, VelComp.class)) {
                 AnimationComp animComp = entity.getComponent(AnimationComp.class);
                 VelComp velComp = entity.getComponent(VelComp.class);

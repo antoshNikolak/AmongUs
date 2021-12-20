@@ -9,18 +9,16 @@ public class StateManager {
     public synchronized void updateTop() {
         states.peek().update();
     }
-
-    public synchronized void update() {
-        ListIterator<PlayingState> stateItr = states.listIterator(states.size());
-        while (stateItr.hasPrevious()) {
-            PlayingState state = stateItr.previous();
-            state.update();
-        }
-    }
-
+//    public synchronized void update() {
+//        ListIterator<PlayingState> stateItr = states.listIterator(states.size());
+//        while (stateItr.hasPrevious()) {
+//            PlayingState state = stateItr.previous();
+//            state.update();
+//        }
+//    }
     public void pushState(PlayingState state) {
-        if (states.contains(state)) return;
         synchronized (this) {
+            if (states.contains(state)) return;
             states.add(state);
         }
         state.init();
@@ -39,8 +37,7 @@ public class StateManager {
         return false;
     }
 
-
-    public synchronized PlayingState getCurrentState() {
+    public synchronized PlayingState getTopState() {
         return states.peek();
     }
 
@@ -53,4 +50,5 @@ public class StateManager {
         }
         return null;
     }
+
 }

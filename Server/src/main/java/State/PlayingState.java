@@ -18,18 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class PlayingState extends State {
-
     protected World world;
 
-
-
+    @Override
     public void close() {
         clearWorldData();
     }
 
     private void clearWorldData() {
         ConnectionServer.sendTCPToAllPlayers(new ClearEntityReturn(world.getTileIDs()));
-        for (Integer ID: world.getTileIDs()) {
+        for (Integer ID : world.getTileIDs()) {
             EntityRegistryServer.unregisterEntity(ID);
         }
     }
@@ -51,34 +49,6 @@ public abstract class PlayingState extends State {
         }
         return newEntities;
     }
-
-
-//    @Override
-//    public void processPlayingSystems(Player player, PosRequest packet) {
-//        super.processPlayingSystems(player, packet);
-//        if (hasSystem(ImposterActionsSystem.class)) {
-//            getSystem(ImposterActionsSystem.class).handleSpecialActions(player, packet);
-//        }
-//        if (hasSystem(CrewMateActionSystem.class)) {
-//            getSystem(CrewMateActionSystem.class).handleSpecialAction(player, packet);
-//        }
-//        if (hasSystem(ReportBodySystem.class)) {
-//            getSystem(ReportBodySystem.class).handleReport(player, packet);
-//        }
-//        if (hasSystem(TaskSystem.class)) {
-//            getSystem(TaskSystem.class).handleTaskAction(player, packet);
-//        }
-//        if (packet.isEmergencyMeetingKey()) {
-//            if (!hasSystem(EmergencyTableSystem.class)) {
-//                double distance = DistanceFinder.getDistanceBetweenEntities(player, AppServer.currentGame.getStateManager().getCurrentState().getWorld().getMainTable()).getDistance();
-//                if (distance < 100) {
-//                    EmergencyTableSystem emergencyTableSystem = new EmergencyTableSystem();
-//                    addSystem(emergencyTableSystem);
-//                    emergencyTableSystem.activate();
-//                }
-//            }
-//        }
-//    }
 
     protected abstract void createWorld();
 

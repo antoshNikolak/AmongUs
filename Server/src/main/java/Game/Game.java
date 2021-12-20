@@ -48,6 +48,7 @@ public class Game {
     }
 
     public void init() {
+//        stateManager.setCurrentStateWithClose(new LobbyState());
         stateManager.pushState(new LobbyState());
     }
 
@@ -57,7 +58,9 @@ public class Game {
             public  void handle() {//todo document syncing
                 synchronized (lock) {
                     if (this.isRunning()) {
-                        stateManager.update();
+                        stateManager.updateTop();
+
+//                        stateManager.update();
                         sendGameState();
                     }
                 }

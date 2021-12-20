@@ -6,7 +6,6 @@ import Entity.Tile;
 import Position.Pos;
 import StartUpServer.AppServer;
 import State.MazeTaskState;
-import State.NumberCountTaskState;
 import State.SudokuTaskState;
 
 import static World.World.TILE_HEIGHT;
@@ -36,7 +35,7 @@ public class TileFactory {
 
     public static Tile createTile(Pos tilePos, String textureName) {
         Tile tile = new Tile(new PosComp(tilePos, TILE_WIDTH, TILE_HEIGHT), textureName);
-        AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(tile);
+        AppServer.currentGame.getStateManager().getTopState().getEntities().add(tile);
         return new Tile(new PosComp(tilePos, TILE_WIDTH, TILE_HEIGHT), textureName);
     }
 }

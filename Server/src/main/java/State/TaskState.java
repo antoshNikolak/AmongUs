@@ -13,12 +13,11 @@ import StartUpServer.AppServer;
 import static EndGameHandler.EndGameHandler.handleCrewWin;
 
 public abstract class TaskState extends State{
-
     protected Player player;
 
-    protected void endState(){
+    @Override
+    protected void close(){
         player.setCurrentTask(null);
-//        this.entities.clear();
         ConnectionServer.sendTCP(new RemoveNestedScreen(), player.getConnectionID());
     }
 
@@ -33,7 +32,7 @@ public abstract class TaskState extends State{
 
     public void setPlayer(Player client) {
         this.player = client;
-    }//solution allows for only 1 client to play a task at a time
+    }
 
     protected void incrementTaskBar() {
         TaskBar taskBar = AppServer.currentGame.getStateManager().getState(GameState.class).getTaskBar();
@@ -45,8 +44,4 @@ public abstract class TaskState extends State{
         }
     }
 
-//    public void handleCrewWin(){
-//        ConnectionServer.sendTCPToAllPlayers(new CrewWin());
-//        AppServer.currentGame.stopGame();
-//    }
 }

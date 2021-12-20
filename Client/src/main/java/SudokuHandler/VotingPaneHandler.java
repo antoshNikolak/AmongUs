@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public class VotingPaneHandler {
-    private final Map<VoteOption, Button> suspectButtonMap = new HashMap<>();//maps candidate to button
+    private final Map<VoteOption, Button> suspectButtonMap = new HashMap<>();//maps suspect to button
     private GameScreen gameScreen;
 
 
@@ -46,9 +47,8 @@ public class VotingPaneHandler {
     }
 
 
-    //map show what player with what texture voted for what player
-    private Map<Button, List<String>> createButtonVotesMap(Map<String, VoteOption> playerVoteMap) {//string vote option
-//        playerVoteMap.entrySet().forEach(System.out::println);
+    private Map<Button, List<String>> createButtonVotesMap(Map<String, VoteOption> playerVoteMap) {
+        //player vote map show what player with what texture voted for what vote option
         Map<Button, List<String>> buttonVoterTexturesMap = new HashMap<>();
         for (Map.Entry<String, VoteOption> playerVote : playerVoteMap.entrySet()) {
             String voter = playerVote.getKey();
@@ -65,20 +65,23 @@ public class VotingPaneHandler {
         }
         return buttonVoterTexturesMap;
     }
-    //todo clear up terms candidate and suspect
 
-    //code to add voting
-    public void addVotingPane(AddVotingPane packet) {
+    public void createVotingPane(AddVotingPane packet) {
         this.gameScreen = NestedScreenHandler.createGameScreen(packet);
         addSkipVoteButton();
-        for (int i = 0; i < packet.getPlayerTextures().size(); i++) {
-            assembleVoteButton(packet.getPlayerTextures().get(i), i);
+        int counter = 0;
+        for (Map.Entry<String, String> voteDataEntry : packet.getTextureNameTagMap().entrySet()){
+            assembleVoteButton(voteDataEntry.getKey(), voteDataEntry.getValue(), counter);
+            counter++;
         }
+//        for (int i = 0; i < packet.getTextureNameTagMap().size(); i++) {
+//            assembleVoteButton(packet.getTextureNameTagMap().get(i), i);
+//        }
     }
 
-    private void assembleVoteButton(String texture, int counter) {
+    private void assembleVoteButton(String texture, String nameTag, int counter) {
         ImageView imageView = createPlayerImageView(texture);
-        Pane inButtonPane = createInButtonPane(imageView);
+        Pane inButtonPane = createInButtonPane(imageView, nameTag);
         Button button = createVoteButton(inButtonPane, texture, counter);
         gameScreen.addNode(button);
     }
@@ -124,13 +127,14 @@ public class VotingPaneHandler {
         inButtonPane.getChildren().add(line2);
     }
 
-    private Button createVoteButton(Pane inButtonPane, String texture, int counter) {
+    private Button createVoteButton(Pane inButtonPane, String texture, int buttonCounter) {
         Button button = new Button();
-        button.setPrefWidth(70);//90 to 80
-        button.setPrefHeight(50);//70 to 50
+        button.setPrefWidth(inButtonPane.getPrefWidth());
+        button.setPrefHeight(inButtonPane.getPrefHeight());
         button.setGraphic(inButtonPane);
-        button.setLayoutX(25 * (1 + Math.floor((double) counter / 3)));
-        button.setLayoutY(counter * 50);
+        final int buttonPerCol = 4;
+        button.setLayoutX(350 * (Math.floor((double) buttonCounter / buttonPerCol)));
+        button.setLayoutY((buttonCounter%buttonPerCol) * 50);
         suspectButtonMap.put(getVoteOption(texture), button);
         customiseButton(button, inButtonPane, texture);
         return button;
@@ -155,11 +159,17 @@ public class VotingPaneHandler {
         return imageView;
     }
 
-    private Pane createInButtonPane(ImageView imageView) {
+    private Pane createInButtonPane(ImageView imageView, String nameTag) {
         Pane inButtonPane = new Pane();
-        inButtonPane.setPrefWidth(70);
+        inButtonPane.setPrefWidth(100);
         inButtonPane.setPrefHeight(50);
         inButtonPane.getChildren().add(imageView);
+        imageView.setX(0);
+        Text text = new Text(nameTag);
+//        text.setFont();
+        text.setX(imageView.getX() + imageView.getFitWidth() + 1);
+        text.setY(inButtonPane.getPrefHeight()/2);
+        inButtonPane.getChildren().add(text);
         return inButtonPane;
     }
 }

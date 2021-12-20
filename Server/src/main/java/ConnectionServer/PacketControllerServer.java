@@ -21,8 +21,6 @@ import Packet.Voting.ImpostorVote;
 import java.util.List;
 import java.util.Optional;
 
-import System.*;
-
 import static StartUpServer.AppServer.currentGame;
 
 public class PacketControllerServer {
@@ -55,28 +53,16 @@ public class PacketControllerServer {
             LobbyState.prepareGame();
             currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
         });
-
-//        if (currentGame != null && currentGame.getPlayers().size() == LobbyState.PLAYER_LIMIT) {
-//            ConnectionServer.sendTCP(new StartGameReturn(false), connectionID);//send back rejection
-//            return;//stops client from entering once game start
-//        }
-//        Optional<Client> clientOptional = ConnectionServer.getClientFromConnectionID(connectionID);
-//        if (clientOptional.isPresent() && clientOptional.get().getPlayer() != null) {
-//            ConnectionServer.sendTCP(new StartGameReturn(false), connectionID);//send back rejection
-//            return;//stops client from pressing button 2x to crash the game
-//        }
-//        ConnectionServer.sendTCP(new StartGameReturn(clientOptional.isPresent()), connectionID);//send back confirmation
-//        clientOptional.ifPresent(client -> {
-//            LobbyState.prepareGame();
-//            currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
-//        });
     }
 
-
+    //todo TEST PROBLEM : CLIENT WASN'T REGISTERED TO START GAME
 
     public void handlePosRequest(PosRequest packet, int connectionId) {
         Optional<Player> optionalPlayer = ConnectionServer.getPlayerFromConnectionID(currentGame.getPlayers(), connectionId);
         if (optionalPlayer.isPresent()) {
+            if (packet.isEmergencyMeetingKey()) {
+                MeetingState.checkStateValid(optionalPlayer.get());
+            }
             State state = getPlayerState(optionalPlayer.get());
             state.processPlayingSystems(optionalPlayer.get(), packet);
         }
@@ -86,7 +72,7 @@ public class PacketControllerServer {
         if (player.getCurrentTask() != null) {
             return player.getCurrentTask();
         }
-        return currentGame.getStateManager().getCurrentState();
+        return currentGame.getStateManager().getTopState();
     }
 
     public void handleVerifySudokuRequest(VerifySudokuRequest packet, int connectionID) {
@@ -104,14 +90,18 @@ public class PacketControllerServer {
     }
 
     public void handleImpostorVote(ImpostorVote packet, int connectionID) {
-        EmergencyTableSystem emergencyTableSystem = currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class);
+//        EmergencyTableSystem emergencyTableSystem = currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class);
+        MeetingState meetingState = currentGame.getStateManager().getState(MeetingState.class);
+        if (meetingState == null)return;
         Optional<Player> playerOptional = ConnectionServer.getPlayerFromConnectionID(connectionID);
-        playerOptional.ifPresent(player -> emergencyTableSystem.getVoteHandler().registerVote(player, packet.getVoteOption()));
+        playerOptional.ifPresent(player -> meetingState.getVoteHandler().registerVote(player, packet.getVoteOption()));
+
+//        playerOptional.ifPresent(player -> emergencyTableSystem.getVoteHandler().registerVote(player, packet.getVoteOption()));
     }
 
     public void handleLogout(int id) {
         Optional<Client> playerOptional = ConnectionServer.getClientFromConnectionID(id);
-        playerOptional.ifPresent(client -> {//todo redundant authorized client list
+        playerOptional.ifPresent(client -> {
             System.out.println("removing client");
             AppServer.getClients().remove(client);
         });

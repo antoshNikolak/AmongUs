@@ -9,7 +9,6 @@ import Packet.AddEntityReturn.AddLocalEntityReturn;
 //import Packet.AddEntityReturn.AddChangingEntityReturn;
 import Packet.EntityState.NewAnimatedEntityState;
 import PlayerColourManager.PlayerColourFactory;
-import StartUpServer.AppServer;
 import TimerHandler.TimerStarter;
 import World.World;
 import System.*;
@@ -18,7 +17,7 @@ import static StartUpServer.AppServer.currentGame;
 
 public class LobbyState extends PlayingState {
 
-    public static final int PLAYER_LIMIT = 2;
+    public static final int PLAYER_LIMIT = 4;
     private final PlayerColourFactory playerColourFactory = new PlayerColourFactory();
 
     public LobbyState() {
@@ -36,6 +35,7 @@ public class LobbyState extends PlayingState {
 
     public static void startGameState() {
         synchronized (currentGame.getStateManager()) {
+//            currentGame.getStateManager().setCurrentStateWithClose(new GameState());
             currentGame.getStateManager().popState();
             currentGame.getStateManager().pushState(new GameState());
         }
@@ -67,7 +67,6 @@ public class LobbyState extends PlayingState {
         this.addSystem(new PhysicsSystem(entities));
         this.addSystem(new TextureSystem());
         this.addSystem(new ImposterActionsSystem());
-        this.addSystem(new NameTagSystem());
     }
 
     @Override

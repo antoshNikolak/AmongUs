@@ -7,7 +7,6 @@ import DistanceFinder.DistanceFinder;
 import Entity.Player;
 import Entity.Tile;
 import Packet.Position.PosRequest;
-import StartUpServer.AppServer;
 import State.TaskState;
 
 import java.util.Optional;
@@ -28,7 +27,7 @@ public class TaskSystem extends BaseSystem {
     @Override
     public void handleAction(Player player, PosRequest posRequest) {
         if (isPlayerEligibleToPlayerTask(player, posRequest)) {
-            Optional<Tile> closestTaskTile = DistanceFinder.getClosestEntity(player, currentGame.getStateManager().getCurrentState().getWorld().getTilesWithTask(), 70);
+            Optional<Tile> closestTaskTile = DistanceFinder.getClosestEntity(player, currentGame.getStateManager().getTopState().getWorld().getTilesWithTask(), 70);
             closestTaskTile.ifPresent(tile -> createTaskPlayerRelation(player, tile));
         }
     }

@@ -6,13 +6,10 @@ import Packet.EntityState.ExistingEntityState;
 import Packet.EntityState.NewEntityState;
 import Packet.EntityState.NewLineState;
 import Packet.Position.StateReturn;
-import Packet.UserData.UserData;
-import Packet.UserTag.UserTagState;
 import StartUpServer.AppServer;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class EntityReturnBuffer {
@@ -54,8 +51,8 @@ public class EntityReturnBuffer {
 
 
     private List<Integer> getAllConnectionIDs() {
-        return AppServer.getClients().stream().
-                map(Client::getConnectionID).
+        return AppServer.currentGame.getPlayers().stream().
+                map(Player::getConnectionID).
                 collect(Collectors.toList());
     }
 

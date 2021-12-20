@@ -1,20 +1,21 @@
 package Packet.NestedPane;
 
 import Packet.EntityState.NewAnimatedEntityState;
-import Packet.NestedPane.AddsPane;
-import Packet.NestedPane.NodeInfo;
 import Packet.Packet;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class AddVotingPane   implements Packet, AddsPane {
+public class AddVotingPane implements Packet, AddsPane {
 
-    private int paneX, paneY, paneWidth, paneHeight;
-    List<String> playerTextures = new ArrayList<>();
+    public int paneX, paneY, paneWidth, paneHeight;
+    public Map<String, String> textureNameTagMap = new HashMap<>();
 
-    public AddVotingPane(List<String> playerTextures, int paneX, int paneY, int paneWidth, int paneHeight) {
-        this.playerTextures = playerTextures;
+
+    public AddVotingPane(Map<String, String> textureNameTagMap, int paneX, int paneY, int paneWidth, int paneHeight) {
+        this.textureNameTagMap = textureNameTagMap;
         this.paneX = paneX;
         this.paneY = paneY;
         this.paneWidth = paneWidth;
@@ -54,7 +55,7 @@ public class AddVotingPane   implements Packet, AddsPane {
         return new ArrayList<>();
     }
 
-    public List<String> getPlayerTextures() {
-        return playerTextures;
+    public Map<String, String> getTextureNameTagMap() {
+        return textureNameTagMap;
     }
 }

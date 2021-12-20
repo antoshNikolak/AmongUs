@@ -19,8 +19,12 @@ public final class AuthorizationServer implements ClientOperator {
     public static final Map<Client, UserData> clientUserDataMap = new HashMap<>();
 
     public static RegistrationConfirmation handleLogin(UserData userData) {
-//        boolean isRegistered = doesAccountAlreadyExists(userData);
-        return new RegistrationConfirmation(doesAccountAlreadyExists(userData));
+        boolean isRegistered = doesAccountAlreadyExists(userData);
+        return new RegistrationConfirmation(getLoginFailMessage(isRegistered));
+    }
+
+    private static String getLoginFailMessage(boolean doesAccountAlreadyExist){
+        return doesAccountAlreadyExist? "": "username or password is incorrect";
     }
 
     private static boolean doesAccountAlreadyExists(UserData userData) {
@@ -31,7 +35,16 @@ public final class AuthorizationServer implements ClientOperator {
     public static RegistrationConfirmation handleSignup(UserData userData) {
         boolean usernameAvailable = !(DataBaseUtil.doesUsernameExist(userData.getUserName()));
         if (usernameAvailable) DataBaseUtil.addUserToTable(userData);
-        return new RegistrationConfirmation(usernameAvailable);
+        return new RegistrationConfirmation(getSignUpFailMessage(userData, usernameAvailable));
+    }
+
+    private static String getSignUpFailMessage(UserData userData, boolean userNameAvailable){
+        if (!userNameAvailable){
+            return "username already exists";
+        }else if (userData.getUserName().length() >=12){                                              //todo alter table in DB to varhcar(12)
+            return "user name is too long";
+        }
+        return "";//return empty string
     }
 
     public static void handleRegistrationConfirmation(RegistrationConfirmation registrationConfirmation, UserData userData, int connectionID) {

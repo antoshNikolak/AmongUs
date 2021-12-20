@@ -1,6 +1,7 @@
 package VoteHandler;
 
 import ClientScreenTracker.ScreenData;
+import State.MeetingState;
 import Utils.CollectionUtils;
 import Packet.Animation.AnimState;
 import Component.AliveComp;
@@ -10,7 +11,7 @@ import ConnectionServer.ConnectionServer;
 import Entity.Player;
 import Packet.NestedPane.AddVotingPane;
 import Packet.NestedPane.DisplayVoteResults;
-import System.EmergencyTableSystem;
+//import System.EmergencyTableSystem;
 import TimerHandler.TimerStarter;
 import Packet.Voting.VoteOption;
 //import
@@ -23,12 +24,18 @@ import static StartUpServer.AppServer.currentGame;
 public class VoteHandler {
 
     private final Map<String, VoteOption> playerVoteMap = new HashMap<>();//todo rename voter suspect map
-    private final EmergencyTableSystem emergencyTableSystem;
+//    private final EmergencyTableSystem emergencyTableSystem;
+    private final MeetingState meetingState;
 
 
-    public VoteHandler(EmergencyTableSystem emergencyTableSystem) {
-        this.emergencyTableSystem = emergencyTableSystem;
+//    public VoteHandler(EmergencyTableSystem emergencyTableSystem) {
+//        this.emergencyTableSystem = emergencyTableSystem;
+//    }
+
+    public VoteHandler(MeetingState meetingState) {
+        this.meetingState = meetingState;
     }
+
 
     private Optional<VoteOption> getVoteOptionWithMostVotes() {
         Map<VoteOption, Integer> playerVotes = getSuspectVoteCountMap();//maps vote option to num of votes
@@ -100,14 +107,15 @@ public class VoteHandler {
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    emergencyTableSystem.onVoteTimerOver();//close and remove the emergency meeting system
+                    currentGame.getStateManager().popState();//assume game state is under this one on the stack
+//                    emergencyTableSystem.onVoteTimerOver();//close and remove the emergency meeting system
                 }
             }, 2000);//time to display
         });
     }
 
     public AddVotingPane createVotingPane() {
-        return new AddVotingPane(getAllPlayerAnimationID(), (ScreenData.WIDTH/2) - 600/2, (ScreenData.HEIGHT/2) - 300/2, 600, 300);
+        return new AddVotingPane(getVotingOptionData(), (ScreenData.WIDTH/2) - 750/2, (ScreenData.HEIGHT/2) - 300/2, 750, 300);
     }
 
     private String getPlayerAnimationID(Player player) {
@@ -119,10 +127,17 @@ public class VoteHandler {
         }
     }
 
-    private List<String> getAllPlayerAnimationID() {
-        return currentGame.getPlayers().stream().
-                map(this::getPlayerAnimationID).
-                collect(Collectors.toList());
+    //return animation ID, username map
+    private Map<String, String> getVotingOptionData() {
+        Map<String, String> votingData = new HashMap<>();
+        for (Player player: currentGame.getPlayers()){
+            votingData.put(getPlayerAnimationID(player), player.getNameTag());
+        }
+        return votingData;
+
+//        return currentGame.getPlayers().stream().
+//                map(this::getPlayerAnimationID).
+//                collect(Collectors.toList());
     }
 
     private String getPlayerAnimationID(String colour) {

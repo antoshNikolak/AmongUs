@@ -42,7 +42,7 @@ public class MazeTaskState extends TaskState {
 
     private void checkTaskComplete() {
         if (isMazeComplete()) {
-            super.endState();
+            super.close();
             super.incrementTaskBar();
         }
     }

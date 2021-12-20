@@ -26,7 +26,7 @@ public class SudokuTaskState extends TaskState {
 
     public void handleCompletionVerification(Integer[][] sudokuValues, Client client) {
         if (checkTaskCompleted(sudokuValues, client.getConnectionID())) {
-            super.endState();
+            super.close();
             super.incrementTaskBar();
             double timeDiffNano = stopWatch.stop();
             recordTimeInDataBase(client, timeDiffNano * 1e-9);
@@ -75,12 +75,6 @@ public class SudokuTaskState extends TaskState {
                 int startX = 3 * (i % 3);
                 for (int x = startX; x < startX + 3; x++) {
                     processDuplicate(errorsFound, itemIndex, sudokuValues[y][x], x, y);
-//                    int num = sudokuValues[y][x];
-//                    if (itemIndex.containsKey(num)) {//duplicate pair found
-//                        errorsFound.add(new Pos(x, y));//add pos of current item
-//                        errorsFound.add(itemIndex.get(num));//add pos of duplicate pair
-//                    }
-//                    itemIndex.put(num, new Pos(x, y));
                 }
             }
         }
@@ -105,22 +99,15 @@ public class SudokuTaskState extends TaskState {
 
         if (!errorsFound.isEmpty()) {
             ConnectionServer.sendTCP(new SudokuFailedReturn(errorsFound), connectionID);
-            System.out.println("ERRORS FOUND AT POS: ");
-            for (Pos pos: errorsFound){
-                System.out.print(pos +" | ");
-            }
             return false;
         }
-        System.out.println("NO ERRORS FOUND");
         return true;
     }
 
     public void processDuplicate(Set<Pos> errorsFound, Map<Integer, Pos> itemIndex, int num, int x, int y) {
         if (itemIndex.containsKey(num)) {
             addPosToErrorsFound(errorsFound, new Pos(x, y));
-//            errorsFound.add(new Pos(x, y));
             addPosToErrorsFound(errorsFound, itemIndex.get(num));
-//            errorsFound.add(itemIndex.get(num));
         }
         itemIndex.put(num, new Pos(x, y));
     }

@@ -1,5 +1,6 @@
 package ConnectionClient;
 
+import AlertBox.AlertBox;
 import Packet.Animation.AnimationDisplayReturn;
 import EntityClient.*;
 import Game.Game;
@@ -44,14 +45,13 @@ public class PacketControllerClient {
         if (packet.isAuthorized()) {
             Platform.runLater(() -> ScreenManager.activate(MenuScreen.class));
         } else {
-            System.out.println("client not authorized");
-        }//todo unnecessary?
+            Platform.runLater(() -> AlertBox.display(packet.failMessage));
+        }
     }
 
     public void handleStartGameReturn(StartGameReturn packet) {
         if (packet.isAuthorizedToStartGame()) {
             AppClient.currentGame = new Game();
-            System.out.println("Game started");
         } else {
             throw new IllegalStateException("client not registered to start game");
         }
@@ -93,15 +93,12 @@ public class PacketControllerClient {
     }
 
     private final Counter gameStartCounter = new Counter(300, 200, 50);
-
     public void handleGameStartTimerReturn(GameStartTimer packet) {
         Platform.runLater(() -> gameStartCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
 
-//    private KillCoolDownCounter killCoolDownCounter = new KillCoolDownCounter();
 
     private final Counter killCoolDownCounter = new Counter(500, 350, 50);
-
     public void handleKillCoolDownTimer(KillCoolDownTimer packet) {
         Platform.runLater(() -> killCoolDownCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
@@ -128,6 +125,7 @@ public class PacketControllerClient {
     }
 
     private SudokuHandler sudokuHandler;
+
     public void handleAddSudokuPane(AddSudokuPane packet) {
         this.sudokuHandler = new SudokuHandler();
         Platform.runLater(() -> sudokuHandler.addSudokuToScreen(packet));
@@ -180,7 +178,7 @@ public class PacketControllerClient {
         Platform.runLater(() -> {
             killCoolDownCounter.setTimerOn(false);
             votingPaneHandler = new VotingPaneHandler();
-            votingPaneHandler.addVotingPane(packet);
+            votingPaneHandler.createVotingPane(packet);
         });
 
     }
@@ -190,8 +188,12 @@ public class PacketControllerClient {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                killCoolDownCounter.setTimerOn(true);
-                removeNestedScreen();
+                killCoolDownCounter.setTimerOn(true);//un-pause timer
+                System.out.println("removing nested screen from handle remove voting screen");
+                System.out.println(ScreenManager.getScreen(GameScreen.class).getNestedScreen());
+                if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {
+                    removeNestedScreen();
+                }
             }
         }, 2000);
     }
@@ -202,49 +204,39 @@ public class PacketControllerClient {
         Platform.runLater(() -> votingTimerCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
 
-    //add as a node
-//    private Rectangle taskBarProgress = new Rectangle(0, 0);
     public void handleTaskBarUpdate(TaskBarUpdate packet) {
         Entity taskBar = EntityRegistryClient.getEntity(packet.getRegistrationID());
         TaskBarHandler.updateTaskBar(taskBar, packet.getNewWidth());
-
-
-//        Entity taskBar = EntityRegistryClient.getEntity(packet.getRegistrationID());
-//        double fillStartX = taskBar.getPos().getX() + 7;//add 10 to compensate for the frame of the bar
-//        double fillEndX = taskBar.getPos().getX() + 7 + packet.getNewWidth();
-//        double taskBarHeight = TextureManager.getTexture("task-bar").getHeight();
-//        this.taskBarProgress = new Rectangle(fillEndX - fillStartX, taskBarHeight - 18);
-//
-////        Rectangle rectangle = new Rectangle(fillEndX - fillStartX, taskBarHeight - 18);
-//        taskBarProgress.setFill(Color.GREEN);
-//        taskBarProgress.setX(fillStartX);
-//        taskBarProgress.setY(taskBar.getPos().getY() + 10);
-//        if (taskBarProgress.getWidth() ==50) {
-//            Platform.runLater(() -> ScreenManager.getCurrentScreen().addNode(taskBarProgress));
-//        }
     }
 
     public void handleRoleNotify(RoleNotify packet) {
         String role = packet.isImpostor() ? "impostor" : "crew";
-        Text text = new Text(200, 150, "ROLE: "+role);
+        Text text = new Text(200, 150, "ROLE: " + role);
         text.setFont(Font.font(50));
-        Platform.runLater(()->ScreenManager.getCurrentScreen().addNode(text));
+        Platform.runLater(() -> ScreenManager.getCurrentScreen().addNode(text));
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                Platform.runLater(()->ScreenManager.getCurrentScreen().removeNode(text));
+                Platform.runLater(() -> ScreenManager.getCurrentScreen().removeNode(text));
             }
         }, 5000);
-        System.out.println("ROLE: " + role);
     }
 
     public void handleCrewWin() {
+        if (ScreenManager.getScreen(GameScreen.class).getNestedScreen()!= null) {
+            System.out.println("removing nested screen from handle remove voting screen");
+            System.out.println(ScreenManager.getScreen(GameScreen.class).getNestedScreen());
+            removeNestedScreen();
+        }
         ScreenManager.activate(CrewWinScreen.class);
         AppClient.currentGame.setRunning(false);
         revertToMenu();
     }
 
     public void handleImpostorWin() {
+        if (ScreenManager.getScreen(GameScreen.class).getNestedScreen()!= null) {
+            removeNestedScreen();
+        }
         ScreenManager.activate(ImpostorWinScreen.class);
         AppClient.currentGame.setRunning(false);
         revertToMenu();
@@ -265,7 +257,7 @@ public class PacketControllerClient {
 
     public void handleSudokuFailedReturn(SudokuFailedReturn packet) {
         sudokuHandler.unhighlightAllErrors();
-        for (Pos pos: packet.errorsFound){
+        for (Pos pos : packet.errorsFound) {
             sudokuHandler.highlightError(pos);
         }
     }
