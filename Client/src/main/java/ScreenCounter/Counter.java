@@ -7,10 +7,10 @@ import javafx.scene.text.Text;
 
 public class Counter {
     private Text previousText;
-    private final int x, y, size;
+    private final double x, y, size;
     private boolean timerOn = true;
 
-    public Counter(int x, int y, int size) {
+    public Counter(double x, double y, int size) {
         this.x = x;
         this.y = y;
         this.size = size;

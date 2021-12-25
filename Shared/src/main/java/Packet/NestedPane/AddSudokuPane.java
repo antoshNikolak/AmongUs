@@ -4,6 +4,7 @@ import Packet.EntityState.NewAnimatedEntityState;
 import Packet.NestedPane.AddsPane;
 import Packet.NestedPane.NodeInfo;
 import Packet.Packet;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,11 @@ public class AddSudokuPane implements Packet, AddsPane {
 
     public int getPaneY() {
         return paneY;
+    }
+
+    @Override
+    public Color getColour() {
+        return Color.WHITE;
     }
 
     @Override

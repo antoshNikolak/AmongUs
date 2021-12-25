@@ -6,32 +6,25 @@ import javax.sound.sampled.*;
 import java.util.Arrays;
 
 public class Microphone implements Runnable {
-
     private TargetDataLine microphone;
     private boolean on = true;
-
 
     @Override
     public void run() {
         try {
-//            ByteArrayOutputStream out = new ByteArrayOutputStream();
             byte[] data = new byte[microphone.getBufferSize() / 5];
             while (on) {
-                try {
                     int numBytesRead = microphone.read(data, 0, 1024);
                     ConnectionClient.sendUDP(new Sound(Arrays.copyOfRange(data, 0, numBytesRead)));
-//                    speaker.setTempData(Arrays.copyOfRange(data, 0, numBytesRead));
-                    Thread.sleep(0);
-                } catch (InterruptedException e) {
-                    break;
-                }
+//                    Thread.sleep(0);
+//                } catch (InterruptedException e) {
+//                    break;
+//                }
             }
-
             microphone.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public void start(AudioFormat format) {

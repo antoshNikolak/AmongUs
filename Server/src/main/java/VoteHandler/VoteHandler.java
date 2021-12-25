@@ -115,7 +115,7 @@ public class VoteHandler {
     }
 
     public AddVotingPane createVotingPane() {
-        return new AddVotingPane(getVotingOptionData(), (ScreenData.WIDTH/2) - 750/2, (ScreenData.HEIGHT/2) - 300/2, 750, 300);
+        return new AddVotingPane(getVotingOptionData(), 0, 0, ScreenData.WIDTH, ScreenData.HEIGHT);
     }
 
     private String getPlayerAnimationID(Player player) {

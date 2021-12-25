@@ -7,10 +7,10 @@ public class NumberCountTaskState extends TaskState {
         super();
     }
 
-    @Override
-    public void removeClient(Client client) {
-
-    }
+//    @Override
+//    public void removeClient(Client client) {
+//
+//    }
 
     @Override
     public void init() {

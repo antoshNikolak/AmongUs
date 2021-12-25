@@ -93,12 +93,14 @@ public class PacketControllerClient {
     }
 
     private final Counter gameStartCounter = new Counter(300, 200, 50);
+
     public void handleGameStartTimerReturn(GameStartTimer packet) {
         Platform.runLater(() -> gameStartCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
 
 
     private final Counter killCoolDownCounter = new Counter(500, 350, 50);
+
     public void handleKillCoolDownTimer(KillCoolDownTimer packet) {
         Platform.runLater(() -> killCoolDownCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
@@ -157,9 +159,7 @@ public class PacketControllerClient {
 
 
     public void handleSound(Sound packet) {
-        if (AppClient.currentGame.getRecordHandler().isOn()) {
-            AppClient.currentGame.getRecordHandler().produceSound(packet.getBytes());
-        }
+        AppClient.currentGame.getRecordHandler().produceSound(packet.getBytes());
     }
 
     public void handleCloseMicAndSpeaker() {
@@ -189,8 +189,6 @@ public class PacketControllerClient {
             @Override
             public void run() {
                 killCoolDownCounter.setTimerOn(true);//un-pause timer
-                System.out.println("removing nested screen from handle remove voting screen");
-                System.out.println(ScreenManager.getScreen(GameScreen.class).getNestedScreen());
                 if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {
                     removeNestedScreen();
                 }
@@ -198,10 +196,10 @@ public class PacketControllerClient {
         }, 2000);
     }
 
-    private final Counter votingTimerCounter = new Counter(250, 250, 50);
+    private final Counter votingTimerCounter = new Counter(ScreenManager.STAGE_WIDTH - 80, ScreenManager.STAGE_HEIGHT - 80, 50);
 
     public void handleVotingTimer(VotingTimer packet) {
-        Platform.runLater(() -> votingTimerCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
+         Platform.runLater(() -> votingTimerCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
 
     public void handleTaskBarUpdate(TaskBarUpdate packet) {
@@ -223,9 +221,7 @@ public class PacketControllerClient {
     }
 
     public void handleCrewWin() {
-        if (ScreenManager.getScreen(GameScreen.class).getNestedScreen()!= null) {
-            System.out.println("removing nested screen from handle remove voting screen");
-            System.out.println(ScreenManager.getScreen(GameScreen.class).getNestedScreen());
+        if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {
             removeNestedScreen();
         }
         ScreenManager.activate(CrewWinScreen.class);
@@ -234,7 +230,7 @@ public class PacketControllerClient {
     }
 
     public void handleImpostorWin() {
-        if (ScreenManager.getScreen(GameScreen.class).getNestedScreen()!= null) {
+        if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {
             removeNestedScreen();
         }
         ScreenManager.activate(ImpostorWinScreen.class);

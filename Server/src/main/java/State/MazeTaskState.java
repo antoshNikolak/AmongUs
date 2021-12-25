@@ -121,10 +121,10 @@ public class MazeTaskState extends TaskState {
         addSystem(new PhysicsSystem(entities));
     }
 
-    @Override
-    public void removeClient(Client client) {
-
-    }
+//    @Override
+//    public void removeClient(Client client) {
+//
+//    }
 
     public MazePlayer getMazePlayer() {
         return mazePlayer;

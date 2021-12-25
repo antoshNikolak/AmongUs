@@ -16,13 +16,12 @@ public class NestedScreenHandler {
                 .withNodes(packet.getNodes())
                 .withNewEntityStates(packet.getNewEntityStates())
                 .build();
-
         addNestedScreen(gameScreen);
 //        gameScreen.setClearBoundaries(0, 0, packet.getPaneWidth(), packet.getPaneHeight());
         return gameScreen;
     }
 
-    private static Pane createPane(AddsPane packet) {
+    public static Pane createPane(AddsPane packet) {
         Pane pane = new Pane();
         pane.setLayoutX(packet.getPaneX());
         pane.setLayoutY(packet.getPaneY());

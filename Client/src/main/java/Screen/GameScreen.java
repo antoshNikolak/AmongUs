@@ -54,12 +54,12 @@ public class GameScreen extends Screen {
     }
 
     public void setNestedScreen(GameScreen nestedPane) {
+        if (nestedScreen!= null)removeNestedScreen();
         pane.getChildren().add(nestedPane.getPane());
         this.nestedScreen = nestedPane;
     }
 
     public void removeNestedScreen(){
-        System.out.println("REMOVING NESTED SCREEN");
         pane.getChildren().remove(nestedScreen.getPane());
         this.nestedScreen = null;
     }

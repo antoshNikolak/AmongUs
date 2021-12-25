@@ -132,10 +132,10 @@ public class SudokuTaskState extends TaskState {
         return errorsFound;
     }
 
-    @Override
-    public void removeClient(Client client) {
-
-    }
+//    @Override
+//    public void removeClient(Client client) {
+//
+//    }
 
     @Override
     public void init() {

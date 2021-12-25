@@ -4,6 +4,7 @@ import Packet.AddEntityReturn.AddEntityReturn;
 import Packet.EntityState.NewAnimatedEntityState;
 import Packet.EntityState.NewEntityState;
 import Packet.Packet;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,9 +48,10 @@ public class AddNestedPane implements AddsPane, Packet {
         return paneY;
     }
 
-
-
-
+    @Override
+    public Color getColour() {
+        return Color.WHITE;
+    }
 
     public  static class Builder{
         private final int paneWidth, paneHeight ,paneX, paneY;

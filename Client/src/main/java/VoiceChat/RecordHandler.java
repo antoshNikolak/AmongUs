@@ -12,12 +12,9 @@ public class RecordHandler {
         AudioFormat format = new AudioFormat(8000.0f, 16, 1, true, true);
         this.speaker = new Speaker(format);
         this.mic = new Microphone();
-        mic.start(format);
-        Thread micThread = new Thread(mic);
-        micThread.start();
+        this.mic.start(format);
+        new Thread(mic).start();
     }
-
-
 
     public void produceSound(byte [] soundData){
         if (on) {

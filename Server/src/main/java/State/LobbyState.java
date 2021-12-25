@@ -17,7 +17,7 @@ import static StartUpServer.AppServer.currentGame;
 
 public class LobbyState extends PlayingState {
 
-    public static final int PLAYER_LIMIT = 4;
+    public static final int PLAYER_LIMIT = 2;
     private final PlayerColourFactory playerColourFactory = new PlayerColourFactory();
 
     public LobbyState() {
@@ -97,10 +97,10 @@ public class LobbyState extends PlayingState {
     }
 
 
-    @Override
-    public void removeClient(Client client) {
-
-    }
+//    @Override
+//    public void removeClient(Client client) {
+//
+//    }
 
     public PlayerColourFactory getPlayerColourFactory() {
         return playerColourFactory;

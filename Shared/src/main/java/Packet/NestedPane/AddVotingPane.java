@@ -2,6 +2,7 @@ package Packet.NestedPane;
 
 import Packet.EntityState.NewAnimatedEntityState;
 import Packet.Packet;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +44,11 @@ public class AddVotingPane implements Packet, AddsPane {
     @Override
     public int getPaneY() {
         return paneY;
+    }
+
+    @Override
+    public Color getColour() {
+        return Color.BLUE;
     }
 
     @Override

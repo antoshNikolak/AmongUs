@@ -173,10 +173,6 @@ public class GameState extends PlayingState {
             this.taskBar = taskBar;
         }
 
-        @Override
-        public void removeClient (Client client){
-            //todo
-        }
 
 
     }

@@ -60,10 +60,6 @@ public class MeetingState extends PlayingState {
 
     private void stopPlayerTasks() {
         currentGame.getPlayers().forEach(Player::stopTask);
-//        for (Player player : currentGame.getPlayers()) {//remove these because it assumes there is a state under this
-//            player.stopTask();
-////            currentGame.getStateManager().getState(GameState.class).getSystem(ImposterActionsSystem.class).stopCrewMateTask(player);
-//        }
     }
 
 
@@ -74,7 +70,6 @@ public class MeetingState extends PlayingState {
 
     @Override
     public void close() {
-        System.out.println("current game: " + currentGame);
         Optional<Player> playerOptional = voteHandler.getPlayerWithMostVotes();
 //        mobilisePlayers();
         disableVoiceChat();
@@ -83,8 +78,6 @@ public class MeetingState extends PlayingState {
             ejectPlayer(suspect);
             checkEndGame(suspect);
         }
-//        playerOptional.ifPresent(this::ejectPlayer);
-//        checkCrewWin();
     }
 
     private void checkEndGame(Player suspect) {
@@ -162,8 +155,5 @@ public class MeetingState extends PlayingState {
 
     }
 
-    @Override
-    public void removeClient(Client client) {
 
-    }
 }

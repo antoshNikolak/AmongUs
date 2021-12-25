@@ -1,4 +1,5 @@
 module Shared {
+    requires javafx.graphics;
     exports Packet;
     exports Packet.UserData;
     exports Packet.Registration;
