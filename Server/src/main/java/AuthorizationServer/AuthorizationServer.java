@@ -15,22 +15,38 @@ import Client.ClientOperator;
 
 public final class AuthorizationServer implements ClientOperator {
 
-//    private static final List<Client> authorizedUsers = new ArrayList<>();
-    public static final Map<Client, UserData> clientUserDataMap = new HashMap<>();
+//    public static final Map<Client, UserData> clientUserDataMap = new HashMap<>();
 
     public static RegistrationConfirmation handleLogin(UserData userData) {
         boolean isRegistered = doesAccountAlreadyExists(userData);
-        return new RegistrationConfirmation(getLoginFailMessage(isRegistered));
+        return new RegistrationConfirmation(getLoginFailMessage(userData, isRegistered));
     }
 
-    private static String getLoginFailMessage(boolean doesAccountAlreadyExist){
-        return doesAccountAlreadyExist? "": "username or password is incorrect";
+    private static String getLoginFailMessage(UserData userData, boolean doesAccountAlreadyExist){
+        if (doesAccountAlreadyExist){
+            if (isPlayerAlreadyInGame(userData)){
+                return "user is already logged in";
+            }
+            return "";
+        }else {
+            return "username or password is incorrect";
+        }
+    }
+
+    private static boolean isPlayerAlreadyInGame(UserData userData){
+        for (Client client: AppServer.getClients()){
+            if (client.getUserData().equals(userData)){
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean doesAccountAlreadyExists(UserData userData) {
         List<UserData> matchingAccounts = DataBaseUtil.getUserDataList(userData);
         return matchingAccounts.size() == 1;
     }
+
 
     public static RegistrationConfirmation handleSignup(UserData userData) {
         boolean usernameAvailable = !(DataBaseUtil.doesUsernameExist(userData.getUserName()));
@@ -49,33 +65,16 @@ public final class AuthorizationServer implements ClientOperator {
 
     public static void handleRegistrationConfirmation(RegistrationConfirmation registrationConfirmation, UserData userData, int connectionID) {
         if (registrationConfirmation.isAuthorized()) {
-            Client client = new Client(connectionID);
+            Client client = new Client(userData, connectionID);
             AppServer.getClients().add(client);
-            clientUserDataMap.put(client, userData);
+//            clientUserDataMap.put(client, userData);
         }
         ConnectionServer.sendTCP(registrationConfirmation, connectionID);
     }
 
-//    public static Optional<Client> getAuthorizedClient(int connectionID) {
-//        return ConnectionServer.getClientFromConnectionID(authorizedUsers, connectionID);
-//    }
-
-//    public static void removeAuthorizedClient(Client client) {
-//        authorizedUsers.remove(client);
-//    }
-
-
-
-
-
-//    private static void addClientToLobby(Client client) {
-//        LobbyState lobbyState = (LobbyState) AppServer.currentGame.getStateManager().getCurrentState();
-//        lobbyState.handleNewPlayerJoin(client);
-//    }
-
     @Override
     public void removeClient(Client client) {
-//        authorizedUsers.remove(client);
+//        clientUserDataMap.remove(client);
     }
 
 }

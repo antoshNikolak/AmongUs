@@ -42,6 +42,9 @@ public final class ScreenManager {
         Pane impostorWinPane = loadPane("ImpostorWinScreen");
         addScreen(new ImpostorWinScreen(impostorWinPane));
 
+        Pane leaderBoardPane = loadPane("LeaderBoardScreen");
+        addScreen(new LeaderBoardScreen(leaderBoardPane));
+
         Pane gamePane = loadPane("GameScreen");
         addScreen(new GameScreen.Builder(gamePane).withNode(new NodeInfo(NodeType.CANVAS, 0, 0, STAGE_WIDTH, STAGE_HEIGHT)).build());
     }
@@ -100,7 +103,7 @@ public final class ScreenManager {
             return null;
         }
 
-        public static void activate (Class < ? extends Screen > screen){
+        public static  void activate (Class < ? extends Screen > screen){
             Screen entry = screens.get(screen);
             currentScreen = entry;
             scene.setRoot(entry.getPane());

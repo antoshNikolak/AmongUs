@@ -1,46 +1,73 @@
 package EndGameHandler;
 
+import Component.ImpostorComp;
 import ConnectionServer.ConnectionServer;
+import DataBase.DataBaseUtil;
+import Entity.Player;
 import Packet.GameEnd.CrewWin;
 import Packet.GameEnd.ImpostorWin;
 import StartUpServer.AppServer;
 import State.GameState;
 import System.*;
 
-public class EndGameHandler {
-    //todo ideas
-    //server sends exact frames to each client every time period
-    //client stores position of all of these
+public class EndGameHandler{
 
-//    public static void checkImpostorWin(int alivePlayers) {
-//        if (alivePlayers == 2) {
-//            recordImpostorWin();
-//            ConnectionServer.sendTCPToAllPlayers(new ImpostorWin());
-//            AppServer.currentGame.stopGame();
-//        }
-//    }
-
-    public static void checkImpostorWin() {//todo remember to stop all client server timers
+    public  void checkImpostorWin() {                                              //todo remember to stop all client server timers
         int numOfPlayerAlive = getPlayersAlive();
         if (numOfPlayerAlive == 2) {
-            recordImpostorWin();
-            ConnectionServer.sendTCPToAllPlayers(new ImpostorWin());
-            AppServer.currentGame.stopGame();
+            new Thread(()->{
+                recordImpostorWin();
+                ConnectionServer.sendTCPToAllPlayers(new ImpostorWin());
+                AppServer.currentGame.stopGame();
+            }).start();
         }
     }
 
-    private static int getPlayersAlive(){
+    private int getPlayersAlive() {
         return AppServer.currentGame.getStateManager().getState(GameState.class).getSystem(ImposterActionsSystem.class).
                 getAlivePlayers().size();
     }
 
-    private static void recordImpostorWin(){
-
+    public void recordImpostorWin() {
+        double time = AppServer.currentGame.getStateManager().getState(GameState.class).stopGameDurationTimer();
+        String userName = getImpostorUserName();
+        DataBaseUtil.updateImpostorWinTime(userName, time / 1000);
     }
 
-    public static void handleCrewWin(){
-        ConnectionServer.sendTCPToAllPlayers(new CrewWin());
-        AppServer.currentGame.stopGame();
+    private  String getImpostorUserName() {
+        for (Player player : AppServer.currentGame.getPlayers()) {
+            if (player.hasComponent(ImpostorComp.class)) {
+                return player.getNameTag();
+            }
+        }
+        return null;
     }
+
+    public void handleCrewWin() {
+        new Thread(()->{
+            ConnectionServer.sendTCPToAllPlayers(new CrewWin());
+            AppServer.currentGame.stopGame();
+        }).start();
+    }
+
+//    public enum Winner{
+//        CREW_WIN{
+//            @Override
+//            public void handleWin() {
+//                ConnectionServer.sendTCPToAllPlayers(new CrewWin());
+//                AppServer.currentGame.stopGame();
+//            }
+//        },
+//        IMPOSTOR_WIN{
+//            @Override
+//            public void handleWin() {
+//                recordImpostorWin();
+//                ConnectionServer.sendTCPToAllPlayers(new ImpostorWin());
+//                AppServer.currentGame.stopGame();
+//            }
+//        };
+//
+//        public abstract void handleWin();
+//    }
 
 }

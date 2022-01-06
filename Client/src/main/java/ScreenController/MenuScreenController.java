@@ -2,6 +2,7 @@ package ScreenController;
 
 import ConnectionClient.ConnectionClient;
 import Packet.GameStart.StartGameRequest;
+import Packet.LeaderBoard.RequestLeaderBoard;
 import Packet.Registration.LogoutRequest;
 import Screen.EntryScreen;
 import Screen.ScreenManager;
@@ -14,7 +15,8 @@ public class MenuScreenController {
     }
 
     public void showLeaderBoard() {
-
+        System.out.println("showing leaderboard");
+        ConnectionClient.sendTCP(new RequestLeaderBoard());
     }
 
     public void logout() {

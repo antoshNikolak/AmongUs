@@ -8,6 +8,7 @@ import Packet.GameEnd.GameEnd;
 import Packet.GameEnd.ImpostorWin;
 import Packet.GameStart.RoleNotify;
 import Packet.GameStart.StartGameReturn;
+import Packet.LeaderBoard.*;
 import Packet.NestedPane.*;
 import Packet.Position.*;
 import Packet.Registration.RegistrationConfirmation;
@@ -19,9 +20,11 @@ import Packet.Timer.KillCoolDownTimer;
 import Packet.Timer.VotingTimer;
 import Packet.SudokuPacket.SudokuFailedReturn;
 import Packet.SudokuPacket.VerifySudokuReturn;
+import Packet.Voting.ChatMessageReturn;
 import Packet.Voting.ElectionReturn;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+
 
 public class PacketListenerClient extends Listener {
     private final  PacketControllerClient packetController = new PacketControllerClient();
@@ -100,8 +103,12 @@ public class PacketListenerClient extends Listener {
             packetController.handleImpostorWin();
         }else if (object instanceof SudokuFailedReturn){
             packetController.handleSudokuFailedReturn((SudokuFailedReturn)object);
+        }else if (object instanceof ChatMessageReturn){
+            packetController.handleChatMessageReturn((ChatMessageReturn) object);
+        }else if (object instanceof LeaderBoardReturn){
+            packetController.handleLeaderBoardReturn((LeaderBoardReturn) object);
         }
-//        else if (object instanceof LogoutReturn){
+        //        else if (object instanceof LogoutReturn){
 //
 //        }
     }

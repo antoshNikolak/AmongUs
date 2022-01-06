@@ -64,18 +64,20 @@ public class Sudoku {
     private void removeValue() {
         List<Cell> cellList = getShuffledCellList();
         int counter = 0;
-        do {
+//        do {
+        while (emptyCells.size() != cellsToTakeOut) {
             Cell cell = cellList.get(counter);
             int cellOriginalValue = addNewInvisibleCell(cell);
             Cell firstCell = peakEmptyCell();
             int solutions = getNumberOfSolutions(new LinkedList<>(emptyCells), 0, firstCell);//runs sudoku solver
-            if (solutions > 1) {//put cell back where where it was
-                reverseCell(cell, cellOriginalValue);
+            if (solutions > 1) {
+                reverseCell(cell, cellOriginalValue);//put cell back where where it was
             } else {
                 counter++;
             }
-        } while (emptyCells.size() != cellsToTakeOut);
-        emptyCells.getLast().setValue(0);
+        }
+//        } while (emptyCells.size() != cellsToTakeOut);
+//        emptyCells.getLast().setValue(0);
     }
 
 
@@ -137,6 +139,7 @@ public class Sudoku {
 
     }
 
+    //return true if sudoku completed, false if not completed
     private boolean addValue(int y, int x) {
         while (true) {
             Cell currentCell = cells[y][x];
@@ -160,7 +163,7 @@ public class Sudoku {
             } else {
                 if (!addValue(y, x + 1)) continue;//recursive call
             }
-            return true;//base case, sudoku has been completed
+            return true;//sudoku has been completed
         }
     }
 

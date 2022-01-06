@@ -14,11 +14,11 @@ import java.util.stream.Collectors;
 
 public class EntityReturnBuffer {
     private final Map<Entity, List<Integer>> entityDestinationsReturnBuffer = new ConcurrentHashMap<>();
+    //    private final Map<Entity, List<Integer>> entityDestinationsReturnBuffer = new HashMap<>();
+
 
     public void sendGameState() {
         Map<Integer, Set<ExistingEntityState>> connectionEntityMap = new HashMap<>();
-        //connection id entity state hash map
-
         for (Entity entity : entityDestinationsReturnBuffer.keySet()) {
             List<Integer> connectionIDs = entityDestinationsReturnBuffer.get(entity);
             for (Integer connectionID : connectionIDs) {
@@ -31,19 +31,20 @@ public class EntityReturnBuffer {
                 }
             }
         }
-        for (Integer connectionID: connectionEntityMap.keySet()){
+        //why do i get a warning when synchronizing on a local var, even though its stored in a global list?
+        for (Integer connectionID : connectionEntityMap.keySet()) {
             ConnectionServer.sendUDP(new StateReturn(connectionEntityMap.get(connectionID)), connectionID);
         }
         entityDestinationsReturnBuffer.clear();
     }
 
-    public static Set<NewEntityState> adaptCollectionToNewEntityStates(Collection<? extends Entity> entities){
+    public static Set<NewEntityState> adaptCollectionToNewEntityStates(Collection<? extends Entity> entities) {
         return entities.stream().
                 map(entity -> entity.adaptToNewAnimatedEntityState(true)).
                 collect(Collectors.toSet());
     }
 
-    public static Set<NewLineState> adaptCollectionToNewLineStates(Collection<? extends Entity> entities){
+    public static Set<NewLineState> adaptCollectionToNewLineStates(Collection<? extends Entity> entities) {
         return entities.stream().
                 map(entity -> entity.adaptToNewLineState()).
                 collect(Collectors.toSet());
@@ -56,21 +57,25 @@ public class EntityReturnBuffer {
                 collect(Collectors.toList());
     }
 
-    public void putEntity(Entity entity) {
+    public synchronized void putEntity(Entity entity) {
+        if (EntityRegistryServer.getEntityID(entity) == null) return;
         entityDestinationsReturnBuffer.put(entity, getAllConnectionIDs());
     }
 
-    public void putEntity(Entity entity, List<Integer> connectionIDs) {
+    public synchronized void putEntity(Entity entity, List<Integer> connectionIDs) {
+        if (EntityRegistryServer.getEntityID(entity) == null) return;
         entityDestinationsReturnBuffer.put(entity, connectionIDs);
     }
 
-    public void putEntity(Entity entity, Integer ... connectionIDs){
+    public synchronized void putEntity(Entity entity, Integer... connectionIDs) {
+        if (EntityRegistryServer.getEntityID(entity) == null) return;
         entityDestinationsReturnBuffer.put(entity, Arrays.asList(connectionIDs));
     }
 
-//    public void addUserTag(UserTagState userTagState){
-//        userTags.add(userTagState);
-//    }
 
+    //todo modify this syncing
+    public synchronized void removeEntity(Entity entity) {
+        this.entityDestinationsReturnBuffer.remove(entity);
+    }
 
 }

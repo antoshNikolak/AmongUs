@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 import Entity.DeadBody;
 import Entity.EntityRegistryServer;
 import Entity.*;
+import StartUpServer.AppServer;
+import State.GameState;
 import TimerHandler.TimerStarter;
 
 import static StartUpServer.AppServer.currentGame;
@@ -33,8 +35,8 @@ public class ImposterActionsSystem extends BaseSystem {
 
     @Override
     public void handleAction(Player player, PosRequest packet) {
-        if (packet.isKillKey() && player.hasComponent(ImposterComp.class)) {
-            if (player.getComponent(ImposterComp.class).isAbleToKill()) {
+        if (packet.isKillKey() && player.hasComponent(ImpostorComp.class)) {
+            if (player.getComponent(ImpostorComp.class).isAbleToKill()) {
                 handleKillAction(player);
 //                EndGameHandler.checkImpostorWin(getAlivePlayers().size());
             }
@@ -65,7 +67,7 @@ public class ImposterActionsSystem extends BaseSystem {
         crewMateOptional.ifPresent(crewMate -> {
             killCrewMate(crewMate);
             startKillImposterCoolDown(imposter);
-            EndGameHandler.checkImpostorWin();
+            AppServer.currentGame.getStateManager().getState(GameState.class).getEndGameHandler().checkImpostorWin();
         });
     }
 
@@ -100,9 +102,9 @@ public class ImposterActionsSystem extends BaseSystem {
     }
 
     private void startKillImposterCoolDown(Player imposter) {
-        ImposterComp imposterComp = imposter.getComponent(ImposterComp.class);
-        imposterComp.setAbleToKill(false);
-        TimerStarter.startTimer("KillCoolDownTimer", 40, () -> imposterComp.setAbleToKill(true), imposter.getConnectionID());
+        ImpostorComp impostorComp = imposter.getComponent(ImpostorComp.class);
+        impostorComp.setAbleToKill(false);
+        TimerStarter.startTimer("KillCoolDownTimer", 40, () -> impostorComp.setAbleToKill(true), imposter.getConnectionID());
     }
 
     public void setGhostAttributes(Player crewMate) {
@@ -152,13 +154,11 @@ public class ImposterActionsSystem extends BaseSystem {
 
     //        DeadPlayer deadPlayer = new DeadPlayer(colourComp.getColour(), new PosComp(posComp.getPos(), posComp.getWidth(), posComp.getHeight()));//todo add this to the diary
 
-    private boolean checkPlayerCanDie(Player player, Player impostor) {
-        return player != impostor && player.getComponent(AliveComp.class).isAlive();
-    }
+
 
     public List<Player> getCrewMates() {
         return currentGame.getPlayers().stream().
-                filter(player -> !player.hasComponent(ImposterComp.class)).
+                filter(player -> !player.hasComponent(ImpostorComp.class)).
                 collect(Collectors.toList());
 
     }

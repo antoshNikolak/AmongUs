@@ -1,7 +1,7 @@
 package System;
 
 import Component.AliveComp;
-import Component.ImposterComp;
+import Component.ImpostorComp;
 import Component.TaskComp;
 import DistanceFinder.DistanceFinder;
 import Entity.Player;
@@ -41,7 +41,7 @@ public class TaskSystem extends BaseSystem {
 
     private boolean isPlayerEligibleToPlayerTask(Player player, PosRequest posRequest) {
         return posRequest.isTaskKey() &&
-                !player.hasComponent(ImposterComp.class) &&
+                !player.hasComponent(ImpostorComp.class) &&
                 player.getCurrentTask() == null &&
                 player.getComponent(AliveComp.class).isAlive();
     }

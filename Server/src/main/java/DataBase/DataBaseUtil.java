@@ -3,9 +3,7 @@ package DataBase;
 import Packet.UserData.UserData;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class DataBaseUtil {
 
@@ -18,29 +16,37 @@ public class DataBaseUtil {
         }
     }
 
-    public static <T> T query(String SQLCommand, ResultQuery<T> command) {
+    public static void executeUpdate(String SQLCommand, Object ... params){
         try (Connection sqlConnection = getSQLConnection();
-             Statement statement = sqlConnection.createStatement();
-             ResultSet resultSet = statement.executeQuery(SQLCommand)) {
-            return command.searchResultSet(resultSet);
+             PreparedStatement statement = sqlConnection.prepareStatement(SQLCommand)) {
+            specifyParams(statement, params);
+            statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
     }
 
-    public static <T> T queryWithPreparedStatement(String SQLCommand, ResultQuery<T> command, Object... params) {
+//    public static <T> T query(String SQLCommand, ResultQuery<T> command) {
+//        try (Connection sqlConnection = getSQLConnection();
+//             Statement statement = sqlConnection.createStatement();
+//             ResultSet resultSet = statement.executeQuery(SQLCommand)) {
+//            return command.searchResultSet(resultSet);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+
+    public static <T> T executeQuery(String SQLCommand, ResultQuery<T> command, Object... params) {
         Connection sqlConnection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-
         try {
             sqlConnection = getSQLConnection();
             statement = sqlConnection.prepareStatement(SQLCommand);
             specifyParams(statement, params);
             resultSet = statement.executeQuery();
             return command.searchResultSet(resultSet);
-
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -49,7 +55,46 @@ public class DataBaseUtil {
             closeConnection(sqlConnection);
         }
         return null;
+//        Connection sqlConnection = null;
+//        PreparedStatement statement = null;
+//        ResultSet resultSet = null;
+//        try {
+//            sqlConnection = getSQLConnection();
+//            statement = sqlConnection.prepareStatement(SQLCommand);
+//            specifyParams(statement, params);
+//            resultSet = statement.executeQuery();
+//            return command.searchResultSet(resultSet);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        } finally {
+//            closeResultSet(resultSet);
+//            closeStatement(statement);
+//            closeConnection(sqlConnection);
+//        }
+//        return null;
     }
+
+//    public static <T> T queryWithPreparedStatement(String SQLCommand,  Object... params) {
+//        Connection sqlConnection = null;
+//        PreparedStatement statement = null;
+//        ResultSet resultSet = null;
+//
+//        try {
+//            sqlConnection = getSQLConnection();
+//            statement = sqlConnection.prepareStatement(SQLCommand);
+//            specifyParams(statement, params);
+//            resultSet = statement.executeQuery();
+//            return command.searchResultSet(resultSet);
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        } finally {
+//            closeResultSet(resultSet);
+//            closeStatement(statement);
+//            closeConnection(sqlConnection);
+//        }
+//        return null;
+//    }
 
     private static void specifyParams(PreparedStatement statement, Object... params) throws SQLException {
         int counter = 1;
@@ -61,7 +106,7 @@ public class DataBaseUtil {
 
     //todo doc change by collation
     public static List<UserData> getUserDataList(UserData userData) {
-        return queryWithPreparedStatement("SELECT username, password FROM UserData " +
+        return executeQuery("SELECT username, password FROM UserData " +
                         "where username = ? " +
                         "AND password = ?",
                 DataBaseUtil::createUserDataList, userData.getUserName(), userData.getPassword());
@@ -82,7 +127,7 @@ public class DataBaseUtil {
     }
 
     public static Boolean doesUsernameExist(String username) {
-        return !Objects.requireNonNull(queryWithPreparedStatement("SELECT username FROM UserData " +
+        return !Objects.requireNonNull(executeQuery("SELECT username FROM UserData " +
                         "where username = ?",
                 DataBaseUtil::isResultSetEmpty, username));
     }
@@ -112,7 +157,7 @@ public class DataBaseUtil {
     }
 
     private static Integer getAttemptNum(String username) {
-        return queryWithPreparedStatement("SELECT attemptNum FROM dbo.SudokuAttempt " +
+        return executeQuery("SELECT attemptNum FROM dbo.SudokuAttempt " +
                         "where username = ?",
                 DataBaseUtil::getMaxValue, username);
     }
@@ -124,6 +169,28 @@ public class DataBaseUtil {
             if (value > maxValue) maxValue = value;
         }
         return maxValue;
+    }
+
+    public static void updateImpostorWinTime(String userName, double time){
+        boolean isNewRecord = Objects.requireNonNull(executeQuery("SELECT fastestImpostorWin FROM UserData WHERE username = ? AND fastestImpostorWin < ?" ,
+                DataBaseUtil::isResultSetEmpty, userName, time));
+        if (!isNewRecord)return;
+        executeUpdate("UPDATE UserData SET fastestImpostorWin = "+time+
+                "WHERE username = ?", userName);
+    }
+
+    public static LinkedHashMap<String, Double> getLeaderBoard(){
+        return executeQuery("SELECT username, fastestImpostorWin FROM UserData ORDER BY fastestImpostorWin DESC ",
+                DataBaseUtil::getLeaderBoardQuery);
+    }
+
+    private static LinkedHashMap<String, Double> getLeaderBoardQuery(ResultSet resultSet) throws SQLException{
+            LinkedHashMap<String, Double> leaderBoard = new LinkedHashMap<>();
+            for (int i = 0; i < 10; i++) {
+                resultSet.next();
+                leaderBoard.put(resultSet.getString("username"), resultSet.getDouble("fastestImpostorWin"));
+            }
+            return leaderBoard;
     }
 
 

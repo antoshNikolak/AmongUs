@@ -1,8 +1,7 @@
 package State;
 
-import Client.Client;
 import Component.AliveComp;
-import Component.ImposterComp;
+import Component.ImpostorComp;
 import Component.PosComp;
 import Component.RespawnComp;
 import ConnectionServer.ConnectionServer;
@@ -13,6 +12,7 @@ import Entity.Tile;
 import Packet.Sound.CloseRecordHandler;
 import Packet.Sound.OpenRecordHandler;
 import Position.Pos;
+import StartUpServer.AppServer;
 import VoteHandler.VoteHandler;
 import System.*;
 
@@ -81,11 +81,11 @@ public class MeetingState extends PlayingState {
     }
 
     private void checkEndGame(Player suspect) {
-        if (suspect.hasComponent(ImposterComp.class)) {
-            EndGameHandler.handleCrewWin();
+        EndGameHandler endGameHandler = currentGame.getStateManager().getState(GameState.class).getEndGameHandler();
+        if (suspect.hasComponent(ImpostorComp.class)) {
+            endGameHandler.handleCrewWin();
         }else {
-            EndGameHandler.checkImpostorWin();
-
+            endGameHandler.checkImpostorWin();
         }
     }
 

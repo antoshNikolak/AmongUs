@@ -10,7 +10,6 @@ import Packet.NestedPane.RemoveNestedScreen;
 import Packet.Position.TaskBarUpdate;
 import StartUpServer.AppServer;
 
-import static EndGameHandler.EndGameHandler.handleCrewWin;
 
 public abstract class TaskState extends State{
     protected Player player;
@@ -35,12 +34,13 @@ public abstract class TaskState extends State{
     }
 
     protected void incrementTaskBar() {
-        TaskBar taskBar = AppServer.currentGame.getStateManager().getState(GameState.class).getTaskBar();
+        GameState gameState = AppServer.currentGame.getStateManager().getState(GameState.class);
+        TaskBar taskBar = gameState.getTaskBar();
         taskBar.incrementProgressBar(50);
         int registrationID = EntityRegistryServer.getEntityID(taskBar);
         ConnectionServer.sendTCPToAllPlayers(new TaskBarUpdate(registrationID, taskBar.getProgressBarWidth()));
         if (taskBar.isFull()){
-            handleCrewWin();
+            gameState.getEndGameHandler().handleCrewWin();
         }
     }
 

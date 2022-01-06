@@ -101,13 +101,14 @@ public class VoteHandler {
 
 
     public void startVotingTimer() {
-        TimerStarter.startTimer("VotingTimer", 30, () -> {//time for players to vote
+        TimerStarter.startTimer("VotingTimer", 5, () -> {//time for players to vote
             ConnectionServer.sendTCPToAllPlayers(new DisplayVoteResults(playerVoteMap));
             //client will remove voting pane once vote results displayed
-            new Timer().schedule(new TimerTask() {
+            new Timer("timer-meeting-state-over").schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    currentGame.getStateManager().popState();//assume game state is under this one on the stack
+                    currentGame.getStateManager().popState();
+//                    currentGame.getStateManager().popState();//assume game state is under this one on the stack
 //                    emergencyTableSystem.onVoteTimerOver();//close and remove the emergency meeting system
                 }
             }, 2000);//time to display

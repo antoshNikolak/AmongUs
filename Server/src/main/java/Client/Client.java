@@ -1,6 +1,7 @@
 package Client;
 
 import Entity.Player;
+import Packet.UserData.UserData;
 import PlayerColourManager.PlayerColourFactory;
 import State.LobbyState;
 
@@ -10,51 +11,23 @@ public class Client {
 
     private final int connectionID;
     private Player player;
-//    private boolean inGame = false;
-
-//    public void prepareClientToPlay(Client client) {
-////            prepareGame();
-//            createPlayer();
-//            currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
-////        currentGame.getStateManager().getState(LobbyState.class).prepareClientToPlay(client);
-////        }
-////        if (AppServer.getClients().size() == 2) {
-////            TimerStarter.startTimer("GameStartTimer", 5, () -> startGameState());
-////        }
-//    }
-
-//    public static void startGameState() {
-//        synchronized (currentGame.getStateManager()) {
-//            currentGame.getStateManager().popState();
-//            currentGame.getStateManager().pushState(new GameState());
-//        }
-//    }
-//
-
-
-
-
-
-//    private static void prepareGame() {
-//        if (currentGame == null) {
-//            currentGame = new Game();
-//            currentGame.startGame();
-//        }
-//    }
+    private final UserData userData;
 
     public void createPlayer() {
         PlayerColourFactory colourFactory = currentGame.getStateManager().getState(LobbyState.class).getPlayerColourFactory();
-        this.player = new Player(this, colourFactory.getRandomColour(), connectionID);
+        this.player = new Player(this, colourFactory.getRandomColour());
         currentGame.getStateManager().getTopState().getEntities().add(player);
     }
 
-    public Client(int connectionID) {
+    public Client(UserData userData, int connectionID) {
+        this.userData = userData;
         this.connectionID = connectionID;
+//        this.connectionID = connectionID;
     }
 
-    public int getConnectionID() {
-        return connectionID;
-    }
+//    public int getConnectionID() {
+//        return connectionID;
+//    }
 
     public Player getPlayer() {
         return player;
@@ -62,6 +35,14 @@ public class Client {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public UserData getUserData() {
+        return userData;
+    }
+
+    public int getConnectionID() {
+        return connectionID;
     }
 
     //    public boolean isInGame() {

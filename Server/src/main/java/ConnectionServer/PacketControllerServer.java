@@ -3,14 +3,21 @@ package ConnectionServer;
 import AuthorizationServer.AuthorizationServer;
 import Client.Client;
 import ClientScreenTracker.ScreenData;
+import Component.AliveComp;
+import Component.AnimationComp;
+import DataBase.DataBaseUtil;
 import Entity.Player;
+import Packet.Animation.AnimState;
 import Packet.GameStart.StartGameReturn;
+import Packet.LeaderBoard.*;
 import Packet.Position.PosRequest;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
 import Packet.ScreenData.ScreenInfo;
 import Packet.Sound.Sound;
+import Packet.Voting.ChatMessageRequest;
+import Packet.Voting.ChatMessageReturn;
 import StartUpServer.AppServer;
 import State.State;
 import Packet.SudokuPacket.VerifySudokuRequest;
@@ -18,8 +25,10 @@ import State.*;
 import Packet.UserData.UserData;
 import Packet.Voting.ImpostorVote;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import static StartUpServer.AppServer.currentGame;
 
@@ -41,6 +50,7 @@ public class PacketControllerServer {
 
     public void handleStartGameRequest(int connectionID) {
         if (currentGame != null && currentGame.getPlayers().size() == LobbyState.PLAYER_LIMIT) {
+            currentGame.getPlayers().forEach(player -> System.out.println("player name: "+player.getNameTag()));
             ConnectionServer.sendTCP(new StartGameReturn(false), connectionID);//send back rejection
             return;//stops client from entering once game start
         }
@@ -49,13 +59,12 @@ public class PacketControllerServer {
             return;//stops client from pressing button 2x to crash the game
         }
         ConnectionServer.sendTCP(new StartGameReturn(clientOptional.isPresent()), connectionID);//send back confirmation
+        System.out.println("num of clients: "+ AppServer.getClients().size());
         clientOptional.ifPresent(client -> {
             LobbyState.prepareGame();
             currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
         });
     }
-
-    //todo TEST PROBLEM : CLIENT WASN'T REGISTERED TO START GAME
 
     public void handlePosRequest(PosRequest packet, int connectionId) {
         Optional<Player> optionalPlayer = ConnectionServer.getPlayerFromConnectionID(currentGame.getPlayers(), connectionId);
@@ -102,7 +111,7 @@ public class PacketControllerServer {
     public void handleLogout(int id) {
         Optional<Client> playerOptional = ConnectionServer.getClientFromConnectionID(id);
         playerOptional.ifPresent(client -> {
-            System.out.println("removing client");
+            System.out.println("removing client "+ client.toString());
             AppServer.getClients().remove(client);
         });
     }
@@ -111,6 +120,19 @@ public class PacketControllerServer {
         ScreenData.HEIGHT = packet.getHeight();
         ScreenData.WIDTH = packet.getWidth();
     }
+
+    public void handleChatMessageRequest(ChatMessageRequest packet, int connectionID) {
+        Optional<Player> playerOptional = ConnectionServer.getPlayerFromConnectionID(connectionID);
+        if (playerOptional.isEmpty() || !playerOptional.get().getComponent(AliveComp.class).isAlive())return;
+        String colour = playerOptional.get().getComponent(AnimationComp.class).getAnimation(AnimState.RIGHT).getFrames()[0];
+        ConnectionServer.sendTCPToAllPlayers(new ChatMessageReturn(packet.message, playerOptional.get().getNameTag(), colour));
+    }
+
+    public void handleLeaderBoardRequest(int connectionID) {
+        LinkedHashMap<String, Double> leaderBoard = DataBaseUtil.getLeaderBoard();
+        ConnectionServer.sendTCP(new LeaderBoardReturn(leaderBoard), connectionID);
+    }
+
 
 //    public void handleAnimationOver(AnimationOver packet, int connectionID) {
 ////        EmergencyTableSystem s = AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class);//todo NULL POINTER SYSTEM

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.text.Text?>
+<?import Node.SpaceButton?>
+<Pane xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ScreenController.LeaderBoardController"
+      prefHeight="400.0" prefWidth="600.0">
+
+    <ImageView fitHeight="450.0" fitWidth="800.0" pickOnBounds="true" preserveRatio="true">
+        <Image requestedWidth="800" requestedHeight="450" url="/Texture/plain-space-background.png" backgroundLoading="true"/>
+    </ImageView>
+
+    <VBox fx:id="content" spacing="20" layoutX="300.0" layoutY="30.0" prefWidth="200.0" />
+    <Text layoutY="15" layoutX="5" text="Fastest Impostor Wins" style="-fx-font-size: 15" fill="aquamarine"/>
+    <SpaceButton layoutX="20" layoutY="350" onAction="#activateMenu" text="Back"/>
+
+</Pane>

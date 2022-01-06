@@ -2,9 +2,11 @@ package Game;
 
 import StartUpServer.AppServer;
 
+import java.util.concurrent.locks.Lock;
+
 public abstract class GameLoop implements Runnable {
     private final double frameRate;
-    private boolean running = true;
+    private volatile boolean running = true;
 
     public GameLoop(int frameRate) {
         this.frameRate = frameRate;
@@ -18,11 +20,13 @@ public abstract class GameLoop implements Runnable {
 
     @Override
     public void run() {
+
         double ns = 1000000000.0 / frameRate;//nano secs per frame
         double delta = 0;
         long lastTime = System.nanoTime();
 //        long timer = System.currentTimeMillis();
-        while (true) {
+        //                AppServer.currentGame = null;
+        do {
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
@@ -30,20 +34,19 @@ public abstract class GameLoop implements Runnable {
                 handle();
                 delta--;
             }
-            if (!running) {
-                AppServer.currentGame = null;
-                return;
-            }
-        }
+        } while (running);
+
+        System.out.println("GAME LOOP THREAD TERMINATING");
     }
 
     public void setRunning(boolean running) {
         this.running = running;
+        System.out.println("RUNNING SET TO FALSE");
     }
 
     public abstract void handle();
 
-    public boolean isRunning() {
+    public  boolean isRunning() {
         return running;
     }
 }

@@ -1,9 +1,9 @@
 package Component;
 
-public class ImposterComp implements Component{
+public class ImpostorComp implements Component{
     private boolean ableToKill = true;
 
-    public ImposterComp() {
+    public ImpostorComp() {
     }
 
     public boolean isAbleToKill() {

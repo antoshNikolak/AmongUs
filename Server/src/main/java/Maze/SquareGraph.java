@@ -34,7 +34,7 @@ public class SquareGraph {
             }
 
             if (edgesConnected.isEmpty()) break;
-            Edge shortestEdge = edgesConnected.peek();
+            Edge shortestEdge = edgesConnected.poll();
             minimalSpanningTree.add(shortestEdge);
         }
         return minimalSpanningTree;

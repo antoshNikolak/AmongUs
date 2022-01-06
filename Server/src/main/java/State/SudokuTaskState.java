@@ -17,7 +17,7 @@ import java.util.*;
 public class SudokuTaskState extends TaskState {
 
     private Sudoku sudoku;
-    private final StopWatch stopWatch = new StopWatch();
+    private final StopWatch stopWatch = new StopWatch(StopWatch.Precision.MILLIS);
 
 
     public SudokuTaskState() {
@@ -28,14 +28,14 @@ public class SudokuTaskState extends TaskState {
         if (checkTaskCompleted(sudokuValues, client.getConnectionID())) {
             super.close();
             super.incrementTaskBar();
-            double timeDiffNano = stopWatch.stop();
-            recordTimeInDataBase(client, timeDiffNano * 1e-9);
+            double timeDiffMillis = stopWatch.stop();
+            recordTimeInDataBase(client, timeDiffMillis / 1e3);
         }
     }
 
     private void recordTimeInDataBase(Client client, double time) {
-        UserData userData = AuthorizationServer.clientUserDataMap.get(client);
-        DataBaseUtil.addTimeToSudokuAttempts(userData.getUserName(), time);
+        String userName = client.getUserData().getUserName();
+        DataBaseUtil.addTimeToSudokuAttempts(userName, time);
     }
 
     private boolean checkTaskCompleted(Integer[][] sudokuValues, int connectionID) {

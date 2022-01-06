@@ -1,17 +1,15 @@
 package State;
 
-import Client.Client;
 import Component.ColourComp;
-import Component.ImposterComp;
+import Component.ImpostorComp;
 import Component.PosComp;
 import ConnectionServer.ConnectionServer;
+import EndGameHandler.EndGameHandler;
 import Packet.AddEntityReturn.AddEntityReturn;
 //import Packet.AddEntityReturn.AddStationaryEntityReturn;
 import Packet.Camera.ScrollingEnableReturn;
 import Packet.GameStart.RoleNotify;
-import Packet.Position.PosRequest;
 import Position.Pos;
-import StartUpServer.AppServer;
 import System.PhysicsSystem;
 import TimerHandler.StopWatch;
 import World.World;
@@ -25,7 +23,8 @@ import static StartUpServer.AppServer.currentGame;
 
 public class GameState extends PlayingState {
     private TaskBar taskBar;
-    private StopWatch stopWatch;
+    private StopWatch gameDurationStopWatch;
+    private final EndGameHandler endGameHandler = new EndGameHandler();
 
     public GameState() {
         super();
@@ -49,18 +48,16 @@ public class GameState extends PlayingState {
         selectImpostor();
         enableClientScreenScrolling();
         addTaskBar();
-        startTimer();
+        startGameDurationTimer();
     }
 
-    private void startTimer(){
-        this.stopWatch = new StopWatch();
-        this.stopWatch.start();
+    private void startGameDurationTimer() {
+        this.gameDurationStopWatch = new StopWatch(StopWatch.Precision.MILLIS);
+        this.gameDurationStopWatch.start();
     }
 
-    private void stopTimer(Player player){
-        double time = stopWatch.stop();
-        //todo add time
-
+    public double stopGameDurationTimer() {
+        return gameDurationStopWatch.stop();
     }
 
     private void addTaskBar() {
@@ -70,30 +67,18 @@ public class GameState extends PlayingState {
     }
 
     private void enableClientScreenScrolling() {
-        for (Player player: currentGame.getPlayers()){
+        for (Player player : currentGame.getPlayers()) {
             Pos pos = player.getComponent(PosComp.class).getPos();
             ConnectionServer.sendTCP(new ScrollingEnableReturn(pos), player.getConnectionID());
         }
-//        for (Client client : AppServer.getClients()) {
-//            //todo player may be null
-//            Pos pos = client.getPlayer().getComponent(PosComp.class).getPos();//todo crash from game state 48
-//            ConnectionServer.sendTCP(new ScrollingEnableReturn(pos), client.getConnectionID());
-//        }
     }
 
     private void selectImpostor() {
         Player imposter = getRandomPlayer();
-        imposter.addComponent(new ImposterComp());
+        imposter.addComponent(new ImpostorComp());
         System.out.println(imposter.getComponent(ColourComp.class).getColour() + "is the impostor");
         ConnectionServer.sendTCP(new RoleNotify(true), imposter.getConnectionID());
         ConnectionServer.sendTCPToAllExcept(new RoleNotify(false), imposter.getConnectionID());
-
-//        for (Player player : currentGame.getPlayers()) {
-//            if (player == imposter) {
-//                player.addComponent(new ImposterComp());
-//                System.out.println(player.getComponent(ColourComp.class).getColour() + "is the impostor");
-//            }
-//        }
     }
 
     private Player getRandomPlayer() {
@@ -152,27 +137,28 @@ public class GameState extends PlayingState {
 //    }
 
 
-    @Override
-    public void processPlayingSystems(Player player, PosRequest packet) {
-        super.processPlayingSystems(player, packet);
-//        if (packet.isEmergencyMeetingKey() && !hasSystem(EmergencyTableSystem.class)) {
-//            new EmergencyTableSystem().handleAction(player, packet);
-//        }
-    }
+//    @Override
+//    public void processPlayingSystems(Player player, PosRequest packet) {
+//        super.processPlayingSystems(player, packet);
+////        if (packet.isEmergencyMeetingKey() && !hasSystem(EmergencyTableSystem.class)) {
+////            new EmergencyTableSystem().handleAction(player, packet);
+////        }
+//    }
 
     @Override
-        protected void createWorld () {
-            this.world = new World("World/game-map.txt");
-        }
-
-        public TaskBar getTaskBar () {
-            return taskBar;
-        }
-
-        public void setTaskBar (TaskBar taskBar){
-            this.taskBar = taskBar;
-        }
-
-
-
+    protected void createWorld() {
+        this.world = new World("World/game-map.txt");
     }
+
+    public TaskBar getTaskBar() {
+        return taskBar;
+    }
+
+    public void setTaskBar(TaskBar taskBar) {
+        this.taskBar = taskBar;
+    }
+
+    public EndGameHandler getEndGameHandler() {
+        return endGameHandler;
+    }
+}

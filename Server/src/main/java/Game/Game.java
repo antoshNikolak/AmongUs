@@ -1,43 +1,61 @@
 package Game;
 
 import Client.Client;
+import ConnectionServer.ConnectionServer;
 import StartUpServer.AppServer;
+import State.GameState;
 import State.LobbyState;
 import State.StateManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import Entity.*;
 import Entity.Player;
+import Utils.ConcurrentUtils;
 
 public class Game {
     private final StateManager stateManager = new StateManager();
     private final EntityReturnBuffer entityReturnBuffer = new EntityReturnBuffer();
     private final List<Player> players = new ArrayList<>();
-//    private boolean running = true;
+    //    private boolean running = true;
     private GameLoop gameLoop;
 
-    private final Object lock = new Object();
+//    private final Object lock = new Object();
 
     public void startGame() {
         init();
         startGameLoop();
     }
 
-    public  void stopGame() {//todo doc stopping game and syncing
-        synchronized (lock) {
-            removeClientPlayers();
-            this.gameLoop.setRunning(false);
-//            AppServer.currentGame = null;
-            System.out.println("set current game to null");
+    public void stopGame() {
+//        synchronized (lock) {
+        //this happens in a timer or clinet thread
+//        System.out.println("entered stop game method");
+        this.gameLoop.setRunning(false);//stops the game loop
+        waitForThreadsToPause();//pause server thread and wait for game loop to terminate
+        removeClientPlayers();
+        AppServer.currentGame = null;
+        ConnectionServer.getServerSemaphor().release();
+    }
+
+    public void waitForThreadsToPause() {
+        Thread gameLoopThread = ConcurrentUtils.getThreadByName("game loop");
+        try {
+            if (gameLoopThread != null) {
+                gameLoopThread.join();
+            }
+            ConnectionServer.getServerSemaphor().acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
-    public void removeClientPlayers(){
-        for (Client client: AppServer.getClients()){
-            if (client.getPlayer() != null && players.contains(client.getPlayer())){
-               client.setPlayer(null);
+    public void removeClientPlayers() {
+        for (Client client : AppServer.getClients()) {
+            if (client.getPlayer() != null && players.contains(client.getPlayer())) {
+                client.setPlayer(null);
             }
         }
 //        AppServer.getClients().stream().
@@ -50,25 +68,19 @@ public class Game {
     public void init() {
 //        stateManager.setCurrentStateWithClose(new LobbyState());
         stateManager.pushState(new LobbyState());
+        players.forEach(player -> System.out.println("play name: " + player.getNameTag()));
     }
 
     private void startGameLoop() {
         this.gameLoop = new GameLoop(30) {
             @Override
-            public  void handle() {//todo document syncing
-                synchronized (lock) {
-                    if (this.isRunning()) {
-                        stateManager.updateTop();
-
-//                        stateManager.update();
-                        sendGameState();
-                    }
-                }
+            public void handle() {
+                stateManager.updateTop();
+                sendGameState();
             }
         };
         gameLoop.start();
     }
-    //TODO dont set game to null, but use is running var all around MAYBE, idk if thats what i want
 
     private void sendGameState() {
         this.entityReturnBuffer.sendGameState();

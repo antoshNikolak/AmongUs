@@ -33,5 +33,6 @@ module Shared {
     exports Packet.GameEnd;
     exports Packet.ScreenData;
     exports Utils;
+    exports Packet.LeaderBoard;
 
 }

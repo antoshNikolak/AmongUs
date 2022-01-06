@@ -5,6 +5,8 @@ import Packet.Position.ClearEntityReturn;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import StartUpServer.AppServer;
 import Utils.*;
 
 public class EntityRegistryServer {
@@ -21,12 +23,18 @@ public class EntityRegistryServer {
     }
 
     public static void unregisterEntity(int id){
-        entityIDMap.remove(id);
+        synchronized (AppServer.currentGame.getEntityReturnBuffer()) {
+            entityIDMap.remove(id);
+        }
     }
 
     public static void removeEntity(int entityID){
-        ConnectionServer.sendTCPToAllPlayers(new ClearEntityReturn(entityID));
-        EntityRegistryServer.unregisterEntity(entityID);
+        Entity entity = entityIDMap.get(entityID);
+        synchronized (AppServer.currentGame.getEntityReturnBuffer()) {
+            AppServer.currentGame.getEntityReturnBuffer().removeEntity(entity);//remove from buffer
+            unregisterEntity(entityID);//remove registration ID
+        }
+        ConnectionServer.sendTCPToAllPlayers(new ClearEntityReturn(entityID));//removes entity on the client side
     }
 
     public static void removeEntity(Entity entity){
@@ -38,7 +46,6 @@ public class EntityRegistryServer {
             removeEntity(entity);
         }
     }
-
 
     public static void removeEntities(List<Integer> entityIDs){
         ConnectionServer.sendTCPToAllPlayers(new ClearEntityReturn(entityIDs));

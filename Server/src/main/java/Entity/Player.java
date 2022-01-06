@@ -15,15 +15,15 @@ public class Player extends Entity {
     //each player must have its own state
     private TaskState currentTask;
     private final Client client;
-    private final int connectionID;
+//    private final int connectionID;
     private final String nameTag;
 
 
-    public Player(Client client, String colour, int connectionID) {
-        this.connectionID = connectionID;
+    public Player(Client client, String colour) {
+//        this.connectionID = connectionID;
         this.client = client;
-        this.nameTag = AuthorizationServer.clientUserDataMap.get(client).getUserName();
-        startComps(new PosComp(100, 100, 50, 63), colour, connectionID);
+        this.nameTag = client.getUserData().getUserName();
+        startComps(new PosComp(100, 100, 50, 63), colour, client.getConnectionID());
         currentGame.getPlayers().add(this);
     }
 
@@ -73,14 +73,14 @@ public class Player extends Entity {
 
     public void stopTask() {
         if (currentTask != null) {
-            ConnectionServer.sendTCP(new RemoveNestedScreen(), connectionID);
+            ConnectionServer.sendTCP(new RemoveNestedScreen(), getConnectionID());
             currentTask.setPlayer(null);
             currentTask = null;
         }
     }
 
     public int getConnectionID() {
-        return connectionID;
+        return client.getConnectionID();
     }
 
     public TaskState getCurrentTask() {

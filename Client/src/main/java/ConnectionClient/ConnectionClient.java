@@ -31,20 +31,17 @@ import Packet.Timer.GameStartTimer;
 import Packet.Timer.KillCoolDownTimer;
 import Packet.Timer.Timer;
 import Packet.Timer.VotingTimer;
+import Packet.Voting.*;
 import Position.Pos;
 import Packet.SudokuPacket.VerifySudokuRequest;
 import Packet.SudokuPacket.VerifySudokuReturn;
 import Packet.UserData.UserData;
-import Packet.Voting.ElectionReturn;
-import Packet.Voting.ImpostorVote;
-import Packet.Voting.VoteOption;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
+import Packet.LeaderBoard.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
@@ -70,8 +67,8 @@ public final class ConnectionClient {
     private static void startConnection() {
         try {
             client.start();
-//            client.connect(5000, "localhost", 49159, 65520);
-            client.connect(5000, "192.168.1.73", 49159, 65520);
+            client.connect(5000, "localhost", 49159, 65520);
+//            client.connect(5000, "192.168.1.73"S, 49159, 65520);
 
 
         } catch (IOException e) {
@@ -144,5 +141,11 @@ public final class ConnectionClient {
         kryo.register(ImpostorWin.class);
         kryo.register(ScreenInfo.class);
         kryo.register(SudokuFailedReturn.class);
+        kryo.register(ChatMessageReturn.class);
+        kryo.register(ChatMessageRequest.class);
+        kryo.register(LeaderBoardReturn.class);
+        kryo.register(RequestLeaderBoard.class);
+        kryo.register(TreeMap.class);
+        kryo.register(LinkedHashMap.class);
     }
 }

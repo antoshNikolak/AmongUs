@@ -10,6 +10,7 @@ import Packet.EntityState.*;
 import Packet.GameEnd.GameEnd;
 import Packet.GameStart.RoleNotify;
 import Packet.GameStart.StartGameReturn;
+import Packet.LeaderBoard.*;
 import Packet.NestedPane.AddNestedPane;
 import Packet.NestedPane.AddSudokuPane;
 import Packet.NestedPane.AddVotingPane;
@@ -20,6 +21,7 @@ import Packet.Sound.Sound;
 import Packet.Timer.GameStartTimer;
 import Packet.Timer.KillCoolDownTimer;
 import Packet.Timer.VotingTimer;
+import Packet.Voting.ChatMessageReturn;
 import Position.Pos;
 import Screen.*;
 import StartUp.AppClient;
@@ -31,10 +33,13 @@ import javafx.application.Platform;
 import ScreenCounter.*;
 import SudokuHandler.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -123,7 +128,11 @@ public class PacketControllerClient {
     }
 
     public void removeNestedScreen() {
-        Platform.runLater(() -> ScreenManager.getScreen(GameScreen.class).removeNestedScreen());
+        Platform.runLater(() -> {
+            if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {
+                ScreenManager.getScreen(GameScreen.class).removeNestedScreen();
+            }
+        });
     }
 
     private SudokuHandler sudokuHandler;
@@ -199,7 +208,7 @@ public class PacketControllerClient {
     private final Counter votingTimerCounter = new Counter(ScreenManager.STAGE_WIDTH - 80, ScreenManager.STAGE_HEIGHT - 80, 50);
 
     public void handleVotingTimer(VotingTimer packet) {
-         Platform.runLater(() -> votingTimerCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
+        Platform.runLater(() -> votingTimerCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
 
     public void handleTaskBarUpdate(TaskBarUpdate packet) {
@@ -242,7 +251,7 @@ public class PacketControllerClient {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                ScreenManager.activate(MenuScreen.class);
+                Platform.runLater(()->ScreenManager.activate(MenuScreen.class));
             }
         }, 3000);
     }
@@ -255,6 +264,28 @@ public class PacketControllerClient {
         sudokuHandler.unhighlightAllErrors();
         for (Pos pos : packet.errorsFound) {
             sudokuHandler.highlightError(pos);
+        }
+    }
+
+    public void handleChatMessageReturn(ChatMessageReturn packet) {
+        votingPaneHandler.handleChat(packet);
+    }
+
+    public void handleLeaderBoardReturn(LeaderBoardReturn packet) {
+        ScreenManager.activate(LeaderBoardScreen.class);
+        VBox content = (VBox) ScreenManager.getScreen(LeaderBoardScreen.class).getNode("content");
+        Platform.runLater(()->content.getChildren().clear());
+        int counter = 1;
+        for (Map.Entry<String, Double> scoreEntry : packet.userTimeMap.entrySet()){
+            String username = scoreEntry.getKey();
+            if (username == null) username = "";
+            double score = scoreEntry.getValue();
+            System.out.println("Score val: "+ score);
+            Text text = (new Text(counter+") "+ username+ " -> "+ score));
+            text.setFont(Font.font(15));
+            text.setStroke(Color.LIGHTGREEN);
+            Platform.runLater(()->content.getChildren().add(text));
+            counter++;
         }
     }
 

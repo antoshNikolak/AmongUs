@@ -75,8 +75,8 @@ public class LobbyState extends PlayingState {
     }
 
     private void sendPlayerData(Client client) {
-        sendExistingPlayersToClient(client.getConnectionID());
-        sendNewPlayerToAll(client);
+        sendExistingPlayersToClient(client.getPlayer().getConnectionID());
+        sendNewPlayerToAll(client.getPlayer());
     }
 
     private void sendExistingPlayersToClient(int connectionID) {
@@ -87,12 +87,12 @@ public class LobbyState extends PlayingState {
         }
     }
 
-    private void sendNewPlayerToAll(Client client) {
-        NewAnimatedEntityState playerState = client.getPlayer().adaptToNewAnimatedEntityState(true);
-        ConnectionServer.sendTCP(new AddLocalEntityReturn(playerState), client.getConnectionID());
-        for (Player player : currentGame.getPlayers())
-            if (player.getConnectionID() != client.getConnectionID()) {
-                ConnectionServer.sendTCP(new AddEntityReturn(playerState), player.getConnectionID());
+    private void sendNewPlayerToAll(Player player) {
+        NewAnimatedEntityState playerState = player.adaptToNewAnimatedEntityState(true);
+        ConnectionServer.sendTCP(new AddLocalEntityReturn(playerState), player.getConnectionID());
+        for (Player player2 : currentGame.getPlayers())
+            if (player2.getConnectionID() != player.getConnectionID()) {
+                ConnectionServer.sendTCP(new AddEntityReturn(playerState), player2.getConnectionID());
             }
     }
 

@@ -17,6 +17,7 @@ import Packet.GameEnd.ImpostorWin;
 import Packet.GameStart.RoleNotify;
 import Packet.GameStart.StartGameRequest;
 import Packet.GameStart.StartGameReturn;
+import Packet.LeaderBoard.RequestLeaderBoard;
 import Packet.NestedPane.*;
 import Packet.Packet;
 import Packet.Position.*;
@@ -33,26 +34,27 @@ import Packet.Timer.GameStartTimer;
 import Packet.Timer.KillCoolDownTimer;
 import Packet.Timer.Timer;
 import Packet.Timer.VotingTimer;
+import Packet.Voting.*;
 import Position.Pos;
 import StartUpServer.AppServer;
 import Packet.SudokuPacket.VerifySudokuRequest;
 import Packet.SudokuPacket.VerifySudokuReturn;
 import Packet.UserData.UserData;
-import Packet.Voting.ElectionReturn;
-import Packet.Voting.ImpostorVote;
-import Packet.Voting.VoteOption;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Server;
+import Packet.LeaderBoard.*;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 import static StartUpServer.AppServer.currentGame;
 
 public final class ConnectionServer {
     private static final Server server = new Server(20000, 20000);
+    private static final PacketListenerServer packetListener = new PacketListenerServer();
 
     public static void sendUDP(Packet packet, int connectionID) {
         server.sendToUDP(connectionID, packet);
@@ -131,7 +133,7 @@ public final class ConnectionServer {
     public static void start(){
         startConnection();
         registerPackets();
-        server.addListener(new PacketListenerServer());
+        server.addListener(packetListener);
     }
 
     private static void startConnection() {
@@ -250,8 +252,17 @@ public final class ConnectionServer {
         kryo.register(ImpostorWin.class);
         kryo.register(ScreenInfo.class);
         kryo.register(SudokuFailedReturn.class);
+        kryo.register(ChatMessageReturn.class);
+        kryo.register(ChatMessageRequest.class);
+        kryo.register(LeaderBoardReturn.class);
+        kryo.register(RequestLeaderBoard.class);
+        kryo.register(TreeMap.class);
+        kryo.register(LinkedHashMap.class);
 
     }
 
 
+    public static Semaphore getServerSemaphor() {
+        return packetListener.getSemaphore();
+    }
 }
