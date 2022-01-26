@@ -4,11 +4,12 @@ import Packet.Animation.AnimState;
 import Component.AnimationComp;
 import Component.HitBoxComp;
 import Component.PosComp;
+import Registry.RegistryHandler;
 
 public class Tile extends Entity {
 
     public Tile(PosComp posComp, String texture) {
-        EntityRegistryServer.addEntity(this);
+        RegistryHandler.entityRegistryServer.addEntity(this);
         addComponent(posComp);
         addComponent(new HitBoxComp(posComp));
         addComponent(configAnimation(texture));

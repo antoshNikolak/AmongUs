@@ -1,18 +1,13 @@
 package State;
 
 import ConnectionServer.ConnectionServer;
-import DistanceFinder.DistanceFinder;
-import Entity.EntityRegistryServer;
-import Entity.Player;
 import Entity.Tile;
 import Packet.AddEntityReturn.AddEntityReturn;
 //import Packet.AddEntityReturn.AddStationaryEntityReturn;
 import Packet.EntityState.NewEntityState;
 import Packet.Position.ClearEntityReturn;
-import Packet.Position.PosRequest;
-import StartUpServer.AppServer;
+import Registry.RegistryHandler;
 import World.World;
-import System.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +23,7 @@ public abstract class PlayingState extends State {
     private void clearWorldData() {
         ConnectionServer.sendTCPToAllPlayers(new ClearEntityReturn(world.getTileIDs()));
         for (Integer ID : world.getTileIDs()) {
-            EntityRegistryServer.unregisterEntity(ID);
+            RegistryHandler.entityRegistryServer.removeEntity(ID);
         }
     }
 

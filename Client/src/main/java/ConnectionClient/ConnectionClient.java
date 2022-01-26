@@ -3,10 +3,10 @@ package ConnectionClient;
 import Packet.Animation.AnimState;
 import Packet.Animation.AnimationDisplayReturn;
 import Packet.Animation.AnimationOver;
-import Packet.*;
 import Packet.AddEntityReturn.*;
 import Packet.Animation.NewAnimationReturn;
 import Packet.Camera.ScrollingEnableReturn;
+import Packet.CountDown.RemoveCountDown;
 import Packet.EntityState.ExistingEntityState;
 import Packet.EntityState.NewAnimatedEntityState;
 import Packet.EntityState.NewEntityState;
@@ -17,20 +17,21 @@ import Packet.GameStart.RoleNotify;
 import Packet.GameStart.StartGameRequest;
 import Packet.GameStart.StartGameReturn;
 import Packet.NestedPane.*;
+import Packet.Packet;
 import Packet.Position.*;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.LogoutRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
 import Packet.ScreenData.ScreenInfo;
-import Packet.Sound.CloseRecordHandler;
-import Packet.Sound.OpenRecordHandler;
+//import Packet.Sound.CloseRecordHandler;
 import Packet.Sound.Sound;
 import Packet.SudokuPacket.SudokuFailedReturn;
-import Packet.Timer.GameStartTimer;
-import Packet.Timer.KillCoolDownTimer;
-import Packet.Timer.Timer;
-import Packet.Timer.VotingTimer;
+//import Packet.Timer.GameStartCountDown;
+//import Packet.Timer.KillCoolDownCountDown;
+//import Packet.Timer.CountDown;
+//import Packet.Timer.VotingCountDown;
+import Packet.CountDown.CountDown;
 import Packet.Voting.*;
 import Position.Pos;
 import Packet.SudokuPacket.VerifySudokuRequest;
@@ -66,11 +67,8 @@ public final class ConnectionClient {
 
     private static void startConnection() {
         try {
-            client.start();
-            client.connect(5000, "localhost", 49159, 65520);
-//            client.connect(5000, "192.168.1.73"S, 49159, 65520);
-
-
+            client.start();//start client thread
+            client.connect(5000, "localhost", 49159, 65520);//Opens a TCP and UDP client
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,10 +97,10 @@ public final class ConnectionClient {
         kryo.register(NewAnimationReturn[].class);
         kryo.register(NewAnimationReturn.class);
         kryo.register(AnimState.class);
-        kryo.register(Timer.class);
+        kryo.register(CountDown.class);
         kryo.register(ClearEntityReturn.class);
-        kryo.register(GameStartTimer.class);
-        kryo.register(KillCoolDownTimer.class);
+//        kryo.register(GameStartCountDown.class);
+//        kryo.register(KillCoolDownCountDown.class);
         kryo.register(ScrollingEnableReturn.class);
         kryo.register(NewAnimatedEntityState.class);
         kryo.register(AddLineReturn.class);
@@ -121,13 +119,11 @@ public final class ConnectionClient {
         kryo.register(AnimationDisplayReturn.class);
         kryo.register(NodeInfo.class);
         kryo.register(NodeType.class);
-        kryo.register(OpenRecordHandler.class);
-        kryo.register(CloseRecordHandler.class);
         kryo.register(Sound.class);
         kryo.register(AddVotingPane.class);
         kryo.register(byte[].class);
         kryo.register(ImpostorVote.class);
-        kryo.register(VotingTimer.class);
+//        kryo.register(VotingCountDown.class);
         kryo.register(ElectionReturn.class);
         kryo.register(DisplayVoteResults.class);
         kryo.register(HashMap.class);
@@ -147,5 +143,7 @@ public final class ConnectionClient {
         kryo.register(RequestLeaderBoard.class);
         kryo.register(TreeMap.class);
         kryo.register(LinkedHashMap.class);
+        kryo.register(RemoveCountDown.class);
+
     }
 }

@@ -35,13 +35,10 @@ public abstract class GameLoop implements Runnable {
                 delta--;
             }
         } while (running);
-
-        System.out.println("GAME LOOP THREAD TERMINATING");
     }
 
     public void setRunning(boolean running) {
         this.running = running;
-        System.out.println("RUNNING SET TO FALSE");
     }
 
     public abstract void handle();

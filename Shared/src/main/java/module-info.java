@@ -14,8 +14,8 @@ module Shared {
     opens Position;
     exports Packet.Animation;
     opens Packet.Animation;
-    exports Packet.Timer;
-    opens Packet.Timer;
+    exports Packet.CountDown;
+    opens Packet.CountDown;
     exports Packet.Camera;
     opens Packet.Camera;
     exports Packet.EntityState;

@@ -16,6 +16,7 @@ public final class EntityDistance<T extends Entity, S extends Entity>  implement
     @Override
     public int compareTo(EntityDistance entityDistance) {
         return Double.compare(distance, entityDistance.getDistance());
+        //natural order sorts entity distance lowest to largest distance
     }
 
     public T getEntity() {

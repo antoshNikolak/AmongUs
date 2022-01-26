@@ -24,11 +24,11 @@ public class TileFactory {
         } else if (id == 3) {
             tile = createTile(tilePos, "maze-task");
             tile.addComponent(new TaskComp(MazeTaskState.class));
-        } else if (id == 4) {
-            tile = createTile(tilePos, "number-count-task");
+//        else if (id == 4) {
+//            tile = createTile(tilePos, "number-count-task");
 //            tile.addComponent(new TaskComp(NumberCountTaskState.class));
-        } else if (id != 0 && id != 5) {
-            throw new IllegalStateException("the world file nums are too big");
+        } else if (id != 0 && id != 5) {//check not 0, or not a type or special enlarged tile
+            throw new IllegalStateException("invalid id number");
         }
         return tile;
     }

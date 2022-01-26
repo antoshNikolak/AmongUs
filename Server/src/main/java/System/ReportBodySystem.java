@@ -3,11 +3,10 @@ package System;
 import Component.AliveComp;
 import DistanceFinder.DistanceFinder;
 import Entity.DeadBody;
-import Entity.EntityRegistryServer;
 import Entity.Player;
 import Packet.Position.PosRequest;
+import Registry.RegistryHandler;
 import StartUpServer.AppServer;
-import State.GameState;
 import State.MeetingState;
 
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ public class ReportBodySystem extends BaseSystem{
         if (packet.isReportKey() && bodyFinder.getComponent(AliveComp.class).isAlive()){
             Optional<DeadBody> deadBodyOptional = getDeadBody(bodyFinder);
             deadBodyOptional.ifPresent(deadBody ->{
-//                removeDeadBodies();//todo redundant?
                 callMeeting();
             });
         }
@@ -42,7 +40,7 @@ public class ReportBodySystem extends BaseSystem{
 //    }
 
     private void callMeeting(){
-        AppServer.currentGame.getStateManager().pushState(new MeetingState());//todo NEW CODE
+        AppServer.currentGame.getStateManager().pushState(new MeetingState());
 //        EmergencyTableSystem emergencyTableSystem = new EmergencyTableSystem();
 //        emergencyTableSystem.activate();
 
@@ -55,12 +53,12 @@ public class ReportBodySystem extends BaseSystem{
 
 
     public void removeDeadBodies(){
-        EntityRegistryServer.removeEntities(deadBodies);
+        RegistryHandler.entityRegistryServer.removeEntities(deadBodies);
         this.deadBodies.clear();
     }
 
     private Optional<DeadBody> getDeadBody(Player bodyFinder){
-        return DistanceFinder.getClosestEntity(bodyFinder, deadBodies, 100);//todo add a range
+        return DistanceFinder.getClosestEntity(bodyFinder, deadBodies, 100);
     }
 
     public List<DeadBody> getDeadBodies() {

@@ -1,11 +1,11 @@
 package Entity;
 
-import Client.Client;
 import ConnectionServer.ConnectionServer;
 import Packet.EntityState.ExistingEntityState;
 import Packet.EntityState.NewEntityState;
 import Packet.EntityState.NewLineState;
 import Packet.Position.StateReturn;
+import Registry.RegistryHandler;
 import StartUpServer.AppServer;
 
 import java.util.*;
@@ -58,22 +58,20 @@ public class EntityReturnBuffer {
     }
 
     public synchronized void putEntity(Entity entity) {
-        if (EntityRegistryServer.getEntityID(entity) == null) return;
+        if (RegistryHandler.entityRegistryServer.getItemID(entity) == null) return;
         entityDestinationsReturnBuffer.put(entity, getAllConnectionIDs());
     }
 
     public synchronized void putEntity(Entity entity, List<Integer> connectionIDs) {
-        if (EntityRegistryServer.getEntityID(entity) == null) return;
+        if (RegistryHandler.entityRegistryServer.getItemID(entity) == null) return;
         entityDestinationsReturnBuffer.put(entity, connectionIDs);
     }
 
     public synchronized void putEntity(Entity entity, Integer... connectionIDs) {
-        if (EntityRegistryServer.getEntityID(entity) == null) return;
+        if (RegistryHandler.entityRegistryServer.getItemID(entity) == null) return;
         entityDestinationsReturnBuffer.put(entity, Arrays.asList(connectionIDs));
     }
 
-
-    //todo modify this syncing
     public synchronized void removeEntity(Entity entity) {
         this.entityDestinationsReturnBuffer.remove(entity);
     }

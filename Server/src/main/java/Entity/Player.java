@@ -1,12 +1,12 @@
 package Entity;
 
-import AuthorizationServer.AuthorizationServer;
 import ConnectionServer.ConnectionServer;
 import Packet.Animation.AnimState;
 import Client.Client;
 import Component.*;
 import Packet.EntityState.NewAnimatedEntityState;
 import Packet.NestedPane.RemoveNestedScreen;
+import Registry.RegistryHandler;
 import State.TaskState;
 
 import static StartUpServer.AppServer.currentGame;
@@ -31,7 +31,7 @@ public class Player extends Entity {
     public NewAnimatedEntityState adaptToNewAnimatedEntityState(boolean scrollable) {
         PosComp posComp = getComponent(PosComp.class);
         AnimationComp animationComp = getComponent(AnimationComp.class);
-        int registrationID = EntityRegistryServer.getEntityID(this);
+        int registrationID = RegistryHandler.entityRegistryServer.getItemID(this);
         NewAnimatedEntityState newAnimatedEntityState = new NewAnimatedEntityState(registrationID, posComp.getPos(), animationComp.adaptToAllNewAnimations(), animationComp.getCurrentAnimationState());
         newAnimatedEntityState.setScrollable(scrollable);
         newAnimatedEntityState.setNameTag(this.nameTag);

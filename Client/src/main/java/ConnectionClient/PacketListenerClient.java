@@ -3,6 +3,7 @@ package ConnectionClient;
 import Packet.Animation.AnimationDisplayReturn;
 import Packet.AddEntityReturn.*;
 import Packet.Camera.ScrollingEnableReturn;
+import Packet.CountDown.RemoveCountDown;
 import Packet.GameEnd.CrewWin;
 import Packet.GameEnd.GameEnd;
 import Packet.GameEnd.ImpostorWin;
@@ -12,12 +13,7 @@ import Packet.LeaderBoard.*;
 import Packet.NestedPane.*;
 import Packet.Position.*;
 import Packet.Registration.RegistrationConfirmation;
-import Packet.Sound.CloseRecordHandler;
-import Packet.Sound.OpenRecordHandler;
-import Packet.Sound.Sound;
-import Packet.Timer.GameStartTimer;
-import Packet.Timer.KillCoolDownTimer;
-import Packet.Timer.VotingTimer;
+import Packet.CountDown.CountDown;
 import Packet.SudokuPacket.SudokuFailedReturn;
 import Packet.SudokuPacket.VerifySudokuReturn;
 import Packet.Voting.ChatMessageReturn;
@@ -61,11 +57,13 @@ public class PacketListenerClient extends Listener {
 //        }
         else if(object instanceof StateReturn){
             packetController.handleStateReturn((StateReturn) object);
-        }else if (object instanceof GameStartTimer){
-            packetController.handleGameStartTimerReturn((GameStartTimer)object);
-        }else if (object instanceof KillCoolDownTimer){
-            packetController.handleKillCoolDownTimer((KillCoolDownTimer) object);
-        } else if (object instanceof ClearEntityReturn){
+        }
+//        else if (object instanceof GameStartCountDown){
+//            packetController.handleGameStartTimerReturn((GameStartCountDown)object);
+//        }else if (object instanceof KillCoolDownCountDown){
+//            packetController.handleKillCoolDownTimer((KillCoolDownCountDown) object);
+//        }
+        else if (object instanceof ClearEntityReturn){
             packetController.handleClearEntityReturn((ClearEntityReturn) object);
         }else if (object instanceof ScrollingEnableReturn){
             packetController.handleScrollingEnableReturn((ScrollingEnableReturn)object);
@@ -79,19 +77,24 @@ public class PacketListenerClient extends Listener {
             packetController.handleAnimationDisplayReturn((AnimationDisplayReturn)object);
         } else if (object instanceof AddVotingPane){
             packetController.handleAddVotingPane((AddVotingPane) object);
-        }else if (object instanceof Sound){
-            packetController.handleSound((Sound) object);
-        }else if (object instanceof OpenRecordHandler){
-            packetController.handleOpenMicAndSpeaker();
-        }else if (object instanceof CloseRecordHandler){
-            packetController.handleCloseMicAndSpeaker();
-        }else if (object instanceof ElectionReturn){
+        }
+//        else if (object instanceof Sound){
+//            packetController.handleSound((Sound) object);
+//        }
+//        else if (object instanceof OpenRecordHandler){
+////            packetController.handleOpenMicAndSpeaker();
+//        }else if (object instanceof CloseRecordHandler){
+////            packetController.handleCloseMicAndSpeaker();
+//        }
+        else if (object instanceof ElectionReturn){
 //            packetController.handleElectionReturn((ElectionReturn) object);
         }else if (object instanceof DisplayVoteResults){
             packetController.handleRemoveVotingScreen((DisplayVoteResults) object);
-        }else if (object instanceof VotingTimer){
-            packetController.handleVotingTimer((VotingTimer) object);
-        }else if (object instanceof TaskBarUpdate){
+        }
+//        else if (object instanceof VotingCountDown){
+//            packetController.handleVotingTimer((VotingCountDown) object);
+//        }
+        else if (object instanceof TaskBarUpdate){
             packetController.handleTaskBarUpdate((TaskBarUpdate) object);
         }else if (object instanceof RoleNotify){
             packetController.handleRoleNotify((RoleNotify)object);
@@ -107,6 +110,10 @@ public class PacketListenerClient extends Listener {
             packetController.handleChatMessageReturn((ChatMessageReturn) object);
         }else if (object instanceof LeaderBoardReturn){
             packetController.handleLeaderBoardReturn((LeaderBoardReturn) object);
+        }else if (object instanceof CountDown){
+            packetController.handleTimer((CountDown)object);
+        }else if (object instanceof RemoveCountDown){
+            packetController.handleRemoveCountDown((RemoveCountDown)object);
         }
         //        else if (object instanceof LogoutReturn){
 //

@@ -1,6 +1,7 @@
 package VoteHandler;
 
 import ClientScreenTracker.ScreenData;
+import Packet.CountDown.CountDown;
 import State.MeetingState;
 import Utils.CollectionUtils;
 import Packet.Animation.AnimState;
@@ -12,18 +13,17 @@ import Entity.Player;
 import Packet.NestedPane.AddVotingPane;
 import Packet.NestedPane.DisplayVoteResults;
 //import System.EmergencyTableSystem;
-import TimerHandler.TimerStarter;
+import TimerHandler.CounterStarter;
 import Packet.Voting.VoteOption;
 //import
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static StartUpServer.AppServer.currentGame;
 
 public class VoteHandler {
 
-    private final Map<String, VoteOption> playerVoteMap = new HashMap<>();//todo rename voter suspect map
+    private final Map<String, VoteOption> playerVoteMap = new HashMap<>();
 //    private final EmergencyTableSystem emergencyTableSystem;
     private final MeetingState meetingState;
 
@@ -101,25 +101,22 @@ public class VoteHandler {
 
 
     public void startVotingTimer() {
-        TimerStarter.startTimer("VotingTimer", 5, () -> {//time for players to vote
-            ConnectionServer.sendTCPToAllPlayers(new DisplayVoteResults(playerVoteMap));
-            //client will remove voting pane once vote results displayed
+        CounterStarter.startCountDown(30, 450, 350, 55,  () -> {//time for players to vote
+            ConnectionServer.sendTCPToAllPlayers(new DisplayVoteResults(playerVoteMap)); //client will remove voting pane once vote results displayed
             new Timer("timer-meeting-state-over").schedule(new TimerTask() {
                 @Override
                 public void run() {
                     currentGame.getStateManager().popState();
-//                    currentGame.getStateManager().popState();//assume game state is under this one on the stack
-//                    emergencyTableSystem.onVoteTimerOver();//close and remove the emergency meeting system
                 }
-            }, 2000);//time to display
+            }, 2000);//time to display, must be synced with client
         });
     }
 
-    public AddVotingPane createVotingPane() {
-        return new AddVotingPane(getVotingOptionData(), 0, 0, ScreenData.WIDTH, ScreenData.HEIGHT);
-    }
+//    public static AddVotingPane createVotingPane() {
+//        return new AddVotingPane(getVotingOptionData(), 0, 0, ScreenData.WIDTH, ScreenData.HEIGHT);
+//    }
 
-    private String getPlayerAnimationID(Player player) {
+    public String getPlayerAnimationID(Player player) {
         AnimationComp animationComp = player.getComponent(AnimationComp.class);
         if (player.getComponent(AliveComp.class).isAlive()) {
             return animationComp.getAnimation(AnimState.RIGHT).getFrames()[0];
@@ -128,8 +125,12 @@ public class VoteHandler {
         }
     }
 
+    public AddVotingPane createVotingPane() {
+        return new AddVotingPane(getVotingOptionData(), 0, 0, ScreenData.WIDTH, ScreenData.HEIGHT);
+    }
+
     //return animation ID, username map
-    private Map<String, String> getVotingOptionData() {
+    private  Map<String, String> getVotingOptionData() {
         Map<String, String> votingData = new HashMap<>();
         for (Player player: currentGame.getPlayers()){
             votingData.put(getPlayerAnimationID(player), player.getNameTag());
@@ -156,10 +157,10 @@ public class VoteHandler {
 
     public void registerVote(Player voter, VoteOption suspect) {
         String animID = getPlayerAnimationID(voter);
-//        if (!animID.contains("ghost") && !getPlayerAnimationID(suspect.getColour()).contains("ghost")) {//todo document changes
+//        if (!animID.contains("ghost") && !getPlayerAnimationID(suspect.getColour()).contains("ghost")) {
         if (!animID.contains("ghost")){
             playerVoteMap.put(animID, suspect);
-        }
+        }//todo stop accepting these once voting time is over
     }
 
     public Optional<Player> getPlayerWithMostVotes() {

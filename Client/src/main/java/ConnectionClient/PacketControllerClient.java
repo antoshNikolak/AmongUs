@@ -1,11 +1,13 @@
 package ConnectionClient;
 
 import AlertBox.AlertBox;
+import CounterHandler.CounterHandler;
 import Packet.Animation.AnimationDisplayReturn;
 import EntityClient.*;
 import Game.Game;
 import Packet.AddEntityReturn.*;
 import Packet.Camera.ScrollingEnableReturn;
+import Packet.CountDown.RemoveCountDown;
 import Packet.EntityState.*;
 import Packet.GameEnd.GameEnd;
 import Packet.GameStart.RoleNotify;
@@ -17,10 +19,8 @@ import Packet.NestedPane.AddVotingPane;
 import Packet.NestedPane.DisplayVoteResults;
 import Packet.Position.*;
 import Packet.Registration.RegistrationConfirmation;
-import Packet.Sound.Sound;
-import Packet.Timer.GameStartTimer;
-import Packet.Timer.KillCoolDownTimer;
-import Packet.Timer.VotingTimer;
+//import Packet.Timer.CountDown;
+import Packet.CountDown.CountDown;
 import Packet.Voting.ChatMessageReturn;
 import Position.Pos;
 import Screen.*;
@@ -30,7 +30,6 @@ import Packet.SudokuPacket.SudokuFailedReturn;
 import Packet.SudokuPacket.VerifySudokuReturn;
 import TaskBar.TaskBarHandler;
 import javafx.application.Platform;
-import ScreenCounter.*;
 import SudokuHandler.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -97,18 +96,18 @@ public class PacketControllerClient {
         }
     }
 
-    private final Counter gameStartCounter = new Counter(300, 200, 50);
-
-    public void handleGameStartTimerReturn(GameStartTimer packet) {
-        Platform.runLater(() -> gameStartCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
-    }
-
-
-    private final Counter killCoolDownCounter = new Counter(500, 350, 50);
-
-    public void handleKillCoolDownTimer(KillCoolDownTimer packet) {
-        Platform.runLater(() -> killCoolDownCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
-    }
+//    private final Counter gameStartCounter = new Counter(300, 200, 50);
+//
+//    public void handleGameStartTimerReturn(GameStartTimer packet) {
+//        Platform.runLater(() -> gameStartCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
+//    }
+//
+//
+//    private final Counter killCoolDownCounter = new Counter(500, 350, 50);
+//
+//    public void handleKillCoolDownTimer(KillCoolDownTimer packet) {
+//        Platform.runLater(() -> killCoolDownCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
+//    }
 
     public void handleClearEntityReturn(ClearEntityReturn packet) {
         for (int tileID : packet.getRegistrationIDs()) {
@@ -143,10 +142,10 @@ public class PacketControllerClient {
     }
 
     public void handleVerifySudokuReturn(VerifySudokuReturn packet) {
-        if (packet.isSudokuComplete()) removeNestedScreen();
+        if (packet.isSudokuComplete()) removeNestedScreen();//todo maybe no need to check if sudoku is complete
     }
 
-    public void handleAnimationDisplayReturn(AnimationDisplayReturn packet) {
+    public void handleAnimationDisplayReturn(AnimationDisplayReturn packet) {//todo delete
         ImageView imageView = new ImageView(TextureManager.getTexture(packet.getTexture()));
         imageView.setX(packet.getPos().getX());
         imageView.setY(packet.getPos().getY());
@@ -167,25 +166,25 @@ public class PacketControllerClient {
     }
 
 
-    public void handleSound(Sound packet) {
-        AppClient.currentGame.getRecordHandler().produceSound(packet.getBytes());
-    }
-
-    public void handleCloseMicAndSpeaker() {
-        AppClient.currentGame.getRecordHandler().setOn(false);
-    }
-
-    public void handleOpenMicAndSpeaker() {
-        AppClient.currentGame.getRecordHandler().startRecording();
-        AppClient.currentGame.getRecordHandler().setOn(true);
-    }
+//    public void handleSound(Sound packet) {
+//        AppClient.currentGame.getRecordHandler().produceSound(packet.getBytes());
+//    }
+//
+//    public void handleCloseMicAndSpeaker() {
+//        AppClient.currentGame.getRecordHandler().setOn(false);
+//    }
+//
+//    public void handleOpenMicAndSpeaker() {
+//        AppClient.currentGame.getRecordHandler().startRecording();
+//        AppClient.currentGame.getRecordHandler().setOn(true);
+//    }
 
 
     private VotingPaneHandler votingPaneHandler = new VotingPaneHandler();
 
     public void handleAddVotingPane(AddVotingPane packet) {
         Platform.runLater(() -> {
-            killCoolDownCounter.setTimerOn(false);
+//            killCoolDownCounter.setTimerOn(false);
             votingPaneHandler = new VotingPaneHandler();
             votingPaneHandler.createVotingPane(packet);
         });
@@ -197,7 +196,7 @@ public class PacketControllerClient {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                killCoolDownCounter.setTimerOn(true);//un-pause timer
+//                killCoolDownCounter.setTimerOn(true);//un-pause timer
                 if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {
                     removeNestedScreen();
                 }
@@ -205,11 +204,42 @@ public class PacketControllerClient {
         }, 2000);
     }
 
-    private final Counter votingTimerCounter = new Counter(ScreenManager.STAGE_WIDTH - 80, ScreenManager.STAGE_HEIGHT - 80, 50);
+    public void handleTimer(CountDown packet) {
+        CounterHandler.addCountDown(packet);
+//        final AtomicInteger atomicInteger = new AtomicInteger(packet.countDownValue);
+//        final Text text = new Text();
+//        text.setText(String.valueOf(atomicInteger.get()));
+//        text.setLayoutX(packet.x);
+//        text.setLayoutY(packet.y);
+//        text.setFont(Font.font(packet.size));
+//        GameScreen gameScreen = ScreenManager.getScreen(GameScreen.class);
+//        Platform.runLater(() -> {
+//            if (gameScreen.getNestedScreen() != null) {//at the time this is called, this is null
+//                gameScreen.getNestedScreen().addNode(text);
+//            } else {
+//                gameScreen.addNode(text);
+//            }
+//        });
+//
+//        new Timer().scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//                Platform.runLater(() -> text.setText(String.valueOf(atomicInteger.decrementAndGet())));
+//                if (atomicInteger.get() == 0) {
+//                    Platform.runLater(() -> gameScreen.removeNode(text));
+//                    cancel();
+//                }
+//            }
+//        }, 1000, 1000);
 
-    public void handleVotingTimer(VotingTimer packet) {
-        Platform.runLater(() -> votingTimerCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
     }
+
+
+//    private final Counter votingTimerCounter = new Counter(ScreenManager.STAGE_WIDTH - 80, ScreenManager.STAGE_HEIGHT - 80, 50);
+//
+//    public void handleVotingTimer(VotingTimer packet) {
+//        Platform.runLater(() -> votingTimerCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
+//    }
 
     public void handleTaskBarUpdate(TaskBarUpdate packet) {
         Entity taskBar = EntityRegistryClient.getEntity(packet.getRegistrationID());
@@ -220,16 +250,17 @@ public class PacketControllerClient {
         String role = packet.isImpostor() ? "impostor" : "crew";
         Text text = new Text(200, 150, "ROLE: " + role);
         text.setFont(Font.font(50));
-        Platform.runLater(() -> ScreenManager.getCurrentScreen().addNode(text));
+        Platform.runLater(() -> ScreenManager.getScreen(GameScreen.class).addNode(text));
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                Platform.runLater(() -> ScreenManager.getCurrentScreen().removeNode(text));
+                Platform.runLater(() -> ScreenManager.getScreen(GameScreen.class).removeNode(text));
             }
         }, 5000);
     }
 
     public void handleCrewWin() {
+//        CounterHandler.stopAllCountDowns();
         if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {
             removeNestedScreen();
         }
@@ -239,6 +270,8 @@ public class PacketControllerClient {
     }
 
     public void handleImpostorWin() {
+//        CounterHandler.stopAllCountDowns();
+
         if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {
             removeNestedScreen();
         }
@@ -251,7 +284,7 @@ public class PacketControllerClient {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                Platform.runLater(()->ScreenManager.activate(MenuScreen.class));
+                Platform.runLater(() -> ScreenManager.activate(MenuScreen.class));
             }
         }, 3000);
     }
@@ -274,19 +307,22 @@ public class PacketControllerClient {
     public void handleLeaderBoardReturn(LeaderBoardReturn packet) {
         ScreenManager.activate(LeaderBoardScreen.class);
         VBox content = (VBox) ScreenManager.getScreen(LeaderBoardScreen.class).getNode("content");
-        Platform.runLater(()->content.getChildren().clear());
+        Platform.runLater(() -> content.getChildren().clear());
         int counter = 1;
-        for (Map.Entry<String, Double> scoreEntry : packet.userTimeMap.entrySet()){
+        for (Map.Entry<String, Double> scoreEntry : packet.userTimeMap.entrySet()) {
             String username = scoreEntry.getKey();
             if (username == null) username = "";
             double score = scoreEntry.getValue();
-            System.out.println("Score val: "+ score);
-            Text text = (new Text(counter+") "+ username+ " -> "+ score));
+            Text text = (new Text(counter + ") " + username + " -> " + score));
             text.setFont(Font.font(15));
             text.setStroke(Color.LIGHTGREEN);
-            Platform.runLater(()->content.getChildren().add(text));
+            Platform.runLater(() -> content.getChildren().add(text));
             counter++;
         }
+    }
+
+    public void handleRemoveCountDown(RemoveCountDown packet) {
+        CounterHandler.stopCountDown(packet.timerID);
     }
 
 //    public void handleElectionReturn(ElectionReturn packet) {

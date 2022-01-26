@@ -31,12 +31,13 @@ public class DistanceFinder {
         Pos pos2 = e2.getComponent(PosComp.class).getPos();
         double deltaX = pos1.getX() - pos2.getX();
         double deltaY = pos1.getY() - pos2.getY();
+        //apply Pythagoras Theorem
         return new EntityDistance<T, S>(e1, e2, Math.sqrt(deltaX * deltaX + deltaY * deltaY));
     }
 
     private static void checkEntitiesHavePosComps(Entity... entities) {
         for (Entity entity : entities) {
-            if (!entity.hasComponent(PosComp.class)) {
+            if (!entity.hasComponent(PosComp.class)) {//method cant be used on an entity without position component
                 throw new IllegalArgumentException("entity doesnt have pos comp");
             }
         }

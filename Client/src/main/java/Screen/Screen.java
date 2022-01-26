@@ -19,8 +19,8 @@ public abstract class Screen {
         return pane;
     }
 
-    public void removeNode(Node item) {
-        this.pane.getChildren().remove(item);
+    public boolean removeNode(Node item) {
+        return this.pane.getChildren().remove(item);
     }
 
     public  Node getNode( String node) {

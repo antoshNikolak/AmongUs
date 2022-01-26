@@ -7,14 +7,14 @@ import java.util.*;
 
 public class DataBaseUtil {
 
-    public static void getStatement(Query command) {
-        try (Connection sqlConnection = getSQLConnection();
-             Statement statement = sqlConnection.createStatement()) {
-            command.excecute(statement);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+//    public static void getStatement(Query command) {
+//        try (Connection sqlConnection = getSQLConnection();
+//             Statement statement = sqlConnection.createStatement()) {
+//            command.excecute(statement);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public static void executeUpdate(String SQLCommand, Object ... params){
         try (Connection sqlConnection = getSQLConnection();
@@ -104,20 +104,20 @@ public class DataBaseUtil {
         }
     }
 
-    //todo doc change by collation
-    public static List<UserData> getUserDataList(UserData userData) {
-        return executeQuery("SELECT username, password FROM UserData " +
+    public static Boolean doesUserExist(UserData userData) {
+        return !Objects.requireNonNull(executeQuery("SELECT username, password FROM UserData " +
                         "where username = ? " +
                         "AND password = ?",
-                DataBaseUtil::createUserDataList, userData.getUserName(), userData.getPassword());
+                DataBaseUtil::isResultSetEmpty, userData.getUserName(), userData.getPassword()));
     }
 
-    private static List<UserData> createUserDataList(ResultSet resultSet) throws SQLException {
-        List<UserData> userData = new ArrayList<>();
-        while (resultSet.next()) {
-            userData.add(getUserData(resultSet));
-        }
-        return userData;
+    private static Boolean createUserDataList(ResultSet resultSet) throws SQLException {
+        return !isResultSetEmpty(resultSet);
+//        List<UserData> userData = new ArrayList<>();
+//        while (resultSet.next()) {
+//            userData.add(getUserData(resultSet));
+//        }
+//        return userData;
     }
 
     private static UserData getUserData(ResultSet resultSet) throws SQLException {
@@ -142,18 +142,22 @@ public class DataBaseUtil {
     }
 
     public static void addUserToTable(UserData userData) {
-        getStatement(statement -> {
-            statement.executeUpdate("INSERT INTO [UserData] (username, password)" +
-                    "VALUES ('" + userData.getUserName() + "','" + userData.getPassword() + "')");
-        });
+        executeUpdate("INSERT INTO UserData (username, password)" +
+                    "VALUES (?,?)", userData.getUserName(), userData.getPassword());
+//        getStatement(statement -> {
+//            statement.executeUpdate("INSERT INTO [UserData] (username, password)" +
+//                    "VALUES ('" + userData.getUserName() + "','" + userData.getPassword() + "')");
+//        });
     }
 
     public static void addTimeToSudokuAttempts(String userName, double time) {
         int attemptNum = getAttemptNum(userName);
-        getStatement(statement -> {
-            statement.executeUpdate("INSERT INTO SudokuAttempt (username, timeTaken, attemptNum)" +
-                    "VALUES ('" + userName + "','" + time + "','" + (attemptNum+1) + "')");
-        });
+        executeUpdate("INSERT INTO SudokuAttempt (username, timeTaken, attemptNum)" +
+                    "VALUES (?,?,?)", userName, time, (attemptNum+1));
+//        getStatement(statement -> {
+//            statement.executeUpdate("INSERT INTO SudokuAttempt (username, timeTaken, attemptNum)" +
+//                    "VALUES ('" + userName + "','" + time + "','" + (attemptNum+1) + "')");
+//        });
     }
 
     private static Integer getAttemptNum(String username) {
@@ -175,20 +179,23 @@ public class DataBaseUtil {
         boolean isNewRecord = Objects.requireNonNull(executeQuery("SELECT fastestImpostorWin FROM UserData WHERE username = ? AND fastestImpostorWin < ?" ,
                 DataBaseUtil::isResultSetEmpty, userName, time));
         if (!isNewRecord)return;
-        executeUpdate("UPDATE UserData SET fastestImpostorWin = "+time+
-                "WHERE username = ?", userName);
+        executeUpdate("UPDATE UserData SET fastestImpostorWin = ?"+                //todo test
+                "WHERE username = ?", time, userName);
     }
 
     public static LinkedHashMap<String, Double> getLeaderBoard(){
-        return executeQuery("SELECT username, fastestImpostorWin FROM UserData ORDER BY fastestImpostorWin DESC ",
-                DataBaseUtil::getLeaderBoardQuery);
+        return executeQuery("SELECT username, fastestImpostorWin FROM UserData WHERE fastestImpostorWin IS NOT NULL ORDER BY fastestImpostorWin ASC ",
+                DataBaseUtil::createLeaderBoard);
     }
 
-    private static LinkedHashMap<String, Double> getLeaderBoardQuery(ResultSet resultSet) throws SQLException{
+    private static LinkedHashMap<String, Double> createLeaderBoard(ResultSet resultSet) throws SQLException{
             LinkedHashMap<String, Double> leaderBoard = new LinkedHashMap<>();
             for (int i = 0; i < 10; i++) {
-                resultSet.next();
-                leaderBoard.put(resultSet.getString("username"), resultSet.getDouble("fastestImpostorWin"));
+                if (resultSet.next()) {
+                    leaderBoard.put(resultSet.getString("username"), resultSet.getDouble("fastestImpostorWin"));
+                }else {
+                    break;
+                }
             }
             return leaderBoard;
     }

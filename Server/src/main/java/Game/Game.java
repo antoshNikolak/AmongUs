@@ -2,14 +2,13 @@ package Game;
 
 import Client.Client;
 import ConnectionServer.ConnectionServer;
+import Registry.RegistryHandler;
 import StartUpServer.AppServer;
-import State.GameState;
 import State.LobbyState;
 import State.StateManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import Entity.*;
 import Entity.Player;
@@ -21,6 +20,7 @@ public class Game {
     private final List<Player> players = new ArrayList<>();
     //    private boolean running = true;
     private GameLoop gameLoop;
+//    private EntityRegistryServer entityRegistryServer;
 
 //    private final Object lock = new Object();
 
@@ -55,6 +55,7 @@ public class Game {
     public void removeClientPlayers() {
         for (Client client : AppServer.getClients()) {
             if (client.getPlayer() != null && players.contains(client.getPlayer())) {
+                RegistryHandler.entityRegistryServer.removeEntity(client.getPlayer());
                 client.setPlayer(null);
             }
         }
@@ -66,9 +67,7 @@ public class Game {
     }
 
     public void init() {
-//        stateManager.setCurrentStateWithClose(new LobbyState());
         stateManager.pushState(new LobbyState());
-        players.forEach(player -> System.out.println("play name: " + player.getNameTag()));
     }
 
     private void startGameLoop() {
@@ -100,4 +99,8 @@ public class Game {
 //                map(Client::getPlayer)
 //                .collect(Collectors.toList());
     }
+
+//    public EntityRegistryServer getEntityRegistryServer() {
+//        return entityRegistryServer;
+//    }
 }

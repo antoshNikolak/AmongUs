@@ -78,7 +78,7 @@ public class SudokuTaskState extends TaskState {
                 }
             }
         }
-//        for (int i = 0; i < 9; i += 3) {//todo no need for cutting out arrays?
+//        for (int i = 0; i < 9; i += 3) {
 //            for (int j = 0 ; j < 9; j += 3) {//start coords of each grid
 //                Integer[][] gridMatrix = new Integer[3][3]; //values of mini grid,
 //                //Integer is immutable so no need to wory about shallow copy, or DO I?

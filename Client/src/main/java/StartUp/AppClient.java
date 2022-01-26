@@ -11,11 +11,15 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+import java.io.File;
+
 public class AppClient  extends Application {
 
     public static Game currentGame;
 
     public static void main(String[] args) {
+        File file = new File("Client/text.txt");
+        System.out.println(file.getAbsolutePath());
         launch(args);
     }
 

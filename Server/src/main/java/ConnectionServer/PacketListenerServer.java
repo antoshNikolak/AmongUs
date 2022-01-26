@@ -3,7 +3,6 @@ package ConnectionServer;
 import Client.Client;
 import Component.ImpostorComp;
 import EndGameHandler.EndGameHandler;
-import Entity.EntityRegistryServer;
 import Packet.Animation.AnimationOver;
 import Packet.GameStart.StartGameRequest;
 import Packet.LeaderBoard.RequestLeaderBoard;
@@ -14,6 +13,7 @@ import Packet.Registration.SignupRequest;
 import Packet.ScreenData.ScreenInfo;
 import Packet.Sound.Sound;
 import Packet.Voting.ChatMessageRequest;
+import Registry.RegistryHandler;
 import StartUpServer.AppServer;
 import Packet.SudokuPacket.VerifySudokuRequest;
 import Packet.Voting.ImpostorVote;
@@ -37,15 +37,14 @@ public class PacketListenerServer extends Listener {
         Optional<Client> clientOpt = ConnectionServer.getClientFromConnectionID(connection.getID());
         if(clientOpt.isPresent()){
             Client client = clientOpt.get();
-
             AppServer.getClients().remove(client);//remove as a client
-            EntityRegistryServer.removeEntity(client.getPlayer());//de register entity, remove on client side
 
             if (client.getPlayer() != null ){
                 AppServer.currentGame.getPlayers().remove(client.getPlayer());//remove player from game server
+                RegistryHandler.entityRegistryServer.removeEntity(client.getPlayer());//de register entity, remove on client side //todo I changed the code here, doc?
             }
 
-            if (AppServer.currentGame!=null) {
+            if (AppServer.currentGame!=null && AppServer.currentGame.getStateManager().hasState(GameState.class)) {//todo doc changes here
                 EndGameHandler endGameHandler = AppServer.currentGame.getStateManager().getState(GameState.class).getEndGameHandler();
                 if (endGameHandler != null) {
                     if (client.getPlayer().hasComponent(ImpostorComp.class)) {//check if the game has been won
@@ -56,6 +55,8 @@ public class PacketListenerServer extends Listener {
                 }
             }
         }
+
+
 
     }
 
@@ -88,11 +89,11 @@ public class PacketListenerServer extends Listener {
         if (AppServer.currentGame == null) return;
         if (packet instanceof PosRequest) {
             ;
-            packetController.handlePosRequest((PosRequest) packet, connection.getID());
+            packetController.handleKeyBoardInput((PosRequest) packet, connection.getID());
         } else if (packet instanceof VerifySudokuRequest) {
             packetController.handleVerifySudokuRequest((VerifySudokuRequest) packet, connection.getID());
         } else if (packet instanceof Sound) {
-            packetController.handleVoiceChat((Sound) packet, connection.getID());
+//            packetController.handleVoiceChat((Sound) packet, connection.getID());
         } else if (packet instanceof ImpostorVote) {
             packetController.handleImpostorVote((ImpostorVote) packet, connection.getID());
         } else if (packet instanceof AnimationOver) {
@@ -105,4 +106,6 @@ public class PacketListenerServer extends Listener {
     public Semaphore getSemaphore() {
         return semaphore;
     }
+
+    //todo guys can log on 2x
 }

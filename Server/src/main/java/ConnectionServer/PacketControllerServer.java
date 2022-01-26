@@ -50,7 +50,6 @@ public class PacketControllerServer {
 
     public void handleStartGameRequest(int connectionID) {
         if (currentGame != null && currentGame.getPlayers().size() == LobbyState.PLAYER_LIMIT) {
-            currentGame.getPlayers().forEach(player -> System.out.println("player name: "+player.getNameTag()));
             ConnectionServer.sendTCP(new StartGameReturn(false), connectionID);//send back rejection
             return;//stops client from entering once game start
         }
@@ -59,14 +58,13 @@ public class PacketControllerServer {
             return;//stops client from pressing button 2x to crash the game
         }
         ConnectionServer.sendTCP(new StartGameReturn(clientOptional.isPresent()), connectionID);//send back confirmation
-        System.out.println("num of clients: "+ AppServer.getClients().size());
         clientOptional.ifPresent(client -> {
             LobbyState.prepareGame();
             currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
         });
     }
 
-    public void handlePosRequest(PosRequest packet, int connectionId) {
+    public void handleKeyBoardInput(PosRequest packet, int connectionId) {
         Optional<Player> optionalPlayer = ConnectionServer.getPlayerFromConnectionID(currentGame.getPlayers(), connectionId);
         if (optionalPlayer.isPresent()) {
             if (packet.isEmergencyMeetingKey()) {
@@ -92,16 +90,16 @@ public class PacketControllerServer {
         });
     }
 
-    public void handleVoiceChat(Sound soundPacket, Integer connectionID) {
-        List<Integer> connectionIDs = ConnectionServer.getClientConnectionIDs();
-        connectionIDs.remove(connectionID);
-        ConnectionServer.sendUDP(soundPacket, connectionIDs);
-    }
+//    public void handleVoiceChat(Sound soundPacket, Integer connectionID) {
+//        List<Integer> connectionIDs = ConnectionServer.getClientConnectionIDs();
+//        connectionIDs.remove(connectionID);
+//        ConnectionServer.sendUDP(soundPacket, connectionIDs);
+//    }
 
     public void handleImpostorVote(ImpostorVote packet, int connectionID) {
 //        EmergencyTableSystem emergencyTableSystem = currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class);
         MeetingState meetingState = currentGame.getStateManager().getState(MeetingState.class);
-        if (meetingState == null)return;
+        if (meetingState == null) return;
         Optional<Player> playerOptional = ConnectionServer.getPlayerFromConnectionID(connectionID);
         playerOptional.ifPresent(player -> meetingState.getVoteHandler().registerVote(player, packet.getVoteOption()));
 
@@ -110,10 +108,7 @@ public class PacketControllerServer {
 
     public void handleLogout(int id) {
         Optional<Client> playerOptional = ConnectionServer.getClientFromConnectionID(id);
-        playerOptional.ifPresent(client -> {
-            System.out.println("removing client "+ client.toString());
-            AppServer.getClients().remove(client);
-        });
+        playerOptional.ifPresent(client -> AppServer.getClients().remove(client));
     }
 
     public void handleScreenInfo(ScreenInfo packet) {
@@ -123,7 +118,7 @@ public class PacketControllerServer {
 
     public void handleChatMessageRequest(ChatMessageRequest packet, int connectionID) {
         Optional<Player> playerOptional = ConnectionServer.getPlayerFromConnectionID(connectionID);
-        if (playerOptional.isEmpty() || !playerOptional.get().getComponent(AliveComp.class).isAlive())return;
+        if (playerOptional.isEmpty() || !playerOptional.get().getComponent(AliveComp.class).isAlive()) return;
         String colour = playerOptional.get().getComponent(AnimationComp.class).getAnimation(AnimState.RIGHT).getFrames()[0];
         ConnectionServer.sendTCPToAllPlayers(new ChatMessageReturn(packet.message, playerOptional.get().getNameTag(), colour));
     }
@@ -137,7 +132,7 @@ public class PacketControllerServer {
 //    public void handleAnimationOver(AnimationOver packet, int connectionID) {
 ////        EmergencyTableSystem s = AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class);//todo NULL POINTER SYSTEM
 ////        //s is null
-////        //todo this gets called twice, because each player sends an anim over request
+////
 //////        System.out.println("E"+s);
 //////        System.out.println(AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class));
 ////        s.onAnimationOver();

@@ -1,7 +1,7 @@
 package TimerHandler;
 
 @FunctionalInterface
-public interface TimerFinish {
+public interface CountDownFinish {
     void execute();
 
 }

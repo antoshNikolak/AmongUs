@@ -1,5 +1,6 @@
 package State;
 
+import ClientScreenTracker.ScreenData;
 import Component.AliveComp;
 import Component.ImpostorComp;
 import Component.PosComp;
@@ -9,13 +10,14 @@ import DistanceFinder.DistanceFinder;
 import EndGameHandler.EndGameHandler;
 import Entity.Player;
 import Entity.Tile;
-import Packet.Sound.CloseRecordHandler;
-import Packet.Sound.OpenRecordHandler;
+import Packet.NestedPane.AddVotingPane;
 import Position.Pos;
 import StartUpServer.AppServer;
 import VoteHandler.VoteHandler;
 import System.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static StartUpServer.AppServer.currentGame;
@@ -51,7 +53,7 @@ public class MeetingState extends PlayingState {
         eraseDeadBodies();
         stopPlayerTasks();
         createWorld();
-        enableVoiceChat();
+//        enableVoiceChat();
     }
 
     private void eraseDeadBodies() {
@@ -72,7 +74,7 @@ public class MeetingState extends PlayingState {
     public void close() {
         Optional<Player> playerOptional = voteHandler.getPlayerWithMostVotes();
 //        mobilisePlayers();
-        disableVoiceChat();
+//        disableVoiceChat();
         if (playerOptional.isPresent()) {
             Player suspect = playerOptional.get();
             ejectPlayer(suspect);
@@ -132,19 +134,25 @@ public class MeetingState extends PlayingState {
 //    }
 
     private void broadcastVotingPanel() {
-        startUpVoteHandler();
+        this.voteHandler = new VoteHandler(this);//TODO CONTINUE HERE
+//        startUpVoteHandler();//todo wrong order here, game screen must be sent first
         for (Player player : currentGame.getPlayers()) {
             ConnectionServer.sendTCP(voteHandler.createVotingPane(), player.getConnectionID());
         }
+        this.voteHandler.startVotingTimer();
     }
 
-    private void enableVoiceChat() {
-        ConnectionServer.sendTCPToAllPlayers(new OpenRecordHandler());
-    }
 
-    private void disableVoiceChat() {
-        ConnectionServer.sendTCPToAllPlayers(new CloseRecordHandler());//migrate this as a system
-    }
+
+
+
+//    private void enableVoiceChat() {
+//        ConnectionServer.sendTCPToAllPlayers(new OpenRecordHandler());
+//    }
+//
+//    private void disableVoiceChat() {
+//        ConnectionServer.sendTCPToAllPlayers(new CloseRecordHandler());//migrate this as a system
+//    }
 
     public VoteHandler getVoteHandler() {
         return voteHandler;

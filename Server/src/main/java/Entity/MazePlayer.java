@@ -18,7 +18,7 @@ public class MazePlayer extends Entity {
         addComponent(posComp);
         addComponent(new HitBoxComp(posComp));
         addComponent(new VelComp());
-        addComponent(new TaskPlayerComp(taskState, connectionID));//todo what this mean
+        addComponent(new TaskPlayerComp(taskState, connectionID));
 
 
     }

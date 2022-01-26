@@ -7,7 +7,7 @@ import EntityClient.LocalPlayer;
 import Node.SpaceButton;
 import StartUp.AppClient;
 import TaskBar.TaskBarHandler;
-import VoiceChat.RecordHandler;
+//import VoiceChat.RecordHandler;
 import javafx.animation.AnimationTimer;
 import Screen.*;
 import javafx.application.Platform;
@@ -21,7 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Game {
     private final List<Entity> changingEntities = new CopyOnWriteArrayList<>();
     private LocalPlayer myPlayer;
-    private RecordHandler recordHandler = new RecordHandler();
+//    private RecordHandler recordHandler = new RecordHandler();
     private AnimationTimer animationTimer;
     private boolean running = true;
 
@@ -39,11 +39,6 @@ public class Game {
         startTimer();
     }
 
-//    public  void stop() {
-//        this.running = false;
-//        this.changingEntities.clear();
-//    }
-
     public void setRunning(boolean running) {
         this.running = running;
         if (!running) {
@@ -60,7 +55,6 @@ public class Game {
                     interpolate(ScreenManager.getScreen(GameScreen.class));
                     ScreenManager.getScreen(GameScreen.class).render();
                 } else {
-//                    stopGame();
                     this.stop();
                 }
 
@@ -104,11 +98,11 @@ public class Game {
         return changingEntities;
     }
 
-    public RecordHandler getRecordHandler() {
-        return recordHandler;
-    }
-
-    public void setRecordHandler(RecordHandler recordHandler) {
-        this.recordHandler = recordHandler;
-    }
+//    public RecordHandler getRecordHandler() {
+//        return recordHandler;
+//    }
+//
+//    public void setRecordHandler(RecordHandler recordHandler) {
+//        this.recordHandler = recordHandler;
+//    }
 }

@@ -2,22 +2,21 @@ package Entity;
 
 import Packet.EntityState.ExistingEntityState;
 import Packet.EntityState.NewAnimatedEntityState;
-import Packet.EntityState.NewEntityState;
 import Packet.EntityState.NewLineState;
 import Position.Pos;
-import StartUpServer.AppServer;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import Component.*;
+import Registry.RegistryHandler;
 
 public abstract class Entity {
 
     private final Map<Class<? extends Component>, Component> components = new HashMap<>();
 
     protected Entity() {
-        EntityRegistryServer.addEntity(this);
+        RegistryHandler.entityRegistryServer.addEntity(this);
 //        AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(this);
 //
 //        if (hasComponent(TaskPlayerComp.class)) {
@@ -30,14 +29,14 @@ public abstract class Entity {
     public ExistingEntityState adaptToEntityState() {
         PosComp posComp = getComponent(PosComp.class);
         AnimationComp animationComp = getComponent(AnimationComp.class);
-        int registrationID = EntityRegistryServer.getEntityID(this);
+        int registrationID = RegistryHandler.entityRegistryServer.getItemID(this);
         return new ExistingEntityState(registrationID, posComp.getPos(), animationComp.getCurrentAnimationState(), animationComp.getCurrentAnimation().getIndex());
     }
 
     public NewAnimatedEntityState adaptToNewAnimatedEntityState(boolean scrollable) {
         PosComp posComp = getComponent(PosComp.class);
         AnimationComp animationComp = getComponent(AnimationComp.class);
-        int registrationID = EntityRegistryServer.getEntityID(this);
+        int registrationID = RegistryHandler.entityRegistryServer.getItemID(this);
         NewAnimatedEntityState newAnimatedEntityState = new NewAnimatedEntityState(registrationID, posComp.getPos(), animationComp.adaptToAllNewAnimations(), animationComp.getCurrentAnimationState());
         newAnimatedEntityState.setScrollable(scrollable);
         return newAnimatedEntityState;//todo record in document and simplify

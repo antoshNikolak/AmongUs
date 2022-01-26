@@ -1,6 +1,6 @@
 package System;
 
-import EndGameHandler.EndGameHandler;
+import ClientScreenTracker.ScreenData;
 import Packet.Animation.AnimState;
 import Component.*;
 import ConnectionServer.ConnectionServer;
@@ -16,11 +16,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import Entity.DeadBody;
-import Entity.EntityRegistryServer;
 import Entity.*;
+import Packet.CountDown.CountDown;
+import Registry.RegistryHandler;
 import StartUpServer.AppServer;
 import State.GameState;
-import TimerHandler.TimerStarter;
+import TimerHandler.CounterStarter;
 
 import static StartUpServer.AppServer.currentGame;
 
@@ -91,7 +92,7 @@ public class ImposterActionsSystem extends BaseSystem {
 
     private void registerDeadBody(DeadBody deadBody) {
         currentGame.getStateManager().getTopState().getSystem(ReportBodySystem.class).getDeadBodies().add(deadBody);
-    }//todo this acc puts the real player, or his pos at least
+    }
 
     public void stopCrewMateTask(Player crewMate) {//MIGRATE TO PLAYER CLASS
         if (crewMate.getCurrentTask() != null) {
@@ -104,7 +105,7 @@ public class ImposterActionsSystem extends BaseSystem {
     private void startKillImposterCoolDown(Player imposter) {
         ImpostorComp impostorComp = imposter.getComponent(ImpostorComp.class);
         impostorComp.setAbleToKill(false);
-        TimerStarter.startTimer("KillCoolDownTimer", 40, () -> impostorComp.setAbleToKill(true), imposter.getConnectionID());
+        CounterStarter.startCountDown( 20, ScreenData.WIDTH- 60, ScreenData.HEIGHT - 50, 50, () -> impostorComp.setAbleToKill(true), imposter.getConnectionID());
     }
 
     public void setGhostAttributes(Player crewMate) {
@@ -118,14 +119,12 @@ public class ImposterActionsSystem extends BaseSystem {
     public void updateGhostForClients(Player ghost) {
         clearGhostsForAlivePlayers(ghost);
         sendNewGhostExistingGhosts(ghost);
-        System.out.println("Placing ghost in entity buffer");
-        System.out.println("number of existing ghosts: "+ getGhostConnectionIDs().size());
         currentGame.getEntityReturnBuffer().putEntity(ghost, getGhostConnectionIDs());
     }
 
     private void clearGhostsForAlivePlayers(Player ghost) {
         for (Player player: getAlivePlayers()) {
-            ConnectionServer.sendTCP(new ClearEntityReturn(EntityRegistryServer.getEntityID(ghost)), player.getConnectionID());
+            ConnectionServer.sendTCP(new ClearEntityReturn(RegistryHandler.entityRegistryServer.getItemID(ghost)), player.getConnectionID());
         }
     }
 

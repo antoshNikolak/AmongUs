@@ -8,8 +8,9 @@ import Packet.AddEntityReturn.AddEntityReturn;
 import Packet.AddEntityReturn.AddLocalEntityReturn;
 //import Packet.AddEntityReturn.AddChangingEntityReturn;
 import Packet.EntityState.NewAnimatedEntityState;
+import Packet.CountDown.CountDown;
 import PlayerColourManager.PlayerColourFactory;
-import TimerHandler.TimerStarter;
+import TimerHandler.CounterStarter;
 import World.World;
 import System.*;
 
@@ -29,13 +30,12 @@ public class LobbyState extends PlayingState {
         sendPlayerData(client);
         sendWorldData(client.getConnectionID());
         if (currentGame.getPlayers().size() == PLAYER_LIMIT) {
-            TimerStarter.startTimer("GameStartTimer", 5, () -> startGameState());
+            CounterStarter.startCountDown( 5, 200, 200, 50,  () -> startGameState());
         }
     }
 
     public static void startGameState() {
         synchronized (currentGame.getStateManager()) {
-//            currentGame.getStateManager().setCurrentStateWithClose(new GameState());
             currentGame.getStateManager().popState();
             currentGame.getStateManager().pushState(new GameState());
         }
@@ -105,5 +105,7 @@ public class LobbyState extends PlayingState {
     public PlayerColourFactory getPlayerColourFactory() {
         return playerColourFactory;
     }
+
+    //todo slower players can travel faster
 
 }

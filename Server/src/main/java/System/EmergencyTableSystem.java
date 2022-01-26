@@ -6,12 +6,9 @@ import ConnectionServer.ConnectionServer;
 import DistanceFinder.DistanceFinder;
 import EndGameHandler.EndGameHandler;
 import Entity.Player;
-//import Packet.NestedPane.AddVotingPane;
 import Packet.GameEnd.CrewWin;
 import Packet.GameEnd.GameEnd;
 import Packet.Position.PosRequest;
-import Packet.Sound.CloseRecordHandler;
-import Packet.Sound.OpenRecordHandler;
 import Position.Pos;
 import StartUpServer.AppServer;
 import State.State;
@@ -26,7 +23,7 @@ import static StartUpServer.AppServer.currentGame;
 //public class EmergencyTableSystem extends BaseSystem {
 //    private VoteHandler voteHandler;
 //
-//    //todo sudoku in lobby state
+//
 //
 //    public EmergencyTableSystem() {
 //    }

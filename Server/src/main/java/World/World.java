@@ -1,9 +1,9 @@
 package World;
 
 import Component.TaskComp;
-import Entity.EntityRegistryServer;
 import Entity.Tile;
 import Position.Pos;
+import Registry.RegistryHandler;
 import Utils.FileUtils;
 
 import java.util.*;
@@ -80,7 +80,7 @@ public class World {
 
     public List<Integer> getTileIDs() {
         return getTiles().stream().
-                map(EntityRegistryServer::getEntityID).
+                map(RegistryHandler.entityRegistryServer::getItemID).
                 collect(Collectors.toList());
     }
 

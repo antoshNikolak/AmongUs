@@ -3,9 +3,15 @@ package EndGameHandler;
 import Component.ImpostorComp;
 import ConnectionServer.ConnectionServer;
 import DataBase.DataBaseUtil;
+import Entity.Entity;
 import Entity.Player;
+import Packet.CountDown.CountDown;
+import Packet.CountDown.RemoveCountDown;
 import Packet.GameEnd.CrewWin;
 import Packet.GameEnd.ImpostorWin;
+import Registry.CountDownRegistryServer;
+import Registry.Registry;
+import Registry.RegistryHandler;
 import StartUpServer.AppServer;
 import State.GameState;
 import System.*;
@@ -14,8 +20,9 @@ public class EndGameHandler{
 
     public  void checkImpostorWin() {                                              //todo remember to stop all client server timers
         int numOfPlayerAlive = getPlayersAlive();
-        if (numOfPlayerAlive == 2) {
+        if (numOfPlayerAlive <= 2) {//todo change this to <=
             new Thread(()->{
+                stopAllTimers();
                 recordImpostorWin();
                 ConnectionServer.sendTCPToAllPlayers(new ImpostorWin());
                 AppServer.currentGame.stopGame();
@@ -45,29 +52,19 @@ public class EndGameHandler{
 
     public void handleCrewWin() {
         new Thread(()->{
+            stopAllTimers();
             ConnectionServer.sendTCPToAllPlayers(new CrewWin());
             AppServer.currentGame.stopGame();
         }).start();
     }
 
-//    public enum Winner{
-//        CREW_WIN{
-//            @Override
-//            public void handleWin() {
-//                ConnectionServer.sendTCPToAllPlayers(new CrewWin());
-//                AppServer.currentGame.stopGame();
-//            }
-//        },
-//        IMPOSTOR_WIN{
-//            @Override
-//            public void handleWin() {
-//                recordImpostorWin();
-//                ConnectionServer.sendTCPToAllPlayers(new ImpostorWin());
-//                AppServer.currentGame.stopGame();
-//            }
-//        };
-//
-//        public abstract void handleWin();
-//    }
+    private void stopAllTimers(){
+        CountDownRegistryServer registry = RegistryHandler.countDownRegistryServer;
+        for (CountDown countDown : registry.getCountDowns()){
+            registry.stopCountDown(countDown);
+            registry.removeEntity(countDown);
+        }
+//        registry.getCountDowns().forEach(registry::stopCountDown);
 
+    }
 }

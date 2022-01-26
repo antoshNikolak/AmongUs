@@ -7,9 +7,7 @@ import Packet.Registration.RegistrationConfirmation;
 import StartUpServer.AppServer;
 import Packet.UserData.UserData;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import Client.ClientOperator;
 
@@ -18,7 +16,8 @@ public final class AuthorizationServer implements ClientOperator {
 //    public static final Map<Client, UserData> clientUserDataMap = new HashMap<>();
 
     public static RegistrationConfirmation handleLogin(UserData userData) {
-        boolean isRegistered = doesAccountAlreadyExists(userData);
+//        boolean isRegistered = doesAccountAlreadyExists(userData);
+        boolean isRegistered = DataBaseUtil.doesUserExist(userData);
         return new RegistrationConfirmation(getLoginFailMessage(userData, isRegistered));
     }
 
@@ -34,6 +33,7 @@ public final class AuthorizationServer implements ClientOperator {
     }
 
     private static boolean isPlayerAlreadyInGame(UserData userData){
+        //this didnt work for cool squad and hi from ilyoncars laptop
         for (Client client: AppServer.getClients()){
             if (client.getUserData().equals(userData)){
                 return true;
@@ -43,8 +43,9 @@ public final class AuthorizationServer implements ClientOperator {
     }
 
     private static boolean doesAccountAlreadyExists(UserData userData) {
-        List<UserData> matchingAccounts = DataBaseUtil.getUserDataList(userData);
-        return matchingAccounts.size() == 1;
+        return DataBaseUtil.doesUserExist(userData);
+//        List<UserData> matchingAccounts = DataBaseUtil.doesUserExist(userData);
+//        return matchingAccounts.size() == 1;
     }
 
 

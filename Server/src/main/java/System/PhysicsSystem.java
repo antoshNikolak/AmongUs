@@ -32,7 +32,7 @@ public class PhysicsSystem extends BaseSystem {
 
 //    public static void updatePlayerPosition(PosRequest packet, Player player) {
 ////        List<Client> clientsPlaying = AppServer.currentGame.getClients();
-////        Optional<Client> clientOptional = ConnectionServer.getClientFromConnectionID(clientsPlaying, connectionId);//todo maybe put in super class
+////        Optional<Client> clientOptional = ConnectionServer.getClientFromConnectionID(clientsPlaying, connectionId);
 ////        clientOptional.ifPresent(client -> processPlayerMove(client.getPlayer(), packet));
 //        processPlayerMove(player, packet);
 //    }

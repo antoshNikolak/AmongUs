@@ -8,6 +8,7 @@ import Entity.Player;
 import Packet.AddEntityReturn.*;
 import Packet.Animation.NewAnimationReturn;
 import Packet.Camera.ScrollingEnableReturn;
+import Packet.CountDown.RemoveCountDown;
 import Packet.EntityState.ExistingEntityState;
 import Packet.EntityState.NewAnimatedEntityState;
 import Packet.EntityState.NewEntityState;
@@ -26,14 +27,10 @@ import Packet.Registration.LogoutRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
 import Packet.ScreenData.ScreenInfo;
-import Packet.Sound.CloseRecordHandler;
-import Packet.Sound.OpenRecordHandler;
 import Packet.Sound.Sound;
 import Packet.SudokuPacket.SudokuFailedReturn;
-import Packet.Timer.GameStartTimer;
-import Packet.Timer.KillCoolDownTimer;
-import Packet.Timer.Timer;
-import Packet.Timer.VotingTimer;
+import Packet.CountDown.CountDown;
+//import Packet.Timer.VotingCountDown;
 import Packet.Voting.*;
 import Position.Pos;
 import StartUpServer.AppServer;
@@ -210,10 +207,10 @@ public final class ConnectionServer {
         kryo.register(NewAnimationReturn[].class);
         kryo.register(NewAnimationReturn.class);
         kryo.register(AnimState.class);
-        kryo.register(Timer.class);
+        kryo.register(CountDown.class);
         kryo.register(ClearEntityReturn.class);
-        kryo.register(GameStartTimer.class);
-        kryo.register(KillCoolDownTimer.class);
+//        kryo.register(GameStartCountDown.class);
+//        kryo.register(KillCoolDownCountDown.class);
         kryo.register(ScrollingEnableReturn.class);
         kryo.register(NewAnimatedEntityState.class);
         kryo.register(AddLineReturn.class);
@@ -232,13 +229,11 @@ public final class ConnectionServer {
         kryo.register(AnimationDisplayReturn.class);
         kryo.register(NodeInfo.class);
         kryo.register(NodeType.class);
-        kryo.register(OpenRecordHandler.class);
-        kryo.register(CloseRecordHandler.class);
         kryo.register(Sound.class);
         kryo.register(AddVotingPane.class);
         kryo.register(byte[].class);
         kryo.register(ImpostorVote.class);
-        kryo.register(VotingTimer.class);
+//        kryo.register(VotingCountDown.class);
         kryo.register(ElectionReturn.class);
         kryo.register(DisplayVoteResults.class);
         kryo.register(HashMap.class);
@@ -258,6 +253,7 @@ public final class ConnectionServer {
         kryo.register(RequestLeaderBoard.class);
         kryo.register(TreeMap.class);
         kryo.register(LinkedHashMap.class);
+        kryo.register(RemoveCountDown.class);
 
     }
 

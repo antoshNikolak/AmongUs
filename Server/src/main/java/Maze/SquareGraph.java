@@ -95,7 +95,7 @@ public class SquareGraph {
 //    private boolean isEdgeConnectedToMSM(Set<Edge> MSM, Edge currentEdge) {
 //        for (Edge edge : MSM) {
 //            Vertex vertex1 = edge.getVertex1();
-//            Vertex vertex2 = edge.getVertex2();//todo forgot to use current edge
+//            Vertex vertex2 = edge.getVertex2();
 //            if (edge.hasConnectionToVertex(vertex1) || edge.hasConnectionToVertex(vertex2)) {
 //                return true;
 //            }
