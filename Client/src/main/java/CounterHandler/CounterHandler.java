@@ -87,28 +87,29 @@ public class CounterHandler {
     private static FixedIntervalScheduler createTimerTask(GameScreen gameScreen, AtomicInteger atomicInteger, Label text, TestObj testObj) {
         testObjs.add(testObj);
         System.out.println("creating new test obj: " + testObj);
-        return new FixedIntervalScheduler() {
-            @Override
-            public void run() {
-                testObj.setValue(testObj.getValue() - 1);
-                if (testObj.getValue() == 0) {//check count down finished
-                    cancel();//removes timer task from timer queue, invoke overridden method
-                }
-            }
-
-            @Override
-            public void cancel() {
-                System.out.println("----------------------------");
-                for (TestObj testObj1 : testObjs) {
-                    System.out.println("test obj in list: " + testObj1);
-
-                }
-                System.out.println("test obj removed: " + testObjs.remove(testObj));//remove from screen
-                System.out.println("test obj I have: " + testObj);
-                System.out.println("-----------------------------");
-                super.cancel();
-            }
-        };
+        return new CountDownScheduler(testObj, testObjs);
+//        return new  FixedIntervalScheduler() {
+//            @Override
+//            public void run() {
+//                testObj.setValue(testObj.getValue() - 1);
+//                if (testObj.getValue() == 0) {//check count down finished
+//                    cancel();//removes timer task from timer queue, invoke overridden method
+//                }
+//            }
+//
+//            @Override
+//            public void cancel() {
+//                System.out.println("----------------------------");
+//                for (TestObj testObj1 : testObjs) {
+//                    System.out.println("test obj in list: " + testObj1);
+//
+//                }
+//                System.out.println("test obj removed: " + testObjs.remove(testObj));//remove from screen
+//                System.out.println("test obj I have: " + testObj);
+//                System.out.println("-----------------------------");
+//                super.cancel();
+//            }
+//        };
 //        return new TimerTask() {
 //            @Override
 //            public void run() {
@@ -159,6 +160,37 @@ public class CounterHandler {
         text.setLayoutY(packet.y);
         text.setFont(Font.font(packet.size));
         return text;
+    }
+}
+
+class CountDownScheduler extends FixedIntervalScheduler{
+    private final TestObj testObj;
+    private final List<TestObj> testObjs;
+
+    public CountDownScheduler(TestObj testObj, List<TestObj> testObjs) {
+        this.testObj = testObj;
+        this.testObjs = testObjs;
+    }
+
+    @Override
+    public void run() {
+        testObj.setValue(testObj.getValue() - 1);
+        if (testObj.getValue() == 0) {//check count down finished
+            cancel();//removes timer task from timer queue, invoke overridden method
+        }
+    }
+
+    @Override
+    public void cancel() {
+        System.out.println("----------------------------");
+        for (TestObj testObj1 : testObjs) {
+            System.out.println("test obj in list: " + testObj1);
+
+        }
+        System.out.println("test obj removed: " + testObjs.remove(testObj));//remove from screen
+        System.out.println("test obj I have: " + testObj);
+        System.out.println("-----------------------------");
+        super.cancel();
     }
 }
 
