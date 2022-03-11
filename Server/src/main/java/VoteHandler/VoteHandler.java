@@ -24,17 +24,13 @@ import static StartUpServer.AppServer.currentGame;
 public class VoteHandler {
 
     private final Map<String, VoteOption> playerVoteMap = new HashMap<>();
-//    private final EmergencyTableSystem emergencyTableSystem;
-    private final MeetingState meetingState;
+//    private final MeetingState meetingState;
 
-
-//    public VoteHandler(EmergencyTableSystem emergencyTableSystem) {
-//        this.emergencyTableSystem = emergencyTableSystem;
+//    public VoteHandler(MeetingState meetingState) {
+//        this.meetingState = meetingState;
 //    }
 
-    public VoteHandler(MeetingState meetingState) {
-        this.meetingState = meetingState;
-    }
+
 
 
     private Optional<VoteOption> getVoteOptionWithMostVotes() {
@@ -45,7 +41,7 @@ public class VoteHandler {
         if (isDraw(playerVotes, winner, highestVotes)){
             return Optional.empty();//return empty if draw
         }
-        return Optional.of(Objects.requireNonNull(winner));//return most popular candidate
+        return Optional.ofNullable(winner);//return most popular candidate
     }
 
     private boolean isDraw(Map<VoteOption, Integer> playerVotes, VoteOption winner, int highestVotes){
@@ -84,21 +80,6 @@ public class VoteHandler {
         }
         return suspectVoteCount;
     }
-
-    private VoteOption getKeyWithLargestEntryValues(Map<Integer, VoteOption> playerVotes) {
-        return playerVotes.get(Collections.max(playerVotes.keySet()));
-//        VoteOption mostVotedPlayer = null;
-//        int votesForPlayer = 0;
-//        for (Map.Entry<VoteOption, Integer> playerVote : playerVotes.entrySet()) {
-////            if (playerVote.getValue() > votesForPlayer && playerVote.getKey().getComponent(AliveComp.class).isAlive()) {
-//            if (playerVote.getValue() > votesForPlayer) {
-//                votesForPlayer = playerVote.getValue();
-//                mostVotedPlayer = playerVote.getKey();
-//            }
-//        }
-//        return mostVotedPlayer;
-    }
-
 
     public void startVotingTimer() {
         CounterStarter.startCountDown(30, 450, 350, 55,  () -> {//time for players to vote
@@ -157,14 +138,14 @@ public class VoteHandler {
 
     public void registerVote(Player voter, VoteOption suspect) {
         String animID = getPlayerAnimationID(voter);
-//        if (!animID.contains("ghost") && !getPlayerAnimationID(suspect.getColour()).contains("ghost")) {
         if (!animID.contains("ghost")){
             playerVoteMap.put(animID, suspect);
-        }//todo stop accepting these once voting time is over
+        }
     }
 
     public Optional<Player> getPlayerWithMostVotes() {
         Optional <VoteOption> voteOption = getVoteOptionWithMostVotes();
         return voteOption.isEmpty() ? Optional.empty() : getPlayerFromVoteOption(voteOption.get());
+        //if no option with leading votes return empty, else return the most popular player
     }
 }

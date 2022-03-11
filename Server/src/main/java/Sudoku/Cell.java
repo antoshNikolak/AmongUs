@@ -15,6 +15,7 @@ public class Cell {
     }
 
     public void replenishValuesAvailable(){
+        valuesAvailable.clear();
         for (int i = 1; i <10 ; i++) {
             valuesAvailable.add(i);
         }

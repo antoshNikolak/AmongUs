@@ -4,14 +4,14 @@ import Component.*;
 import Entity.Entity;
 import Entity.Player;
 import Entity.*;
-import Packet.Position.PosRequest;
+import Packet.Position.InputRequest;
 import StartUpServer.AppServer;
 import State.MazeTaskState;
 
 import java.util.List;
 
 public class PhysicsSystem extends BaseSystem {
-    private List<Entity> entitiesToCollideWith;
+    private final List<Entity> entitiesToCollideWith;
 
     public PhysicsSystem(List<Entity> entitiesToCollideWith) {
         this.entitiesToCollideWith = entitiesToCollideWith;
@@ -23,30 +23,11 @@ public class PhysicsSystem extends BaseSystem {
     }
 
     @Override
-    public void handleAction(Player player, PosRequest packet) {
-        Entity playerForm = getPlayersMovingForm(player);
-        applyPacketToPlayer(playerForm, packet);
-        handleClientReturn(playerForm);
+    public void handleAction(Player player, InputRequest packet) {
+        Entity playerForm = getPlayersMovingForm(player);//get entity the player wants to move
+        applyPacketToPlayer(playerForm, packet);//shift the player's position, based on input
+        handleClientReturn(playerForm);//return players new position
     }
-
-
-//    public static void updatePlayerPosition(PosRequest packet, Player player) {
-////        List<Client> clientsPlaying = AppServer.currentGame.getClients();
-////        Optional<Client> clientOptional = ConnectionServer.getClientFromConnectionID(clientsPlaying, connectionId);
-////        clientOptional.ifPresent(client -> processPlayerMove(client.getPlayer(), packet));
-//        processPlayerMove(player, packet);
-//    }
-
-//    public static Optional<? extends Entity> getPlayerOptional(int connectionId) {
-//        return ConnectionServer.getPlayerFromConnectionID(AppServer.currentGame.getPlayers(), connectionId);
-//    }
-
-
-//    public void processPlayerMove(Player player, PosRequest packet) {
-//        Entity playerForm = getPlayersMovingForm(player);
-//        applyPacketToPlayer(playerForm, packet);
-//        handleClientReturn(playerForm);
-//    }
 
     private Entity getPlayersMovingForm(Player player) {
         if (player.getCurrentTask() != null) {
@@ -57,26 +38,28 @@ public class PhysicsSystem extends BaseSystem {
         return player;
     }
 
-    private void handleClientReturn(Entity player) {//todo migrate
-        if (player.hasComponent(TaskPlayerComp.class)) {
-            AppServer.currentGame.getEntityReturnBuffer().putEntity(player, player.getComponent(TaskPlayerComp.class).getConnectionID());
-        } else if (player.getComponent(AliveComp.class).isAlive()) {
-            AppServer.currentGame.getEntityReturnBuffer().putEntity(player);
+    private void handleClientReturn(Entity entity) {
+        if (entity.hasComponent(TaskPlayerComp.class)) {//player is playing a task
+            AppServer.currentGame.getEntityReturnBuffer().putEntity(entity, entity.getComponent(TaskPlayerComp.class).getConnectionID());
+            //add entity the client is controlling within the task
+        } else if (entity.getComponent(AliveComp.class).isAlive()) {
+            AppServer.currentGame.getEntityReturnBuffer().putEntity(entity);//add main game sprite
         } else {
-            AppServer.currentGame.getEntityReturnBuffer().putEntity(player,
+            AppServer.currentGame.getEntityReturnBuffer().putEntity(entity,
                     AppServer.currentGame.getStateManager().getTopState().getSystem(ImposterActionsSystem.class).getGhostConnectionIDs());
+            //add ghost, only to be sent to other ghosts
         }
     }
 
 
-    private void applyPacketToPlayer(Entity player, PosRequest packet) {
+    private void applyPacketToPlayer(Entity player, InputRequest packet) {
         PosComp posComp = player.getComponent(PosComp.class);
         VelComp velComp = player.getComponent(VelComp.class);
         AliveComp aliveComp = player.getComponent(AliveComp.class);
         AnimationComp animationComp = player.getComponent(AnimationComp.class);
-        applyPacketToPos(posComp, velComp, packet);
-        handleCollisions(player, velComp, posComp);
-        TextureSystem.handlePlayerAnimationState(velComp, animationComp, aliveComp);
+        applyPacketToPos(posComp, velComp, packet);//update player position comp
+        handleCollisions(player, velComp, posComp);//stop player moving through tile
+        TextureSystem.handlePlayerAnimationState(velComp, animationComp, aliveComp);//change players texture
 
     }
 
@@ -88,7 +71,7 @@ public class PhysicsSystem extends BaseSystem {
         }
     }
 
-    private static void applyPacketToPos(PosComp posComp, VelComp velComp, PosRequest packet) {
+    private static void applyPacketToPos(PosComp posComp, VelComp velComp, InputRequest packet) {
         velComp.setPreviousVelX(velComp.getVelX());
         velComp.setPreviousVelY(velComp.getVelY());
         velComp.setVelX(0);
@@ -116,18 +99,18 @@ public class PhysicsSystem extends BaseSystem {
     private void handleCollisionX(VelComp velComp, PosComp posComp, HitBoxComp hitBox) {
         hitBox.setX(posComp.getPos().getX());
         entitiesToCollideWith.stream().
-                filter(this::canEntityCollideWithPlayer).
+                filter(this::canEntityCollideWithPlayer).//check player has a hit box
                 forEach(entity -> checkCollisionsX(entity.getComponent(HitBoxComp.class), hitBox, posComp, velComp));
     }
 
     private void checkCollisionsX(HitBoxComp bumperHitBox, HitBoxComp hitBox, PosComp posComp, VelComp velComp) {
-        if (bumperHitBox.intersect(hitBox)) {
-            hitBox.incrementX(-velComp.getVelX());
+        if (bumperHitBox.intersect(hitBox)) {//if collision has occurred
+            hitBox.incrementX(-velComp.getVelX());//take a step back
             while (!bumperHitBox.intersect(hitBox)) {
                 hitBox.incrementX(Math.signum(velComp.getVelX()));
-            }
-            hitBox.incrementX(-Math.signum(velComp.getVelX()));
-            posComp.getPos().setX(hitBox.getX());
+            }//move forward step by step until collision has happened
+            hitBox.incrementX(-Math.signum(velComp.getVelX()));//take step back
+            posComp.getPos().setX(hitBox.getX());//update player position
         }
     }
 

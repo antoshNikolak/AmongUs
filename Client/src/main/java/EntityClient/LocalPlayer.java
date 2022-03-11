@@ -4,13 +4,13 @@ import Camera.Camera;
 import ConnectionClient.ConnectionClient;
 import KeyManager.KeyManager;
 import Packet.EntityState.NewAnimatedEntityState;
-import Packet.Position.PosRequest;
+import Packet.Position.InputRequest;
 import Screen.GameScreen;
 import Screen.ScreenManager;
 import javafx.scene.canvas.GraphicsContext;
 
 public class LocalPlayer extends Entity {
-    private PosRequest prevRequest;
+    private InputRequest prevRequest;
     private boolean scrollingEnabled = false;
 
     public LocalPlayer(NewAnimatedEntityState entityState) {
@@ -18,45 +18,45 @@ public class LocalPlayer extends Entity {
     }
 
     public void sendInput() {
-        PosRequest request = createPosRequest();
+        InputRequest request = createPosRequest();
         if (hasUserInput(request) || hasMovementInputChanged(request)) {
             ConnectionClient.sendUDP(request);
         }
         this.prevRequest = request;
     }
 
-    private boolean hasMovementInputChanged(PosRequest posRequest) {
+    private boolean hasMovementInputChanged(InputRequest inputRequest) {
         if (prevRequest == null) return  true;
-        return !(posRequest.isUp() == prevRequest.isUp() &&
-                posRequest.isRight() == prevRequest.isRight() &&
-                posRequest.isDown() == prevRequest.isDown() &&
-                posRequest.isLeft() == prevRequest.isLeft());
+        return !(inputRequest.isUp() == prevRequest.isUp() &&
+                inputRequest.isRight() == prevRequest.isRight() &&
+                inputRequest.isDown() == prevRequest.isDown() &&
+                inputRequest.isLeft() == prevRequest.isLeft());
     }
 
-    private PosRequest createPosRequest() {
-        PosRequest request = new PosRequest();
+    private InputRequest createPosRequest() {
+        InputRequest request = new InputRequest();
         checkHorizontalMovement(request);
         checkVerticalMovement(request);
         checkSpecialMoves(request);
         return request;
     }
 
-    private void checkSpecialMoves(PosRequest posRequest){
+    private void checkSpecialMoves(InputRequest inputRequest){
         if (KeyManager.isKillKeyPressed()){
-            posRequest.setKillKey(true);
+            inputRequest.setKillKey(true);
         }
         if (KeyManager.isTaskKeyPressed()){
-            posRequest.setTaskKey(true);
+            inputRequest.setTaskKey(true);
         }
         if (KeyManager.isReportKeyPressed()){
-            posRequest.setReportKey(true);
+            inputRequest.setReportKey(true);
         }
         if (KeyManager.isEmergencyMeetingKeyPressed()){
-            posRequest.setEmergencyMeetingKey(true);
+            inputRequest.setEmergencyMeetingKey(true);
         }
     }
 
-    private void checkVerticalMovement(PosRequest request) {
+    private void checkVerticalMovement(InputRequest request) {
         if (KeyManager.isUpKeyPressed()) {
             request.setUp(true);
         } else if (KeyManager.isDownKeyPressed()) {
@@ -64,7 +64,7 @@ public class LocalPlayer extends Entity {
         }
     }
 
-    private void checkHorizontalMovement(PosRequest request) {
+    private void checkHorizontalMovement(InputRequest request) {
         if (KeyManager.isRightKeyPressed()) {
             request.setRight(true);
         } else if (KeyManager.isLeftKeyPressed()) {
@@ -72,7 +72,7 @@ public class LocalPlayer extends Entity {
         }
     }
 
-    private boolean hasUserInput(PosRequest request) {
+    private boolean hasUserInput(InputRequest request) {
         return request.isDown() || request.isLeft() ||
                 request.isUp() || request.isRight() ||
                 request.isKillKey() || request.isTaskKey()||

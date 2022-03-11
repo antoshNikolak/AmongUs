@@ -9,11 +9,11 @@ import java.util.*;
 public class DistanceFinder {
 
     public static <T extends Entity, S extends Entity> Optional<S> getClosestEntity(T e1, Collection<S> e2List, int range) {
-        PriorityQueue<EntityDistance<S, T>> entities = getEntityDistanceQueue(e1, e2List);
-        if (entities.peek() != null && entities.peek().getDistance() <= range) {
-            return Optional.of(entities.peek().getEntity());
+        PriorityQueue<EntityDistance<S, T>> entities = getEntityDistanceQueue(e1, e2List);//create priority queue to sort entities closest to furthest
+        if (entities.peek() != null && entities.peek().getDistance() <= range) {//check closest entity is in range
+            return Optional.of(entities.peek().getEntity());//return optional of entity with shortest distance
         } else {
-            return Optional.empty();
+            return Optional.empty();//return empty
         }
     }
 

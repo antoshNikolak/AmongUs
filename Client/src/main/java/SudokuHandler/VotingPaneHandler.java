@@ -62,16 +62,16 @@ public class VotingPaneHandler {
 
 
     private Map<Button, List<String>> createButtonVotesMap(Map<String, VoteOption> playerVoteMap) {
-        //player vote map show what player with what texture voted for what vote option
+        //create player vote map show what player with what texture voted for what vote option
         Map<Button, List<String>> buttonVoterTexturesMap = new HashMap<>();
         for (Map.Entry<String, VoteOption> playerVote : playerVoteMap.entrySet()) {
             String voter = playerVote.getKey();
             VoteOption suspect = playerVote.getValue();
             Button suspectButton = suspectButtonMap.get(suspect);
-            //add entry
-            if (buttonVoterTexturesMap.containsKey(suspectButton)) {
+            if (buttonVoterTexturesMap.containsKey(suspectButton)) {//check if entry exists
                 buttonVoterTexturesMap.get(suspectButton).add(voter);
-            } else {
+                //update existing entry
+            } else {//add new entry
                 List<String> textureList = new ArrayList<>();
                 textureList.add(voter);
                 buttonVoterTexturesMap.put(suspectButton, textureList);
@@ -88,74 +88,8 @@ public class VotingPaneHandler {
     private void createChattingScreen(AddVotingPane packet) {
         this.chatHandler = new ChatHandler();
         this.chatHandler.start(packet);
-//        this.chattingScreen = NestedScreenHandler.createGameScreen(packet);
-//
-//        VBox content = createChatContent(packet);
-//        this.scrollingPane = createScrollPane(packet, content);
-//        this.chattingScreen.getPane().getChildren().add(createVotingScreenButton(packet));
-//
-//        TextArea input = createTextArea(scrollingPane);
-//
-////        TextArea input = new TextArea("Enter input text");
-////        this.chattingScreen.getPane().getChildren().add(input);
-////        input.setLayoutX(5);
-////        input.setLayoutY(scrollingPane.getPrefHeight() + 8);
-////        input.setPrefWidth(500);
-////        input.setPrefHeight(80);
-//        Button inputSender = new Button("send chat");
-//        this.chattingScreen.getPane().getChildren().add(inputSender);
-//        inputSender.setLayoutX(input.getLayoutX() + input.getPrefWidth() + 5);
-//        inputSender.setLayoutY(input.getLayoutY() + input.getPrefHeight() - input.getPrefHeight()/2);
-//        inputSender.setOnAction(e ->{
-//            ConnectionClient.sendTCP(new ChatMessageRequest(input.getText()));
-//            input.clear();
-//        });
-
-//        this.chattingScreen.getPane().getChildren().add(scrollingPane);
-//        this.chattingScreen.getPane().getChildren().add(createBlueSideBackGround(packet));
-//        this.chattingScreen.getPane().getChildren().add(content);
-//        this.chattingScreen.getPane().getChildren().add(createScrollBar(packet, content));
-//        this.chattingScreen.getPane().getChildren().add(createVotingScreenButton(packet));
     }
 
-//    private TextArea createTextArea(Pane scrollingPane){
-//        TextArea input = new TextArea("Enter input text");
-//        this.chattingScreen.getPane().getChildren().add(input);
-//        input.setLayoutX(5);
-//        input.setLayoutY(scrollingPane.getPrefHeight() + 8);
-//        input.setPrefWidth(500);
-//        input.setPrefHeight(80);
-//        return input;
-//    }
-
-
-//    public void receiveChatMessage(String message){
-//        Rectangle rectangle = new Rectangle();
-//        rectangle.setFill(null);
-//        rectangle.setStroke(Color.GRAY);
-//        Text text = new Text(message);
-//        StackPane stackPane = new StackPane();
-//        stackPane.getChildren().addAll(rectangle, text);
-//        scrollingPane.getChildren().add(stackPane);
-//
-//    }
-
-//    private Pane create
-
-//    private Pane createScrollPane(AddVotingPane packet, VBox content){
-//        Pane scrollingPane = NestedScreenHandler.createPane(packet);
-//        scrollingPane.setPrefHeight(packet.paneHeight - 100);
-//        this.chattingScreen.getPane().getChildren().add(scrollingPane);
-//        clipChildren(scrollingPane);
-//        scrollingPane.getChildren().add(content);
-//        scrollingPane.getChildren().add(createScrollBar(packet, content));
-//        return scrollingPane;
-//    }
-
-//    private void clipChildren(Pane pane){
-//        Rectangle clip = new Rectangle(pane.getPrefWidth(), pane.getPrefHeight());
-//        pane.setClip(clip);
-//    }
 
     private Rectangle createBlueSideBackGround(AddVotingPane packet) {
         Rectangle rectangle = new Rectangle(100, packet.paneHeight);
@@ -164,44 +98,6 @@ public class VotingPaneHandler {
         rectangle.setFill(Color.BLUE);
         return rectangle;
     }
-
-//    private VBox createChatContent(AddVotingPane packet){
-//        VBox vBox = new VBox();
-////        vBox.setPrefHeight(packet.getPaneHeight()-100);
-//        vBox.setPrefHeight(packet.paneHeight);
-//        vBox.setPrefWidth(packet.paneWidth-100);
-//        for (int i = 0; i < 10; i++) {
-//            vBox.getChildren().add(new ImageView(TextureManager.getTexture("grey-tile")));
-//        };
-//        return vBox;
-//    }
-
-//    private Button createVotingScreenButton(AddVotingPane packet) {
-//        Button button = new Button("vote");
-//        button.setLayoutY(packet.paneHeight/2d);
-//        button.setLayoutX(packet.paneWidth - 50);
-//        button.setOnAction(e -> {
-//            ScreenManager.getScreen(GameScreen.class).setNestedScreen(votingScreen);//change to voting screen
-//
-//        });
-//        return button;
-//    }
-
-//    private ScrollBar createScrollBar(AddVotingPane packet, VBox content) {
-//        scrollBar = new ScrollBar();
-//        scrollBar.setPrefHeight(packet.paneHeight);
-//        scrollBar.setOrientation(Orientation.VERTICAL);
-//        scrollBar.setMin(0);
-//        scrollBar.setMax(50);//this value means how much of an offset it can create     //todo make this value change to the height of stuff there is under the screen
-//
-//        scrollBar.setValue(0);
-//        scrollBar.valueProperty().addListener(new ChangeListener<Number>() {
-//            public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
-//                content.setLayoutY(-new_val.doubleValue());
-//            }
-//        });
-//        return scrollBar;
-//    }
 
     private void createVotingScreen(AddVotingPane packet) {
         this.votingScreen = NestedScreenHandler.createGameScreen(packet);

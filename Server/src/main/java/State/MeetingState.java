@@ -13,7 +13,7 @@ import Entity.Tile;
 import Packet.NestedPane.AddVotingPane;
 import Position.Pos;
 import StartUpServer.AppServer;
-import VoteHandler.VoteHandler;
+import VoteHandler.*;
 import System.*;
 
 import java.util.HashMap;
@@ -29,14 +29,12 @@ public class MeetingState extends PlayingState {
 
     public static void checkStateValid(Player player) {
         PlayingState gameState = currentGame.getStateManager().getState(GameState.class);
-        if (gameState == null) return;
-        if (currentGame.getStateManager().hasState(MeetingState.class)) return;
-//        if (state.hasSystem(getClass())) return;
-//        if (this == currentGame.getStateManager().getCurrentState())return false;
+        if (gameState == null) return;//state can only be pushed on top of a game state
+        if (currentGame.getStateManager().hasState(MeetingState.class)) return;//ensure players arent already in a meeting
         Tile mainTable = gameState.getWorld().getMainTable();
-        double distance = DistanceFinder.getDistanceBetweenEntities(player, mainTable).getDistance();
-        if (distance <= 250 && player.getComponent(AliveComp.class).isAlive()) {
-            currentGame.getStateManager().pushState(new MeetingState());
+        double distance = DistanceFinder.getDistanceBetweenEntities(player, mainTable).getDistance();//find distance between player and meeting table
+        if (distance <= 250 && player.getComponent(AliveComp.class).isAlive()) {//check player in range and isn't a ghost
+            currentGame.getStateManager().pushState(new MeetingState());//push new state
         }
     }
 
@@ -47,13 +45,10 @@ public class MeetingState extends PlayingState {
 
     @Override
     public void init() {
-//        currentGame.getStateManager().getCurrentState().addSystem(this);
-        teleportPlayersToEmergencyTable();
-//        immobilisePlayers();
-        eraseDeadBodies();
-        stopPlayerTasks();
-        createWorld();
-//        enableVoiceChat();
+        teleportPlayersToEmergencyTable();//gather players around meeting table
+        eraseDeadBodies();//remove dead bodies from map
+        stopPlayerTasks();//force stop any tasks the players are in
+        createWorld();//broadcasts voting panel
     }
 
     private void eraseDeadBodies() {
@@ -66,19 +61,17 @@ public class MeetingState extends PlayingState {
 
 
     private void startUpVoteHandler() {
-        this.voteHandler = new VoteHandler(this);
+        this.voteHandler = new VoteHandler();
         this.voteHandler.startVotingTimer();
     }
 
     @Override
     public void close() {
         Optional<Player> playerOptional = voteHandler.getPlayerWithMostVotes();
-//        mobilisePlayers();
-//        disableVoiceChat();
         if (playerOptional.isPresent()) {
             Player suspect = playerOptional.get();
-            ejectPlayer(suspect);
-            checkEndGame(suspect);
+            ejectPlayer(suspect);//turn player with most votes into a ghost
+            checkEndGame(suspect);//check in-case someone has won the game
         }
     }
 
@@ -86,22 +79,10 @@ public class MeetingState extends PlayingState {
         EndGameHandler endGameHandler = currentGame.getStateManager().getState(GameState.class).getEndGameHandler();
         if (suspect.hasComponent(ImpostorComp.class)) {
             endGameHandler.handleCrewWin();
-        }else {
+        } else {
             endGameHandler.checkImpostorWin();
         }
     }
-
-//    public void onVoteTimerOver() {
-//        Optional<Player> playerOptional = voteHandler.getPlayerWithMostVotes();
-//        playerOptional.ifPresent(this::ejectPlayer);
-//        mobilisePlayers();
-//        disableVoiceChat();
-////        removeThisFromSystems();
-//    }
-
-//    public void removeThisFromSystems() {//todo talk about concurrent modification
-//        currentGame.getStateManager().getCurrentState().removeSystem(getClass());
-//    }
 
     private void ejectPlayer(Player player) {
         ImposterActionsSystem killHandler = currentGame.getStateManager().getState(GameState.class).getSystem(ImposterActionsSystem.class);//null here
@@ -118,50 +99,20 @@ public class MeetingState extends PlayingState {
         }
     }
 
-//    private void immobilisePlayers() {
-//        currentGame.getStateManager().getCurrentState().removeSystem(PhysicsSystem.class);
-//    }
-
-//    private void mobilisePlayers() {
-//        State currentState = currentGame.getStateManager().getCurrentState();
-//        currentState.addSystem(new PhysicsSystem(currentState.getEntities()));
-//    }
-
-//    private void broadcastDeadBodyReportedAnimation() {
-//        for (Player player : currentGame.getPlayers()) {
-//            ConnectionServer.sendTCP(AnimationFactory.createAnimationDisplayReturn("dead-body-reported"), player.getConnectionID());
-//        }
-//    }
-
     private void broadcastVotingPanel() {
-        this.voteHandler = new VoteHandler(this);//TODO CONTINUE HERE
-//        startUpVoteHandler();//todo wrong order here, game screen must be sent first
+        this.voteHandler = new VoteHandler();
         for (Player player : currentGame.getPlayers()) {
             ConnectionServer.sendTCP(voteHandler.createVotingPane(), player.getConnectionID());
         }
         this.voteHandler.startVotingTimer();
     }
 
-
-
-
-
-//    private void enableVoiceChat() {
-//        ConnectionServer.sendTCPToAllPlayers(new OpenRecordHandler());
-//    }
-//
-//    private void disableVoiceChat() {
-//        ConnectionServer.sendTCPToAllPlayers(new CloseRecordHandler());//migrate this as a system
-//    }
-
     public VoteHandler getVoteHandler() {
         return voteHandler;
     }
 
     @Override
-    protected void startSystems() {
-
-    }
+    protected void startSystems() {}
 
 
 }

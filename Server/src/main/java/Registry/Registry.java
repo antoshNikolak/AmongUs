@@ -8,26 +8,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Registry<T> {
 
-    protected final Map<Integer, T> IDMap = new ConcurrentHashMap<>();
+    protected final Map<Integer, T> IDMap = new ConcurrentHashMap<>();//maps ID to item
+
 
     public void addEntity(T entity) {
         IDMap.put(getFreeID(), entity);
     }
 
-//    public void unregisterEntity(int id) {
-//        IDMap.remove(id);
-//    }
-
     public void removeEntity(int id) {
         IDMap.remove(id);
-//        unregisterEntity(entityID);//remove registration ID
-        //removed fully if overriden
-
-////        synchronized (AppServer.currentGame.getEntityReturnBuffer()) {
-//            AppServer.currentGame.getEntityReturnBuffer().removeEntity(entity);//remove from buffer
-//            unregisterEntity(entityID);//remove registration ID
-////        }
-//        ConnectionServer.sendTCPToAllPlayers(new ClearEntityReturn(entityID));//removes entity on the client side
     }
 
 
@@ -45,14 +34,6 @@ public class Registry<T> {
         IDMap.values().forEach(this::removeEntity);
     }
 
-//    public  void removeEntities(List<Integer> entityIDs){
-//        ConnectionServer.sendTCPToAllPlayers(new ClearEntityReturn(entityIDs));
-//        for (Integer ID: entityIDs) {
-//            unregisterEntity(ID);
-//        }
-//    }
-
-
     public T getItem(int id) {
         return IDMap.get(id);
     }
@@ -63,7 +44,7 @@ public class Registry<T> {
 
     public int getFreeID() {
         int counter = 0;
-        while (true) {
+        while (true) {//linear search to find free ID key.
             if (!IDMap.containsKey(counter)) {
                 return counter;
             }

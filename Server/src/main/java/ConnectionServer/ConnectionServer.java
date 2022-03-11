@@ -136,7 +136,7 @@ public final class ConnectionServer {
     private static void startConnection() {
         try {
             server.start();
-            server.bind(49159, 65520);
+            server.bind(49158, 65521);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -193,7 +193,7 @@ public final class ConnectionServer {
         kryo.register(StartGameRequest.class);
         kryo.register(StartGameReturn.class);
         kryo.register(StateReturn.class);
-        kryo.register(PosRequest.class);
+        kryo.register(InputRequest.class);
         kryo.register(Pos.class);
 //        kryo.register(AddStationaryEntityReturn.class);
         kryo.register(ExistingEntityState.class);

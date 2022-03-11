@@ -99,7 +99,7 @@ public class PacketListenerClient extends Listener {
         }else if (object instanceof RoleNotify){
             packetController.handleRoleNotify((RoleNotify)object);
         }else if (object instanceof GameEnd){
-            packetController.handleGameEnd((GameEnd)object);
+//            packetController.handleGameEnd((GameEnd)object);
         }else if (object instanceof CrewWin){
             packetController.handleCrewWin();
         }else if (object instanceof ImpostorWin){

@@ -6,7 +6,7 @@ import EndGameHandler.EndGameHandler;
 import Packet.Animation.AnimationOver;
 import Packet.GameStart.StartGameRequest;
 import Packet.LeaderBoard.RequestLeaderBoard;
-import Packet.Position.PosRequest;
+import Packet.Position.InputRequest;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.LogoutRequest;
 import Packet.Registration.SignupRequest;
@@ -87,9 +87,9 @@ public class PacketListenerServer extends Listener {
             packetController.handleLeaderBoardRequest(connection.getID());
         }
         if (AppServer.currentGame == null) return;
-        if (packet instanceof PosRequest) {
+        if (packet instanceof InputRequest) {
             ;
-            packetController.handleKeyBoardInput((PosRequest) packet, connection.getID());
+            packetController.handleKeyBoardInput((InputRequest) packet, connection.getID());
         } else if (packet instanceof VerifySudokuRequest) {
             packetController.handleVerifySudokuRequest((VerifySudokuRequest) packet, connection.getID());
         } else if (packet instanceof Sound) {

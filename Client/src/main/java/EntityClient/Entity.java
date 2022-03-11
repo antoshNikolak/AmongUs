@@ -31,8 +31,8 @@ public class Entity {
         this.nameTag = newEntityState.getNameTag();//null maybe>
         try {
             AppClient.currentGame.getEntites().add(this);
-        }catch (NullPointerException e){
-            System.out.println("problem adding Entity: "+ newEntityState.getCurrentState());
+        } catch (NullPointerException e) {
+            System.out.println("problem adding Entity: " + newEntityState.getCurrentState());
             System.out.println(AppClient.currentGame);
             System.out.println(AppClient.currentGame.getEntites());
             System.out.println(this);
@@ -43,41 +43,41 @@ public class Entity {
     public void render(GraphicsContext gc, Camera camera) {
         Image image = TextureManager.getTexture(animationManager.getCurrentFrame());
         gc.drawImage(image, pos.getX() - camera.getOffsetX(), pos.getY() - camera.getOffsetY());
-        if (nameTag != null){
-            gc.strokeText(nameTag, pos.getX() - camera.getOffsetX(), pos.getY()-10 - camera.getOffsetY());
+        if (nameTag != null) {
+            gc.strokeText(nameTag, pos.getX() - camera.getOffsetX(), pos.getY() - 10 - camera.getOffsetY());
         }
     }
 
     public void render(GraphicsContext gc) {
         Image image = TextureManager.getTexture(animationManager.getCurrentFrame());
         gc.drawImage(image, pos.getX(), pos.getY());
-        if (nameTag != null){
-            gc.strokeText(nameTag, pos.getX(), pos.getY()-10);
+        if (nameTag != null) {
+            gc.strokeText(nameTag, pos.getX(), pos.getY() - 10);
         }
 
     }
 
     public void interpolate() {
-        if (positionReturns.size() != 2) return;
         Pos oldPos;
         Pos newPos;
         synchronized (this) {
-            oldPos = positionReturns.get(0);
-            newPos = positionReturns.get(1);
+            if (positionReturns.size() != 2) return;
+            oldPos = positionReturns.get(0);//position of player 2 server updates ago
+            newPos = positionReturns.get(1);//position of player 1 server update ago (most recent)
         }
-
-        double timeSinceLastPacket = getTimeSinceLastPacket();
+        double timeSinceLastPacket = getTimeSinceLastPacket();//time since most recent update was sent
         Pos currentPos = getCurrentPos(oldPos, newPos, timeSinceLastPacket, timeBetweenPackets);
-        pos.setPos(currentPos);
-//        System.out.println("current pos: "+currentPos.getX());
+        //get position between old pos and new pos using linear interpolation
+        pos.setPos(currentPos);//updates player's pos so can be displayed
     }
 
     private Pos getCurrentPos(Pos oldPos, Pos newPos, double timeSinceLastPacket, double timeBetweenPackets) {
         Pos currentPos = new Pos(oldPos);
-        if (timeSinceLastPacket < timeBetweenPackets) {
+        if (timeSinceLastPacket < timeBetweenPackets) {//estimate if position has not expired
             currentPos = lerpPos(currentPos, newPos, timeSinceLastPacket / timeBetweenPackets);
-        } else {
-            currentPos.setPos(newPos);
+            //use linear interpolation
+        } else {//position has expired
+            currentPos.setPos(newPos);//set current position to the new pos
         }
         return currentPos;
     }
@@ -98,7 +98,7 @@ public class Entity {
 
     //todo document synchronization
     public void updatePositionReturns(Pos pos) {
-        if (pos == null)return;//LATEST ADDITION
+        if (pos == null) return;//LATEST ADDITION
         synchronized (this) {
             positionReturns.add(pos);
             if (positionReturns.size() > 2) {

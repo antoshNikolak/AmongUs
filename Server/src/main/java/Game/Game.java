@@ -71,11 +71,11 @@ public class Game {
     }
 
     private void startGameLoop() {
-        this.gameLoop = new GameLoop(30) {
+        this.gameLoop = new GameLoop(30) {//game loop runs at 30 fps
             @Override
             public void handle() {
-                stateManager.updateTop();
-                sendGameState();
+                stateManager.updateTop();//update state that is at the top of stack
+                sendGameState();//sends state of the game to every relevant client
             }
         };
         gameLoop.start();

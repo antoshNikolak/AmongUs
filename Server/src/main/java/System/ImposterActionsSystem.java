@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 import Entity.DeadBody;
 import Entity.*;
-import Packet.CountDown.CountDown;
 import Registry.RegistryHandler;
 import StartUpServer.AppServer;
 import State.GameState;
@@ -35,7 +34,7 @@ public class ImposterActionsSystem extends BaseSystem {
     }
 
     @Override
-    public void handleAction(Player player, PosRequest packet) {
+    public void handleAction(Player player, InputRequest packet) {
         if (packet.isKillKey() && player.hasComponent(ImpostorComp.class)) {
             if (player.getComponent(ImpostorComp.class).isAbleToKill()) {
                 handleKillAction(player);
@@ -82,12 +81,11 @@ public class ImposterActionsSystem extends BaseSystem {
     }
 
     public void killCrewMate(Player crewMate) {
-        setGhostAttributes(crewMate);
-        crewMate.stopTask();
-//        stopCrewMateTask(crewMate);
-        sendDeadBodyToClients(crewMate);
-        raiseGhost(crewMate);
-        updateGhostForClients(crewMate);
+        setGhostAttributes(crewMate);//turn crew mate into a ghost
+        crewMate.stopTask();//force exit current task crewmate is doing
+        sendDeadBodyToClients(crewMate);//broadcast dead body so players can render it
+        raiseGhost(crewMate);//decrement y value of dead player
+        updateGhostForClients(crewMate);//update player visibility to others
     }
 
     private void registerDeadBody(DeadBody deadBody) {
@@ -109,11 +107,9 @@ public class ImposterActionsSystem extends BaseSystem {
     }
 
     public void setGhostAttributes(Player crewMate) {
-        crewMate.getComponent(AliveComp.class).setAlive(false);//todo remove comp dont set it to false
+        crewMate.getComponent(AliveComp.class).setAlive(false);
         crewMate.getComponent(AnimationComp.class).setCurrentAnimation(AnimState.GHOST_RIGHT);
         crewMate.removeComponent(HitBoxComp.class);
-//        ghosts.add(crewMate);
-
     }
 
     public void updateGhostForClients(Player ghost) {

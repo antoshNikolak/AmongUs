@@ -3,31 +3,28 @@ package State;
 import java.util.*;
 
 public class StateManager {
-
     private final Stack<PlayingState> states = new Stack<>();//wont allow duplicates
 
     public synchronized void updateTop() {
-        states.peek().update();
+        states.peek().update();//updates playing state on top of the stack
     }
-//    public synchronized void update() {
-//        ListIterator<PlayingState> stateItr = states.listIterator(states.size());
-//        while (stateItr.hasPrevious()) {
-//            PlayingState state = stateItr.previous();
-//            state.update();
-//        }
-//    }
+
     public void pushState(PlayingState state) {
         synchronized (this) {
             if (states.contains(state)) return;
-            states.add(state);
+            states.add(state);//pushes a new playing state on top of the stack
         }
-        state.init();
+        state.init();//invoke init method of playing state so it is initialized properly
     }
 
+    //removes the playing state on top of the class, invoking the
+    // the states close method
     public synchronized void popState() {
         states.pop().close();
+
     }
 
+    //returns true if playing state exists in the class that user entered
     public synchronized boolean hasState(Class<? extends PlayingState> playingStateClass) {
         for (PlayingState playingState : states) {
             if (playingStateClass.isAssignableFrom(playingState.getClass())) {
@@ -41,6 +38,8 @@ public class StateManager {
         return states.peek();
     }
 
+    //returns playing state object, of the class object entered, if exists in the stack.
+    //if doesnt exist, return null
     @SuppressWarnings("unchecked")
     public synchronized <T extends State> T getState(Class<T> stateClass) {
         for (State state : states) {

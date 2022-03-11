@@ -10,12 +10,11 @@ import Entity.Player;
 import Packet.Animation.AnimState;
 import Packet.GameStart.StartGameReturn;
 import Packet.LeaderBoard.*;
-import Packet.Position.PosRequest;
+import Packet.Position.InputRequest;
 import Packet.Registration.LoginRequest;
 import Packet.Registration.RegistrationConfirmation;
 import Packet.Registration.SignupRequest;
 import Packet.ScreenData.ScreenInfo;
-import Packet.Sound.Sound;
 import Packet.Voting.ChatMessageRequest;
 import Packet.Voting.ChatMessageReturn;
 import StartUpServer.AppServer;
@@ -26,9 +25,7 @@ import Packet.UserData.UserData;
 import Packet.Voting.ImpostorVote;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Optional;
-import java.util.TreeMap;
 
 import static StartUpServer.AppServer.currentGame;
 
@@ -64,17 +61,18 @@ public class PacketControllerServer {
         });
     }
 
-    public void handleKeyBoardInput(PosRequest packet, int connectionId) {
+    public void handleKeyBoardInput(InputRequest packet, int connectionId) {
         Optional<Player> optionalPlayer = ConnectionServer.getPlayerFromConnectionID(currentGame.getPlayers(), connectionId);
         if (optionalPlayer.isPresent()) {
-            if (packet.isEmergencyMeetingKey()) {
-                MeetingState.checkStateValid(optionalPlayer.get());
+            if (packet.isEmergencyMeetingKey()) {//check player pressed E
+                MeetingState.checkStateValid(optionalPlayer.get());//push meeting state onto stack if correct conditions
             }
             State state = getPlayerState(optionalPlayer.get());
             state.processPlayingSystems(optionalPlayer.get(), packet);
         }
     }
 
+    //returns state of player task
     private State getPlayerState(Player player) {
         if (player.getCurrentTask() != null) {
             return player.getCurrentTask();

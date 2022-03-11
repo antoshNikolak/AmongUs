@@ -5,7 +5,7 @@ import Component.AliveComp;
 import Component.AnimationComp;
 import Component.VelComp;
 import Entity.Entity;
-import Packet.Position.PosRequest;
+import Packet.Position.InputRequest;
 import StartUpServer.AppServer;
 import Entity.Player;
 
@@ -26,7 +26,7 @@ public class TextureSystem extends BaseSystem {
     }
 
     @Override
-    public void handleAction(Player player, PosRequest packet) {}
+    public void handleAction(Player player, InputRequest packet) {}
 
     private void processEntityAnimation(AnimationComp animComp, VelComp velComp, Entity entity) {
         if (animComp.getCurrentAnimation().getIndexesPerFrame() != 0) {
@@ -36,10 +36,10 @@ public class TextureSystem extends BaseSystem {
     }
 
     private void changeAnimFrame(VelComp velComp, AnimationComp animComp) {
-        if (velComp.getVelX() != 0 || velComp.getVelY() != 0) {
-            animComp.getCurrentAnimation().runAnimation();
-        }else {
-            animComp.getCurrentAnimation().setIndex(0);
+        if (velComp.getVelX() != 0 || velComp.getVelY() != 0) {//if character moving
+            animComp.getCurrentAnimation().runAnimation();//change current texture
+        } else {
+            animComp.getCurrentAnimation().setIndex(0);//set texture to standing still
         }
     }
 

@@ -14,28 +14,27 @@ import java.util.stream.Collectors;
 
 public class EntityReturnBuffer {
     private final Map<Entity, List<Integer>> entityDestinationsReturnBuffer = new ConcurrentHashMap<>();
-    //    private final Map<Entity, List<Integer>> entityDestinationsReturnBuffer = new HashMap<>();
-
+    //maps entity and connection ID's of relevant clients to send the entity state to
 
     public void sendGameState() {
-        Map<Integer, Set<ExistingEntityState>> connectionEntityMap = new HashMap<>();
-        for (Entity entity : entityDestinationsReturnBuffer.keySet()) {
+        Map<Integer, Set<ExistingEntityState>> connectionEntityMap = new HashMap<>();//map connection ID and set of entity states to send
+        for (Entity entity : entityDestinationsReturnBuffer.keySet()) {//for each entity in buffer
             List<Integer> connectionIDs = entityDestinationsReturnBuffer.get(entity);
-            for (Integer connectionID : connectionIDs) {
-                if (connectionEntityMap.containsKey(connectionID)) {
-                    connectionEntityMap.get(connectionID).add(entity.adaptToEntityState());
+            for (Integer connectionID : connectionIDs) {//for each relevant connection ID
+                if (connectionEntityMap.containsKey(connectionID)) {//check if an entry from this connection ID has been made into connectionEntityMap
+                    connectionEntityMap.get(connectionID).add(entity.adaptToEntityState());//add entity state to existing entry
                 } else {
                     Set<ExistingEntityState> entities = new HashSet<>();
                     entities.add(entity.adaptToEntityState());
-                    connectionEntityMap.put(connectionID, entities);
+                    connectionEntityMap.put(connectionID, entities);//add a new entry
                 }
             }
         }
-        //why do i get a warning when synchronizing on a local var, even though its stored in a global list?
-        for (Integer connectionID : connectionEntityMap.keySet()) {
+
+        for (Integer connectionID : connectionEntityMap.keySet()) {//send out game states to each relevant client
             ConnectionServer.sendUDP(new StateReturn(connectionEntityMap.get(connectionID)), connectionID);
         }
-        entityDestinationsReturnBuffer.clear();
+        entityDestinationsReturnBuffer.clear();//clear the buffer
     }
 
     public static Set<NewEntityState> adaptCollectionToNewEntityStates(Collection<? extends Entity> entities) {

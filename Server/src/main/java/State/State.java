@@ -1,21 +1,20 @@
 package State;
 
-import Client.ClientOperator;
-import DistanceFinder.DistanceFinder;
 import Entity.Entity;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import Packet.Position.PosRequest;
-import StartUpServer.AppServer;
+import Packet.Position.InputRequest;
 import System.*;
 import Entity.*;
 
 public abstract class State{
 
     private final Map<Class<? extends BaseSystem>, BaseSystem> systems = new HashMap<>();
+    //maps class instance to its corresponding object
     protected final List<Entity> entities = new CopyOnWriteArrayList<>();
+    //stores a thread safe list of all entities that exists in a state
 
     public void addSystem(BaseSystem system) {
         this.systems.put(system.getClass(), system);
@@ -41,16 +40,16 @@ public abstract class State{
         }
     }
 
-    public void processPlayingSystems(Player player, PosRequest packet) {
+    public void processPlayingSystems(Player player, InputRequest packet) {
         for (BaseSystem system : new HashSet<>(systems.values())) {
             //new hashset to remove concurrent sys modification
             system.handleAction(player, packet);
         }
     }
 
-    public abstract void init();
-    protected abstract void startSystems();
-    protected abstract void close();
+    public abstract void init();//initialize state
+    protected abstract void startSystems();//add all required systems of the state
+    protected abstract void close();//perform actions to safely close state
 
     public List<Entity> getEntities() {
         return entities;

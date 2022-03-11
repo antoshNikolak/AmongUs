@@ -1,25 +1,5 @@
 package System;
 
-import AnimationFactory.AnimationFactory;
-import Component.*;
-import ConnectionServer.ConnectionServer;
-import DistanceFinder.DistanceFinder;
-import EndGameHandler.EndGameHandler;
-import Entity.Player;
-import Packet.GameEnd.CrewWin;
-import Packet.GameEnd.GameEnd;
-import Packet.Position.PosRequest;
-import Position.Pos;
-import StartUpServer.AppServer;
-import State.State;
-import VoteHandler.VoteHandler;
-import Entity.Tile;
-import State.*;
-
-import java.util.*;
-
-import static StartUpServer.AppServer.currentGame;
-
 //public class EmergencyTableSystem extends BaseSystem {
 //    private VoteHandler voteHandler;
 //

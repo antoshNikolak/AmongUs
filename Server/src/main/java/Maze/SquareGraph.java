@@ -27,15 +27,14 @@ public class SquareGraph {
         PriorityQueue<Edge> edgesConnected = new PriorityQueue<>();
         while (true) {
             if (minimalSpanningTree.isEmpty()) {
-                Vertex source = getRandomVertex();
-                edgesConnected = getConnectedEdges(source);
+                Vertex source = getRandomVertex();//returns random vertex in graph
+                edgesConnected = getConnectedEdges(source);//returns queue of edges connected to node
             } else {
-                edgesConnected = getConnectedEdges(minimalSpanningTree);//cant be part
+                edgesConnected = getConnectedEdges(minimalSpanningTree);//returns queue of edges connected to to the vertices
             }
-
             if (edgesConnected.isEmpty()) break;
             Edge shortestEdge = edgesConnected.poll();
-            minimalSpanningTree.add(shortestEdge);
+            minimalSpanningTree.add(shortestEdge);//add edge with shortest weight
         }
         return minimalSpanningTree;
     }
@@ -67,42 +66,19 @@ public class SquareGraph {
         for (Edge edge : MSM) {
             if (edge.getVertex1() == currentEdge.getVertex1()
                     || edge.getVertex2() == currentEdge.getVertex1()) {
-                commonVertexOne = true;
+                commonVertexOne = true;//vertex shared by edge being looped over and tree
             }
             if (edge.getVertex1() == currentEdge.getVertex2()
                     || edge.getVertex2() == currentEdge.getVertex2()){
-                commonVertexTwo = true;
+                commonVertexTwo = true;//vertex shared by edge being looped over and tree
             }
         }
-         return oneOfEquals(commonVertexOne, commonVertexTwo, true);
+         return oneOfTrue(commonVertexOne, commonVertexTwo);
     }
 
-    private boolean oneOfEquals(boolean a, boolean b, boolean expected){
-        return a == expected && b != expected
-                || a != expected && b == expected;
+    private boolean oneOfTrue(boolean a, boolean b){
+        return a && !b || !a && b;
     }
-
-//    private Set<Vertex> getUniqueVerticesFromEdges(Collection<Edge> edges) {
-//        Set<Vertex> vertices = new HashSet<>();
-//        for (Edge edge : edges) {
-//            vertices.add(edge.getVertex1());
-//            vertices.add(edge.getVertex2());
-//        }
-//        System.out.println(vertices.size());
-//        return vertices;
-//    }
-//
-//    private boolean isEdgeConnectedToMSM(Set<Edge> MSM, Edge currentEdge) {
-//        for (Edge edge : MSM) {
-//            Vertex vertex1 = edge.getVertex1();
-//            Vertex vertex2 = edge.getVertex2();
-//            if (edge.hasConnectionToVertex(vertex1) || edge.hasConnectionToVertex(vertex2)) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
 
     private void addVertexToGraph(Vertex vertex1, int currentVertex) {
         Vertex vertex2 = new Vertex();

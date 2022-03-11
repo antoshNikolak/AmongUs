@@ -16,16 +16,18 @@ import StartUpServer.AppServer;
 import State.GameState;
 import System.*;
 
-public class EndGameHandler{
+import java.util.List;
 
-    public  void checkImpostorWin() {                                              //todo remember to stop all client server timers
-        int numOfPlayerAlive = getPlayersAlive();
-        if (numOfPlayerAlive <= 2) {//todo change this to <=
-            new Thread(()->{
-                stopAllTimers();
-                recordImpostorWin();
-                ConnectionServer.sendTCPToAllPlayers(new ImpostorWin());
-                AppServer.currentGame.stopGame();
+public class EndGameHandler {
+
+    public void checkImpostorWin() {
+        int numOfPlayerAlive = getPlayersAlive();//players that arent ghosts
+        if (numOfPlayerAlive <= 2) {
+            new Thread(() -> {
+                stopAllTimers();//interrupts all client side count downs
+                recordImpostorWin();//record win in data base
+                ConnectionServer.sendTCPToAllPlayers(new ImpostorWin());//broadcast impostor win
+                AppServer.currentGame.stopGame();//bring players back to menu, close game
             }).start();
         }
     }
@@ -41,7 +43,7 @@ public class EndGameHandler{
         DataBaseUtil.updateImpostorWinTime(userName, time / 1000);
     }
 
-    private  String getImpostorUserName() {
+    private String getImpostorUserName() {
         for (Player player : AppServer.currentGame.getPlayers()) {
             if (player.hasComponent(ImpostorComp.class)) {
                 return player.getNameTag();
@@ -51,16 +53,16 @@ public class EndGameHandler{
     }
 
     public void handleCrewWin() {
-        new Thread(()->{
-            stopAllTimers();
-            ConnectionServer.sendTCPToAllPlayers(new CrewWin());
-            AppServer.currentGame.stopGame();
+        new Thread(() -> {
+            stopAllTimers();//interrupts all client side count downs
+            ConnectionServer.sendTCPToAllPlayers(new CrewWin());//broadcast crew win
+            AppServer.currentGame.stopGame();//bring players back to menu, close game
         }).start();
     }
 
-    private void stopAllTimers(){
+    private void stopAllTimers() {
         CountDownRegistryServer registry = RegistryHandler.countDownRegistryServer;
-        for (CountDown countDown : registry.getCountDowns()){
+        for (CountDown countDown : registry.getCountDowns()) {
             registry.stopCountDown(countDown);
             registry.removeEntity(countDown);
         }

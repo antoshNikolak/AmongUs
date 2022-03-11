@@ -60,29 +60,6 @@ public class Maze {
         this.endPos = new Pos((width-1)* cellDimension, endCellHeight * cellDimension);
     }
 
-
-//    private void creatVerticalOpening(Random random) {
-//        int startY = 0;
-//        int startX = random.nextInt(width - 1);
-//        int endY = width - 1;
-//        int endX = random.nextInt(width - 1);
-//        Cell startCell = cells[startY][startX];
-//        Cell endCell = cells[endY][endX];
-//        startCell.setTopWall(false);
-//        endCell.setBottomWall(false);
-//    }
-//
-//    private void createHorizontalOpenings(Random random) {
-//        int startX = 0;
-//        int startY = random.nextInt(width - 1);
-//        int endX = width - 1;
-//        int endY = random.nextInt(width - 1);
-//        Cell startCell = cells[startY][startX];
-//        Cell endCell = cells[endY][endX];
-//        startCell.setLeftWall(false);
-//        endCell.setRightWall(false);
-//    }
-
     private void removeWallsBetweenCells(SquareGraph graph, Set<Edge> MSM) {
         Vertex[][] vertices = graph.create2DArray();
         for (Edge edge : MSM) {

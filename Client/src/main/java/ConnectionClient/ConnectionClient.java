@@ -58,8 +58,6 @@ public final class ConnectionClient {
     }
 
     static {
-
-//        Log.set(Log.LEVEL_DEBUG);//print all level above and including debug
         startConnection();
         registerPackets();
         client.addListener(new PacketListenerClient());
@@ -68,7 +66,7 @@ public final class ConnectionClient {
     private static void startConnection() {
         try {
             client.start();//start client thread
-            client.connect(5000, "localhost", 49159, 65520);//Opens a TCP and UDP client
+            client.connect(5000, "localhost", 49158, 65521);//Opens a TCP and UDP client
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,7 +81,7 @@ public final class ConnectionClient {
         kryo.register(StartGameRequest.class);
         kryo.register(StartGameReturn.class);
         kryo.register(StateReturn.class);
-        kryo.register(PosRequest.class);
+        kryo.register(InputRequest.class);
         kryo.register(Pos.class);
 //        kryo.register(AddStationaryEntityReturn.class);
         kryo.register(ExistingEntityState.class);

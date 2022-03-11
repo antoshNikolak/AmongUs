@@ -2,7 +2,7 @@ package Packet.Position;
 
 import Packet.Packet;
 
-public class PosRequest implements Packet {
+public class InputRequest implements Packet {
     private boolean left= false;
     private boolean right= false;
     private boolean up= false;
@@ -13,7 +13,7 @@ public class PosRequest implements Packet {
     private boolean emergencyMeetingKey = false;
 
 
-    public PosRequest() {}
+    public InputRequest() {}
 
 //    public PosRequest(boolean left, boolean down, boolean up, boolean right) {
 //        this.left = left;

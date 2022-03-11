@@ -289,10 +289,6 @@ public class PacketControllerClient {
         }, 3000);
     }
 
-    public void handleGameEnd(GameEnd packet) {
-
-    }
-
     public void handleSudokuFailedReturn(SudokuFailedReturn packet) {
         sudokuHandler.unhighlightAllErrors();
         for (Pos pos : packet.errorsFound) {
@@ -322,7 +318,7 @@ public class PacketControllerClient {
     }
 
     public void handleRemoveCountDown(RemoveCountDown packet) {
-        CounterHandler.stopCountDown(packet.timerID);
+        CounterHandler.stopCountDown(packet.id);
     }
 
 //    public void handleElectionReturn(ElectionReturn packet) {

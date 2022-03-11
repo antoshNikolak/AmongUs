@@ -8,29 +8,26 @@ import Packet.CountDown.RemoveCountDown;
 import java.util.*;
 
 public class CountDownRegistryServer extends Registry<CountDown> {
-    private final Map<Integer, List<Integer>> countDownClientMap = new HashMap<>();//todo what happens when a value becomes null, does it get removed
+
+    private final Map<Integer, List<Integer>> countDownClientMap = new HashMap<>();
     //maps count down id with connection ids it was sent to
 
     @Override
     public void removeEntity(int countDownID) {
-        if (!IDMap.containsKey(countDownID)) return;//here, we need to remove
-//        ConnectionServer.sendTCP(new RemoveCountDown(countDownID), countDownClientMap.get(countDownID));//removes entity on the client side //todo only send to appropriate clients
-        countDownClientMap.remove(countDownID);//todo useless
+        if (!IDMap.containsKey(countDownID)) return;
+        countDownClientMap.remove(countDownID);
         super.removeEntity(countDownID);
     }
 
     public void stopCountDown(CountDown countDown){
-        int countDownID = getItemID(countDown);
-        ConnectionServer.sendTCP(new RemoveCountDown(countDownID), countDownClientMap.get(countDownID));
+        Integer countDownID = getItemID(countDown);
+        ConnectionServer.sendTCP(new RemoveCountDown(countDown.id), countDownClientMap.get(countDownID));
     }
 
-//    public void removeEntity
 
-
-    public void addEntity(CountDown entity, List<Integer> connectionID) {
+    public void addEntity(CountDown entity, List<Integer> connectionIDs) {
         super.addEntity(entity);
-        countDownClientMap.put(getItemID(entity), connectionID);
-
+        countDownClientMap.put(getItemID(entity), connectionIDs);
     }
 
     @Override

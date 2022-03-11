@@ -66,9 +66,9 @@ public class AnimationComp implements Component {
 
 
     public static class Animation {
-        private final String[] frames;
-        private final int indexesPerFrame;
-        private int index = 0;
+        private final String[] frames;//array of texture
+        private final int indexesPerFrame;//slowness of animation
+        private int index = 0;//current index
 
 
         public Animation(String [] frames, int framesPerIndex) {
@@ -77,9 +77,9 @@ public class AnimationComp implements Component {
         }
 
         public void runAnimation() {
-            index++;
-            if (index > (indexesPerFrame * frames.length)-1) {
-                index = 0;
+            index++;//increment index
+            if (index >= (indexesPerFrame * frames.length)) {//check all frames have been cycled
+                index = 0;//resent index to show initial frame
             }
         }
 

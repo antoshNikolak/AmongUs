@@ -1,8 +1,6 @@
 package Sudoku;
 
 
-import Position.Pos;
-
 import java.util.*;
 
 public class Sudoku {
@@ -48,10 +46,10 @@ public class Sudoku {
         }
     }
 
-    private int addNewInvisibleCell(Cell cell) {
+    private int addNewEmptyCell(Cell cell) {
         int cellOriginalValue = cell.getValue();
-        emptyCells.add(cell);
-        setupInvisCells();
+        emptyCells.add(cell);//add cell to queue of empty cells
+        setupInvisCells();//replenish values available
         return cellOriginalValue;
     }
 
@@ -64,10 +62,9 @@ public class Sudoku {
     private void removeValue() {
         List<Cell> cellList = getShuffledCellList();
         int counter = 0;
-//        do {
-        while (emptyCells.size() != cellsToTakeOut) {
+        while (emptyCells.size() != cellsToTakeOut+1) {
             Cell cell = cellList.get(counter);
-            int cellOriginalValue = addNewInvisibleCell(cell);
+            int cellOriginalValue = addNewEmptyCell(cell);
             Cell firstCell = peakEmptyCell();
             int solutions = getNumberOfSolutions(new LinkedList<>(emptyCells), 0, firstCell);//runs sudoku solver
             if (solutions > 1) {
@@ -76,8 +73,6 @@ public class Sudoku {
                 counter++;
             }
         }
-//        } while (emptyCells.size() != cellsToTakeOut);
-//        emptyCells.getLast().setValue(0);
     }
 
 
@@ -89,7 +84,7 @@ public class Sudoku {
     private List<Cell> getShuffledCellList() {
         List<Cell> cellList = new ArrayList<>();
         for (int y = 0; y < 9; y++) {
-            cellList.addAll(Arrays.asList(cells[y]).subList(0, 9));
+            cellList.addAll(Arrays.asList(cells[y]));//add cells row by row
         }
         Collections.shuffle(cellList);
         return cellList;
@@ -112,12 +107,14 @@ public class Sudoku {
                 continue;//try again for same cell with different values
             }
 
-            Cell nextCell = emptyCells.poll();
-            if (nextCell == null) {//this is the last invisible cell to solve that's in the list
+            emptyCells.poll();
+            Cell nextCell = emptyCells.peek();
+
+            if (nextCell == null) {//this is the last invisible cell to solve that's in the list, solved
                 return possibleSolutions + 1;
             }
             possibleSolutions = getNumberOfSolutions(new LinkedList<>(emptyCells), possibleSolutions, nextCell);
-            if (possibleSolutions == 0 || possibleSolutions == 1) {//hasn't been solved keep trying
+            if (possibleSolutions == 0 || possibleSolutions == 1) {//hasn't been solved enough times keep trying
                 continue;//try again
             }
             return possibleSolutions;//sudoku solved, return
@@ -141,7 +138,7 @@ public class Sudoku {
 
     //return true if sudoku completed, false if not completed
     private boolean addValue(int y, int x) {
-        while (true) {
+        while (true) {//loop through until exhausted all values available
             Cell currentCell = cells[y][x];
             ArrayList<Integer> valuesAvailable = currentCell.getValuesAvailable();
             if (currentCell.getValuesAvailable().size() == 0) {//no more values are left to guess
@@ -167,14 +164,12 @@ public class Sudoku {
         }
     }
 
+    //return true if all constraints met
     private boolean checkConstraints(int y, int x) {
-        Integer[][] sudoku = transformCellToIntArray(cells);
+        Integer[][] sudoku = transformCellToIntArray(cells);//store value of each cell in 2d array
         return !(checkHorizontalDuplicates(sudoku, y) ||
                 checkVerticalDuplicates(sudoku, x) ||
                 checkGridDuplicates(sudoku, y, x));
-//        return !(checkHorizontalDuplicates(sudoku, x) ||
-//                checkVerticalDuplicates(sudoku, y) ||
-//                checkGridDuplicates(sudoku, y, x));
     }
 
     public static boolean checkGridDuplicates(Integer[][] sudoku, int y, int x) {
@@ -199,7 +194,7 @@ public class Sudoku {
 
     private static int getGridCount(int num) {
         int multiplier = num / 3;
-        return (multiplier) * 3;
+        return (multiplier) * 3;//return lower bound position;
     }
 
     public static Integer[] trimVerticalArray(Integer[][] sudoku, int x) {//trim in y direction
@@ -212,10 +207,10 @@ public class Sudoku {
         return row;
     }
 
-    public static Integer[] trimHorizontalArray(Integer[][] sudoku, int y) {//trim in x direction
+    //trim in x direction
+    public static Integer[] trimHorizontalArray(Integer[][] sudoku, int y) {
         Integer[] col = new Integer[9];
         for (int x = 0; x < sudoku.length; x++) {
-//            col[i] = sudoku[i][y];
             col[x] = sudoku[y][x];
         }
         return col;

@@ -53,18 +53,18 @@ public class MergeTileHandler {
 
     public void clusterGroupedTiles(String[][] tokens, Tile tile, int x, int y, int id) {
         if (Integer.parseInt(tokens[y - 1][x]) == id) {
-            addDisplacedTile(tile, x, y, 0, -1);
+            addDisplacedTile(tile, x, y, 0, -1);//add time to existing grouped square tile
         } else if (Integer.parseInt(tokens[y][x - 1]) == id) {
-            addDisplacedTile(tile, x, y, -1, 0);
-        } else {
-            groupedTiles.add(new GroupedSquareTile(tile));
+            addDisplacedTile(tile, x, y, -1, 0);//add time to existing grouped square tile
+        } else {//if this is the first grouped tile piece found in tokens
+            groupedTiles.add(new GroupedSquareTile(tile));//add new grouped square tile entry
         }
     }
 
     private void addDisplacedTile(Tile tile, int x, int y, int displacementX, int displacementY) {
         Tile displacedTile = tileMatrix[y + displacementY][x + displacementX];
-        for (GroupedSquareTile groupedSquareTile : groupedTiles) {
-            if (groupedSquareTile.getTiles().contains(displacedTile)) {
+        for (GroupedSquareTile groupedSquareTile : groupedTiles) {//for each grouped tile
+            if (groupedSquareTile.getTiles().contains(displacedTile)) {//search which grouped tile this tile belongs to
                 groupedSquareTile.getTiles().add(tile);
             }
         }

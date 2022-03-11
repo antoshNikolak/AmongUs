@@ -18,7 +18,7 @@ import static StartUpServer.AppServer.currentGame;
 
 public class LobbyState extends PlayingState {
 
-    public static final int PLAYER_LIMIT = 2;
+    public static final int PLAYER_LIMIT = 4;
     private final PlayerColourFactory playerColourFactory = new PlayerColourFactory();
 
     public LobbyState() {
@@ -26,11 +26,12 @@ public class LobbyState extends PlayingState {
     }
 
     public void handleNewPlayerJoin(Client client) {
-        client.createPlayer();
-        sendPlayerData(client);
-        sendWorldData(client.getConnectionID());
-        if (currentGame.getPlayers().size() == PLAYER_LIMIT) {
+        client.createPlayer();//create player object linked to client
+        sendPlayerData(client);//register and notify all clients new player joined
+        sendWorldData(client.getConnectionID());//send tile to render
+        if (currentGame.getPlayers().size() == PLAYER_LIMIT) {//if limit reached
             CounterStarter.startCountDown( 5, 200, 200, 50,  () -> startGameState());
+            //count down to start game
         }
     }
 
