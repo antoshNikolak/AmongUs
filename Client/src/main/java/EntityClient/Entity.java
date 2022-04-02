@@ -14,8 +14,8 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Entity {
-    private final LinkedList<Pos> positionReturns = new LinkedList<>();
-    private static double timeBetweenPackets = 0.0066;//default value
+    private final LinkedList<Pos> positionReturns = new LinkedList<>();//queue of position states received from server
+    private static double timeBetweenPackets = 0.0066;//default value, estimate for how long it should take before updating based on server updates
     private static double timeLastPacketArrived;
     protected Pos pos;
     protected AnimationManager animationManager;
@@ -28,30 +28,24 @@ public class Entity {
         }
         this.animationManager = new AnimationManager(newEntityState);
         this.pos = newEntityState.getPos();
-        this.nameTag = newEntityState.getNameTag();//null maybe>
-        try {
-            AppClient.currentGame.getEntites().add(this);
-        } catch (NullPointerException e) {
-            System.out.println("problem adding Entity: " + newEntityState.getCurrentState());
-            System.out.println(AppClient.currentGame);
-            System.out.println(AppClient.currentGame.getEntites());
-            System.out.println(this);
-
-        }
+        this.nameTag = newEntityState.getNameTag();
+        AppClient.currentGame.getEntites().add(this);
     }
 
-    public void render(GraphicsContext gc, Camera camera) {
-        Image image = TextureManager.getTexture(animationManager.getCurrentFrame());
-        gc.drawImage(image, pos.getX() - camera.getOffsetX(), pos.getY() - camera.getOffsetY());
+    public void render(GraphicsContext gc, Camera camera) {//render image onto screen accounting for player offset
+        Image image = TextureManager.getTexture(animationManager.getCurrentFrame());//get image object corresponding to appropriate texture name
+        gc.drawImage(image, pos.getX() - camera.getOffsetX(), pos.getY() - camera.getOffsetY());//draw image onto canvas
         if (nameTag != null) {
+            //draw name tag if the entity has one.
             gc.strokeText(nameTag, pos.getX() - camera.getOffsetX(), pos.getY() - 10 - camera.getOffsetY());
         }
     }
 
-    public void render(GraphicsContext gc) {
-        Image image = TextureManager.getTexture(animationManager.getCurrentFrame());
-        gc.drawImage(image, pos.getX(), pos.getY());
+    public void render(GraphicsContext gc) {//render image onto screen without accounting for player offset
+        Image image = TextureManager.getTexture(animationManager.getCurrentFrame());//get image object corresponding to appropriate texture name
+        gc.drawImage(image, pos.getX(), pos.getY());//draw image onto canvas
         if (nameTag != null) {
+            //draw name tag if the entity has one.
             gc.strokeText(nameTag, pos.getX(), pos.getY() - 10);
         }
 
@@ -119,6 +113,7 @@ public class Entity {
     }
 
     public static void calculateTimeDiffBetweenPackets() {
+        //update time last packet arrived, for linear interpolation
         if (timeLastPacketArrived != 0) timeBetweenPackets = (System.nanoTime() - timeLastPacketArrived) / 10e9;
         timeLastPacketArrived = System.nanoTime();
     }

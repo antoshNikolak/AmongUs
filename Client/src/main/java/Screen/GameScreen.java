@@ -1,22 +1,16 @@
 package Screen;
 
 import Camera.Camera;
-import ConnectionClient.ConnectionClient;
 import EntityClient.Entity;
 
 import Packet.EntityState.NewAnimatedEntityState;
-import Packet.EntityState.NewEntityState;
-import Packet.NestedPane.ActionEvent;
 import Packet.NestedPane.NodeInfo;
 import Packet.NestedPane.NodeType;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +27,7 @@ public class GameScreen extends Screen {
     private GameScreen (Builder builder){
         super(builder.pane);
         this.nodesMap = builder.nodesMap;
-        this.entities = builder.entites;
+        this.entities = builder.entities;
     }
 
     public void render() {
@@ -64,13 +58,6 @@ public class GameScreen extends Screen {
         this.nestedScreen = null;
     }
 
-//    public void setClearBoundaries(int x1, int y1, int width, int height) {
-//        this.clearX1 = x1;
-//        this.clearY1 = y1;
-//        this.clearWidth = width;
-//        this.clearHeight = height;
-//    }
-
     public List<Entity> getEntities() {
         return entities;
     }
@@ -87,9 +74,9 @@ public class GameScreen extends Screen {
         return nestedScreen;
     }
 
-    public  static class Builder{
+    public  static class Builder{//use of builder pattern below
         private final Pane pane;
-        private final List<Entity> entites = new CopyOnWriteArrayList<>();
+        private final List<Entity> entities = new CopyOnWriteArrayList<>();
         private final Map<NodeType, List<Node>> nodesMap = new HashMap<>();
 
 
@@ -124,24 +111,10 @@ public class GameScreen extends Screen {
                     line.setStrokeWidth(nodeInfo.getLineWidth());
                     addNodeToMap(nodeInfo, line);
                     break;
-//                case BUTTON:
-//                    Button button = new Button(nodeInfo.getText());
-//                    setNodeLayout(button, nodeInfo);
-//                    button.setOnAction(event-> ConnectionClient.sendTCP(new ActionEvent(nodeInfo.getOnActionID())));
-//                    addNodeToMap(nodeInfo, button);
-//                    break;
-                case TEXT_FIELD:
-                    TextField textField = new TextField();
-                    setNodeLayout(textField, nodeInfo);
                 default:
                     return null;
             }
             return this;
-        }
-
-        private void setNodeLayout(Node node, NodeInfo nodeInfo){
-            node.setLayoutX(nodeInfo.getX());
-            node.setLayoutY(nodeInfo.getY());
         }
 
         private void addNodeToMap(NodeInfo nodeInfo, Node node){
@@ -156,7 +129,7 @@ public class GameScreen extends Screen {
         }
 
         public Builder withNewEntityState(NewAnimatedEntityState newEntityState){
-            entites.add(new Entity(newEntityState));
+            entities.add(new Entity(newEntityState));
             return this;
         }
 

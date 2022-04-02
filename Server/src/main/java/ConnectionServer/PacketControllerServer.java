@@ -35,14 +35,14 @@ public class PacketControllerServer {
         if (ConnectionServer.getClientFromConnectionID(connectionID).isEmpty()) {//check this client has not already logged in
             UserData userData = packet.getUserData();
             RegistrationConfirmation confirmation = AuthorizationServer.handleLogin(userData);
-            AuthorizationServer.handleRegistrationConfirmation(confirmation, userData, connectionID);
+            AuthorizationServer.handleRegistrationConfirmation(confirmation, userData, connectionID);//notify user if they have been authorized
         }
     }
 
     public void handleSignup(SignupRequest packet, int connectionID) {
         UserData userData = packet.getUserData();
         RegistrationConfirmation confirmation = AuthorizationServer.handleSignup(userData);
-        AuthorizationServer.handleRegistrationConfirmation(confirmation, userData, connectionID);
+        AuthorizationServer.handleRegistrationConfirmation(confirmation, userData, connectionID);//notify user if they have been authorized
     }
 
     public void handleStartGameRequest(int connectionID) {
@@ -81,6 +81,7 @@ public class PacketControllerServer {
     }
 
     public void handleVerifySudokuRequest(VerifySudokuRequest packet, int connectionID) {
+        //check if sudoku client sent is correctly solved
         Optional<Player> playerOptional = ConnectionServer.getPlayerFromConnectionID(connectionID);
         playerOptional.ifPresent(player -> {
             SudokuTaskState sudokuTaskState = (SudokuTaskState) player.getCurrentTask();
@@ -88,23 +89,17 @@ public class PacketControllerServer {
         });
     }
 
-//    public void handleVoiceChat(Sound soundPacket, Integer connectionID) {
-//        List<Integer> connectionIDs = ConnectionServer.getClientConnectionIDs();
-//        connectionIDs.remove(connectionID);
-//        ConnectionServer.sendUDP(soundPacket, connectionIDs);
-//    }
 
     public void handleImpostorVote(ImpostorVote packet, int connectionID) {
-//        EmergencyTableSystem emergencyTableSystem = currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class);
+        //handle player vote durin meeting state
         MeetingState meetingState = currentGame.getStateManager().getState(MeetingState.class);
         if (meetingState == null) return;
         Optional<Player> playerOptional = ConnectionServer.getPlayerFromConnectionID(connectionID);
         playerOptional.ifPresent(player -> meetingState.getVoteHandler().registerVote(player, packet.getVoteOption()));
-
-//        playerOptional.ifPresent(player -> emergencyTableSystem.getVoteHandler().registerVote(player, packet.getVoteOption()));
     }
 
     public void handleLogout(int id) {
+        //handle client logout request
         Optional<Client> playerOptional = ConnectionServer.getClientFromConnectionID(id);
         playerOptional.ifPresent(client -> AppServer.getClients().remove(client));
     }
@@ -115,6 +110,7 @@ public class PacketControllerServer {
     }
 
     public void handleChatMessageRequest(ChatMessageRequest packet, int connectionID) {
+        //handle chat message/
         Optional<Player> playerOptional = ConnectionServer.getPlayerFromConnectionID(connectionID);
         if (playerOptional.isEmpty() || !playerOptional.get().getComponent(AliveComp.class).isAlive()) return;
         String colour = playerOptional.get().getComponent(AnimationComp.class).getAnimation(AnimState.RIGHT).getFrames()[0];

@@ -19,6 +19,7 @@ import java.util.Objects;
 
 public class SudokuHandler {
     private final HashMap<TextField, Pos> inputPositionMap = new HashMap<>();
+    //map text field obj to position in the sudoku matrix
 
     public SudokuHandler() {}
 
@@ -27,10 +28,10 @@ public class SudokuHandler {
         drawLines(gameScreen);
         addNumbersAndInput(gameScreen, packet.getSudoku());
         addCheckButton(gameScreen, packet.getSudoku());
-        originalSudoku = packet.getSudoku();
     }
 
     private  void addCheckButton(GameScreen gameScreen, Integer[][] sudoku) {
+        //initialise check button
         Button button = new Button("check sudoku");
         button.setLayoutX((gameScreen.getPane().getPrefWidth() / 2) - 60);
         button.setLayoutY(390);
@@ -40,49 +41,13 @@ public class SudokuHandler {
         gameScreen.addNode(button);
     }
 
-    private  Integer [][] originalSudoku = new Integer[9][9];
-
     public  void verifySudoku(Integer[][] sudoku) {
-//        boolean sudokuCompleted = checkUserInputComplete();
-//        plugInUserInputValues(sudoku);
-//        if (sudokuCompleted) {//if method returns false dont send, because user hasn't completed the sudoku, so not worth checking
-//        for (int y = 0; y < 9; y++) {
-//            for (int x = 0; x < 9; x++) {
-//                if (!sudoku[y][x].equals(originalSudoku[y][x])){
-//                    throw new IllegalStateException("Sudokus arent matching");
-//                }
-//            }
-//        }
-
-        System.out.println("sending sudoku");
-        plugInUserInputValues(sudoku);//swapped
-        for (int y = 0; y < 9; y++) {
-            for (int x = 0; x < 9; x++) {
-                if (!sudoku[y][x].equals(originalSudoku[y][x])){
-                    throw new IllegalStateException("Sudoku values dont match - pre send");
-                }
-            }
-        }
-//        for (int y = 0; y < 9; y++) {
-//            for (int x = 0; x < 9; x++) {
-//                if (!sudoku[y][x].equals(originalSudoku[y][x]) && !originalSudoku[y][x].equals(0)){
-//                    throw new IllegalStateException("Sudoku values dont match - pre send");
-//                }
-//            }
-//        }
-//        System.out.println("AFTER USER INPUT: ");
-//        System.out.println("------------------");
-//        for (int y = 0; y < 9; y++) {
-//            for (int x = 0; x < 9; x++) {
-//                System.out.print(sudoku[y][x] + " ");
-//            }
-//            System.out.println("");
-//        }
-//        System.out.println("------------------");
-        ConnectionClient.sendTCP(new VerifySudokuRequest(sudoku));
+        plugInUserInputValues(sudoku);//add user input values into the matrix
+        ConnectionClient.sendTCP(new VerifySudokuRequest(sudoku));//send sudoku matrix to server for verification
     }
 
     private  void plugInUserInputValues(Integer[][] sudoku) {
+        //insert user input into the corresponding slot of the matrix
         for (Map.Entry<TextField, Pos> entry : inputPositionMap.entrySet()) {
             int input = getUserInput(entry.getKey().getText());
             Pos pos = entry.getValue();
@@ -98,16 +63,6 @@ public class SudokuHandler {
         }
     }
 
-    private  boolean checkUserInputComplete() {
-        for (TextField textField : inputPositionMap.keySet()) {
-            try {
-                Integer.parseInt(textField.getText());//text field is filled out so the sudoku is worth checking
-            } catch (NumberFormatException e) {
-                return false; //if text field is empty, or not a number, false is returned
-            }
-        }
-        return true;
-    }
 
     private void addNumbersAndInput(GameScreen gameScreen, Integer[][] sudoku) {
         for (int x = 0; x < 9; x++) {
@@ -170,32 +125,14 @@ public class SudokuHandler {
         }
     }
 
-//    public static void highlightErrors(Pos duplicate1, Pos duplicate2){
-//        if (inputPositionMap.containsValue(duplicate1)){//todo check if necessary
-//            TextField textField = CollectionUtils.getKey(inputPositionMap, duplicate1);
-//            if (textField != null) {
-//                textField.setStyle("-fx-border-color: red");
-//            }
-//        }
-//
-//
-//
-//    }
 
-    //todo document overiding .equals
     public  void highlightError(Pos error) {
         TextField textField = CollectionUtils.getKey(inputPositionMap, error);
-        Objects.requireNonNull(textField).setStyle("-fx-border-color: red");
-//        if (inputPositionMap.containsValue(duplicate)) {
-//            TextField textField = CollectionUtils.getKey(inputPositionMap, error);
-//            if (textField != null) {
-//                textField.setStyle("-fx-border-color: red");
-//            }
-//        }
-
+        Objects.requireNonNull(textField).setStyle("-fx-border-color: red");//set textfield border to red
     }
 
     public  void unhighlightAllErrors() {
+        //reset text fields to original style
         for (TextField textField : inputPositionMap.keySet()) {
             textField.setStyle(null);
         }

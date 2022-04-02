@@ -1,9 +1,9 @@
 package Maze;
 
 public class Edge {
-    private Vertex vertex1;
-    private Vertex vertex2;
-    private int distance;
+    private final Vertex vertex1;
+    private final Vertex vertex2;
+    private final int distance;
 
     public Edge(Vertex vertex1,Vertex vertex2, int distance) {
         this.vertex1 = vertex1;

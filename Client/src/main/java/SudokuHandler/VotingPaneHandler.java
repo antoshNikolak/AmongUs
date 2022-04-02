@@ -35,11 +35,12 @@ public class VotingPaneHandler {
     private GameScreen votingScreen;
     private ChatHandler chatHandler;
     private GameScreen chattingScreen;
-//    private Pane scrollingPane;
 
-
-    //code to remove
-    public void showVotes(Map<String, VoteOption> voterSuspectMap) {//could be string, vote option
+    /**
+     * displays the texture of each voter next to the buttons of the player they voted for
+     * @param voterSuspectMap maps texture name of the voter to the vote option that they voted for
+     */
+    public void showVotes(Map<String, VoteOption> voterSuspectMap) {
         Map<Button, List<String>> buttonVotesMap = createButtonVotesMap(voterSuspectMap);
         for (Map.Entry<Button, List<String>> entry : buttonVotesMap.entrySet()) {
             Button button = entry.getKey();
@@ -90,16 +91,8 @@ public class VotingPaneHandler {
         this.chatHandler.start(packet);
     }
 
-
-    private Rectangle createBlueSideBackGround(AddVotingPane packet) {
-        Rectangle rectangle = new Rectangle(100, packet.paneHeight);
-        rectangle.setX(packet.paneWidth - 100);
-        rectangle.setY(0);
-        rectangle.setFill(Color.BLUE);
-        return rectangle;
-    }
-
     private void createVotingScreen(AddVotingPane packet) {
+        //initialise voting screen
         this.votingScreen = NestedScreenHandler.createGameScreen(packet);
         addSkipVoteButton();
         addChatRoomButton();
@@ -127,9 +120,8 @@ public class VotingPaneHandler {
         votingScreen.addNode(button);
     }
 
-//    public void addChatText()
-
     private void customiseButton(Button button, Pane inButtonPane, String texture) {
+        //add cross to buttons with ghost images
         if (!texture.contains("ghost")) {
             button.setText("vote");
             button.setOnAction(event -> ConnectionClient.sendTCP(new ImpostorVote(getVoteOption(texture))));
@@ -138,15 +130,6 @@ public class VotingPaneHandler {
         }
 
     }
-
-//    private VoteOption getVoteOption(String playerTexture) {
-//        for (VoteOption voteOption : VoteOption.values()) {
-//            if (playerTexture.contains(voteOption.getColour())) {
-//                return voteOption;
-//            }
-//        }
-//        throw new IllegalStateException("player texture invalid");
-//    }
 
     private void addSkipVoteButton() {
         Button button = new Button("skip vote");
@@ -157,11 +140,12 @@ public class VotingPaneHandler {
         votingScreen.addNode(button);
     }
 
-    private void handleSkipVoteLogic() {
+    private void handleSkipVoteLogic() {//handle skip vote button pressed
         ConnectionClient.sendTCP(new ImpostorVote(VoteOption.SKIP));
     }
 
     private void addCrossToPane(Button button, Pane inButtonPane) {
+        //draw cross to buttons
         Line line1 = new Line(0, 0, button.getPrefWidth() - 10, button.getPrefHeight() - 10);
         line1.setStroke(Color.RED);
         Line line2 = new Line(button.getPrefWidth() - 10, 0, 0, button.getPrefHeight() - 10);
@@ -170,7 +154,9 @@ public class VotingPaneHandler {
         inButtonPane.getChildren().add(line2);
     }
 
+
     private Button createVoteButton(Pane inButtonPane, String texture, int buttonCounter) {
+        //create vote buttons, spread out across
         Button button = new Button();
         button.setPrefWidth(inButtonPane.getPrefWidth());
         button.setPrefHeight(inButtonPane.getPrefHeight());
@@ -196,7 +182,6 @@ public class VotingPaneHandler {
         ImageView imageView = new ImageView(TextureManager.getTexture(textureName));
         imageView.setFitWidth(40);
         imageView.setFitHeight(40);
-
         imageView.setX(10);
         imageView.setY(5);
         return imageView;
@@ -209,7 +194,6 @@ public class VotingPaneHandler {
         inButtonPane.getChildren().add(imageView);
         imageView.setX(0);
         Text text = new Text(nameTag);
-//        text.setFont();
         text.setX(imageView.getX() + imageView.getFitWidth() + 1);
         text.setY(inButtonPane.getPrefHeight() / 2);
         inButtonPane.getChildren().add(text);
@@ -226,69 +210,47 @@ public class VotingPaneHandler {
         private ScrollBar scrollBar;
         private Pane scrollingPane;
         private int speechBubbleCounter = 0;
-//        private int numOfMessages ;
 
         public void start(AddVotingPane packet) {
+            //initialize chat room screen
             chattingScreen = NestedScreenHandler.createGameScreen(packet);
             this.content = createChatContent(packet);
             Pane scrollingPane = createScrollPane(packet, content);
             chattingScreen.getPane().getChildren().add(createVotingScreenButton(packet));
-
             TextArea input = createTextArea(scrollingPane);
             createInputSenderButton(input);
-
-//            Button inputSender = new Button("send chat");
-//            chattingScreen.getPane().getChildren().add(inputSender);
-//            inputSender.setLayoutX(input.getLayoutX() + input.getPrefWidth() + 5);
-//            inputSender.setLayoutY(input.getLayoutY() + input.getPrefHeight() - input.getPrefHeight() / 2);
-//            inputSender.setOnAction(e -> {
-//                final int maxChar = 156;
-//                String message = input.getText();
-//                if (input.getText().length() > maxChar) {
-//                    message = input.getText().substring(0, maxChar + 1);
-//                }
-//                input.replaceText(0, Math.min(maxChar + 1, message.length()), "");
-//                ConnectionClient.sendTCP(new ChatMessageRequest(message));
-//            });
         }
 
-        private void createInputSenderButton(TextArea input){
+        private void createInputSenderButton(TextArea input) {
+            //create button that will send chat to the server.
             Button inputSender = new Button("send chat");
             chattingScreen.getPane().getChildren().add(inputSender);
             inputSender.setLayoutX(input.getLayoutX() + input.getPrefWidth() + 5);
             inputSender.setLayoutY(input.getLayoutY() + input.getPrefHeight() - input.getPrefHeight() / 2);
-            inputSender.setOnAction(e -> { sendInput(input);
-
-                //                String message = input.getText();
-//                final int maxChar = getMaxNumOfChars(message);
-//                if (message.length() > maxChar) {
-//                    message = message.substring(0, maxChar + 1);
-//                }
-//                input.replaceText(0, Math.min(maxChar + 1, message.length()), "");
-//                ConnectionClient.sendTCP(new ChatMessageRequest(message));
+            inputSender.setOnAction(e -> {
+                sendInput(input);
             });
         }
 
-        private void sendInput(TextArea input){
+        private void sendInput(TextArea input) {
+            //get user input from text area
             String message = input.getText();
-            if (message.isEmpty()){ return; }//nothing to send
+            if (message.isEmpty()) {
+                return;
+            }//nothing to send
             final int maxChar = getMaxNumOfChars(message);
             if (message.length() > maxChar) {
-                message = message.substring(0, maxChar);//send only part of message that fits         //todo +1 -> 0
+                message = message.substring(0, maxChar);//send only part of message that fits
             }
-//            input.replaceText(0, Math.min(maxChar, message.length())+1, "");//remove text from text area
-//            input.replaceText(0, Math.min(maxChar, message.length()), "");//remove text from text area
-            input.replaceText(0, message.length(), "");//remove text from text area
-
-
+            input.replaceText(0, message.length(), "");//remove text from text area, that has been sent
             ConnectionClient.sendTCP(new ChatMessageRequest(message));
         }
 
-        private int getMaxNumOfChars(String message){
-                int charsOnTopLine = getCharsPerLine(message);
-                String bottomLine = message.substring(charsOnTopLine);
-                int charsOnBottomLine = getCharsPerLine(bottomLine);
-                return charsOnBottomLine + charsOnTopLine;
+        private int getMaxNumOfChars(String message) {
+            int charsOnTopLine = getCharsPerLine(message);
+            String bottomLine = message.substring(charsOnTopLine);
+            int charsOnBottomLine = getCharsPerLine(bottomLine);
+            return charsOnBottomLine + charsOnTopLine;
         }
 
         private TextArea createTextArea(Pane scrollingPane) {
@@ -305,15 +267,13 @@ public class VotingPaneHandler {
             VBox vBox = new VBox();
             vBox.setLayoutX(25);
             vBox.setLayoutY(5);
-//            vBox.setPrefHeight(packet.paneHeight);
             vBox.setPrefWidth(packet.paneWidth - 75);
-//            vBox.setPadding(new Insets(10, 0, 50, ));
-
             vBox.setSpacing(20);
             return vBox;
         }
 
         private Pane createScrollPane(AddVotingPane packet, VBox content) {
+            //initialize sctoll pane
             scrollingPane = NestedScreenHandler.createPane(packet);
             scrollingPane.setPrefHeight(packet.paneHeight - 100);
             chattingScreen.getPane().getChildren().add(scrollingPane);
@@ -334,6 +294,7 @@ public class VotingPaneHandler {
         }
 
         private Button createVotingScreenButton(AddVotingPane packet) {
+            //initialize voting screen button
             Button button = new Button("vote");
             button.setLayoutY(packet.paneHeight / 2d);
             button.setLayoutX(packet.paneWidth - 50);
@@ -350,32 +311,14 @@ public class VotingPaneHandler {
         }
 
         public void receiveChatMessage(ChatMessageReturn message) {
-//            Rectangle rectangle = new Rectangle(this.content.getPrefWidth() - 50, 50);
-//            rectangle.setLayoutY(30);
-//            rectangle.setStroke(Color.GRAY);
-//            rectangle.setFill(null);
+            //display chat from other player onto the screen in a speech bubble
+            //with the texture and name tag of the player that sent in
+
             Rectangle borderRect = createBorderRect();
             createSpeechBubble(borderRect);
-
-//            this.speechBubble = new Pane();
-//            speechBubble.setPrefWidth(rectangle.getWidth());
-//            speechBubble.setPrefHeight(rectangle.getHeight() + rectangle.getLayoutY());
-
-//            ImageView player = new ImageView(TextureManager.getTexture(message.texture));
-//            player.setPreserveRatio(true);
-//            player.setFitHeight(23);
             ImageView player = createSpeechPlayerImageView(message.texture);
-
-//            Label nameTag = new Label(message.username);
-//            nameTag.setLayoutX(player.prefWidth(-1) + player.getLayoutX() + 3);
-//            nameTag.setFont(Font.font(15));
             Label nameTag = createNameTag(player, message.username);
-
-//            Text chat = new Text(insertSpacings(message.message));
-//            chat.setFont(Font.font(15));
-//            chat.setY(15 + rectangle.getLayoutY());
             Text chat = createMessageText(borderRect, message.message);
-
 
             speechBubble.getChildren().addAll(borderRect, chat, player, nameTag);
             Platform.runLater(() -> this.content.getChildren().add(speechBubble));
@@ -404,7 +347,7 @@ public class VotingPaneHandler {
             return player;
         }
 
-        private Rectangle createBorderRect(){
+        private Rectangle createBorderRect() {
             Rectangle rectangle = new Rectangle(this.content.getPrefWidth() - 50, 50);
             rectangle.setLayoutY(30);
             rectangle.setStroke(Color.GRAY);
@@ -412,7 +355,7 @@ public class VotingPaneHandler {
             return rectangle;
         }
 
-        private void createSpeechBubble(Rectangle borderRect){
+        private void createSpeechBubble(Rectangle borderRect) {
             this.speechBubble = new Pane();
             speechBubble.setPrefWidth(borderRect.getWidth());
             speechBubble.setPrefHeight(borderRect.getHeight() + borderRect.getLayoutY());
@@ -426,10 +369,10 @@ public class VotingPaneHandler {
             return sb.toString();
         }
 
-        private int getCharsPerLine(String message){
+        private int getCharsPerLine(String message) {
             for (int i = 50; i < message.length(); i++) {
-                Text text = new Text(message.substring(0, i+1));
-                if (text.getLayoutBounds().getWidth() >= speechBubble.getPrefWidth()-150) {//speech bubble width
+                Text text = new Text(message.substring(0, i + 1));
+                if (text.getLayoutBounds().getWidth() >= speechBubble.getPrefWidth() - 150) {//speech bubble width
                     return i;//return num of chars that fit onto top line
                 }
             }

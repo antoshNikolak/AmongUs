@@ -10,21 +10,19 @@ import java.util.List;
 public class AnimationManager {
 
     private final EnumMap<AnimState, AnimationClient> directionAnimationMap = new EnumMap<>(AnimState.class);
-    private AnimState currentState;
+    //dictionary maps animation type to a animation client object which stores a list of textures.
+    private AnimState currentState;//stores the current animation type being displayed
 
     public AnimationManager(NewAnimatedEntityState newAnimationEntityState) {
         loadAnimationMap(newAnimationEntityState.getNewAnimationReturns());
-        determineCurrentState(newAnimationEntityState);
+        this.currentState = newAnimationEntityState.getCurrentState();
     }
 
     private void loadAnimationMap(List<NewAnimationReturn> newAnimationReturns){
+        //load each type of animation into the map
         for (NewAnimationReturn anim: newAnimationReturns){
             directionAnimationMap.put(anim.getAnimState(), new AnimationClient(anim));
         }
-    }
-
-    private void determineCurrentState(NewAnimatedEntityState newEntityState){
-        this.currentState = newEntityState.getCurrentState();
     }
 
     public AnimationClient getCurrentAnimation(){

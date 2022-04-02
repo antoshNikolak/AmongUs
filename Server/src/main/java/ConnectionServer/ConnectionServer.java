@@ -1,7 +1,7 @@
 package ConnectionServer;
 
 import Packet.Animation.AnimState;
-import Packet.Animation.AnimationDisplayReturn;
+//import Packet.Animation.AnimationDisplayReturn;
 import Packet.Animation.AnimationOver;
 import Client.Client;
 import Entity.Player;
@@ -118,15 +118,6 @@ public final class ConnectionServer {
 
 
 
-    //    public boolean checkConnected(int connectionID){
-//        for (Connection connection: server.getConnections()){
-//            if (connection.getID() == connectionID){
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
     public static void start(){
         startConnection();
         registerPackets();
@@ -166,7 +157,7 @@ public final class ConnectionServer {
         return Optional.empty();
     }
 
-    public static Optional<Player> getPlayerFromConnectionID( int connectionID) {//should this return optional
+    public static Optional<Player> getPlayerFromConnectionID( int connectionID) {//todo should this return optional?
         for (Player player: currentGame.getPlayers()){
             if (player.getConnectionID() == connectionID){
                 return Optional.of(player);
@@ -226,7 +217,7 @@ public final class ConnectionServer {
         kryo.register(Integer[][].class);
         kryo.register(Integer[].class);
         kryo.register(Integer.class);
-        kryo.register(AnimationDisplayReturn.class);
+//        kryo.register(AnimationDisplayReturn.class);
         kryo.register(NodeInfo.class);
         kryo.register(NodeType.class);
         kryo.register(Sound.class);

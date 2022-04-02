@@ -29,10 +29,6 @@ public class PacketListenerServer extends Listener {
     private final Semaphore semaphore = new Semaphore(1);
 
     @Override
-    public void connected(Connection connection) {
-    }
-
-    @Override
     public void disconnected(Connection connection) {
         Optional<Client> clientOpt = ConnectionServer.getClientFromConnectionID(connection.getID());
         if(clientOpt.isPresent()){
@@ -41,10 +37,10 @@ public class PacketListenerServer extends Listener {
 
             if (client.getPlayer() != null ){
                 AppServer.currentGame.getPlayers().remove(client.getPlayer());//remove player from game server
-                RegistryHandler.entityRegistryServer.removeEntity(client.getPlayer());//de register entity, remove on client side //todo I changed the code here, doc?
+                RegistryHandler.entityRegistryServer.removeEntity(client.getPlayer());//de register entity, remove on client side
             }
 
-            if (AppServer.currentGame!=null && AppServer.currentGame.getStateManager().hasState(GameState.class)) {//todo doc changes here
+            if (AppServer.currentGame!=null && AppServer.currentGame.getStateManager().hasState(GameState.class)) {
                 EndGameHandler endGameHandler = AppServer.currentGame.getStateManager().getState(GameState.class).getEndGameHandler();
                 if (endGameHandler != null) {
                     if (client.getPlayer().hasComponent(ImpostorComp.class)) {//check if the game has been won
@@ -61,7 +57,7 @@ public class PacketListenerServer extends Listener {
     }
 
     @Override
-    public void received(Connection connection, Object packet) {
+    public void received(Connection connection, Object packet) {//method invoked when when packet for client received
         try {
             this.semaphore.acquire();
             handlePacket(connection, packet);

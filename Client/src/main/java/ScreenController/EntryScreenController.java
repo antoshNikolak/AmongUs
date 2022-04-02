@@ -8,13 +8,13 @@ import javafx.scene.control.Button;
 
 public class EntryScreenController {
 
-    public void login(){
+    public void login(){//handle login button being pressed
         ScreenManager.activate(LoginScreen.class);
         Button button = (Button) ScreenManager.getScreen(LoginScreen.class).getNode("proceed");
         button.setOnAction(e -> AuthorizationClient.login());
     }
 
-    public void signup() {
+    public void signup() {//handle sign up button being pressed
         ScreenManager.activate(LoginScreen.class);
         Button button = (Button) ScreenManager.getScreen(LoginScreen.class).getNode("proceed");
         button.setOnAction(e -> AuthorizationClient.signup());

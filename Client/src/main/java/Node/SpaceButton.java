@@ -14,7 +14,7 @@ public class SpaceButton extends Button {
         setStyle();
     }
 
-    private void setStyle(){
+    private void setStyle(){//set 'space themed' background for button
         this.setStyle("-fx-background-color: transparent; " +
                 "-fx-border-color: white;" +
                 " -fx-border-width: 4;" +

@@ -10,7 +10,6 @@ public class DeadBody extends Entity {
     public DeadBody(String colour, PosComp pos) {
         super();
         addComponent(new ColourComp(colour));
-//        addComponent(new VelComp());
         addComponent(pos);
         addComponent(configAnimationComp(colour));
     }

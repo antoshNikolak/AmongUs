@@ -26,6 +26,8 @@ public class LocalPlayer extends Entity {
     }
 
     private boolean hasMovementInputChanged(InputRequest inputRequest) {
+        //determine if input is different since from the last input
+        //returns true if input is different
         if (prevRequest == null) return  true;
         return !(inputRequest.isUp() == prevRequest.isUp() &&
                 inputRequest.isRight() == prevRequest.isRight() &&
@@ -34,6 +36,8 @@ public class LocalPlayer extends Entity {
     }
 
     private InputRequest createPosRequest() {
+        //checks if player has pressed any relevant buttons. Returns each button the player pressed
+        //as input request object
         InputRequest request = new InputRequest();
         checkHorizontalMovement(request);
         checkVerticalMovement(request);
@@ -84,6 +88,7 @@ public class LocalPlayer extends Entity {
     public void render(GraphicsContext gc, Camera camera) {
         if (scrollingEnabled) {
             ScreenManager.getScreen(GameScreen.class).getCamera().centreOnEntity(this);
+            //show that the player is always in the centre of the screen, and all players are moving around him
         }
         super.render(gc, camera);
     }

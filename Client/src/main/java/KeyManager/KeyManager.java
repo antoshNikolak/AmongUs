@@ -17,6 +17,7 @@ public class KeyManager {
 
 
     static {
+        //listen for key board input
         ScreenManager.getScene().setOnKeyPressed(event -> {
             KeyCode keyCode = event.getCode();
             if (keyCode == KeyCode.A) {
@@ -45,6 +46,7 @@ public class KeyManager {
             }
 
         });
+        //listen for keys being released
         ScreenManager.getScene().setOnKeyReleased(event -> {
             KeyCode keyCode = event.getCode();
             if (keyCode == KeyCode.A) {

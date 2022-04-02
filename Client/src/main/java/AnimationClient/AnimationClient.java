@@ -4,10 +4,9 @@ package AnimationClient;
 import Packet.Animation.NewAnimationReturn;
 
 public class AnimationClient {
-    //    private int index = 0;
-    private final String[] frames;
-    private String currentFrame;
-    private final int indexesPerFrame;
+    private final String[] frames;//array of texture names
+    private String currentFrame;//current texture being displayed
+    private final int indexesPerFrame;//measure of how slow the animation plays
 
     public AnimationClient(NewAnimationReturn newAnimationReturn) {
         this.frames = newAnimationReturn.getFrames();
@@ -19,7 +18,7 @@ public class AnimationClient {
         if (indexesPerFrame == 0) {
             this.currentFrame = frames[0];
         } else {
-            this.currentFrame = frames[index / indexesPerFrame];
+            this.currentFrame = frames[index / indexesPerFrame];//set current frame corresponding to correct index per frame.
         }
     }
 

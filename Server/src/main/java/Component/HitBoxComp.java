@@ -5,7 +5,7 @@ import javafx.scene.shape.Rectangle;
 
 public class HitBoxComp implements Component{
 
-    private Rectangle hitBox;
+    private final Rectangle hitBox;//stores hit box of properties, as a rectangle
 
     public HitBoxComp(PosComp posComp){
         this.hitBox = new Rectangle(posComp.getPos().getX(), posComp.getPos().getY(), posComp.getWidth(), posComp.getHeight());

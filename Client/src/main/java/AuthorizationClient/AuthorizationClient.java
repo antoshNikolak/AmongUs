@@ -10,17 +10,17 @@ import javafx.scene.control.TextField;
 
 public class AuthorizationClient {
 
-    public static void login() {
+    public static void login() {//takes user input and send a login request to server
         UserData userData = retrieveUserData();
         ConnectionClient.sendTCP(new LoginRequest(userData));
     }
 
-    public static void signup(){
+    public static void signup(){//takes user input and send a sign up request to server
         UserData userData = retrieveUserData();
         ConnectionClient.sendTCP(new SignupRequest(userData));
     }
 
-    private static UserData retrieveUserData(){
+    private static UserData retrieveUserData(){//returns user input
         TextField textFieldUserName = (TextField) ScreenManager.getScreen(LoginScreen.class).getNode("userName");
         String userName = textFieldUserName.getText();
         TextField textFieldPassword = (TextField) ScreenManager.getScreen(LoginScreen.class).getNode("password");

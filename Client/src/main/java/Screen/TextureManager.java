@@ -8,8 +8,10 @@ import java.util.Map;
 
 public class TextureManager {
     private final static Map<String, Image> images = new HashMap<>();
+    //stores texture name with appropriate image object
 
     public static void init() {
+        //load all textures needed for later use
         String[] playerColours = new String[]{"green", "blue", "orange", "cyan", "yellow", "pink", "red"};
         for (String colour : playerColours) {
             loadImage("dead-" + colour, "Texture/dead-" + colour + ".png");

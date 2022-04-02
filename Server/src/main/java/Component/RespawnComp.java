@@ -3,7 +3,7 @@ package Component;
 import Position.Pos;
 
 public class RespawnComp implements Component{
-    private Pos pos;
+    private Pos pos;//position where player will respawn
 
     public RespawnComp(Pos pos) {
         this.pos = pos;

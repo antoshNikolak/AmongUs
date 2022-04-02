@@ -2,7 +2,6 @@ package ConnectionClient;
 
 import AlertBox.AlertBox;
 import CounterHandler.CounterHandler;
-import Packet.Animation.AnimationDisplayReturn;
 import EntityClient.*;
 import Game.Game;
 import Packet.AddEntityReturn.*;
@@ -48,20 +47,25 @@ public class PacketControllerClient {
     public void handleRegistrationConfirmation(RegistrationConfirmation packet) {
         if (packet.isAuthorized()) {
             Platform.runLater(() -> ScreenManager.activate(MenuScreen.class));
+            //user valid, proceed to menu
         } else {
             Platform.runLater(() -> AlertBox.display(packet.failMessage));
+            //display rejection alert box
         }
     }
 
     public void handleStartGameReturn(StartGameReturn packet) {
+        //handles packet game start packet from server, notifying this client to create a game object
         if (packet.isAuthorizedToStartGame()) {
             AppClient.currentGame = new Game();
         } else {
-            throw new IllegalStateException("client not registered to start game");
+            AlertBox.display("game already in progress");
+//            throw new IllegalStateException("client not registered to start game");
         }
     }
 
     public void handleAddEntityReturn(AddEntityReturn packet) {
+        //adds new entity object into the game, making them visible on the screen
         for (NewEntityState newEntityState : packet.getNewEntityStates()) {
             if (newEntityState instanceof NewAnimatedEntityState) {
                 Entity entity = new Entity((NewAnimatedEntityState) newEntityState);
@@ -73,6 +77,7 @@ public class PacketControllerClient {
     }
 
     public void handleAddLineReturn(AddLineReturn packet) {
+        //add a line onto the screen
         for (NewLineState newLineState : packet.getNewEntityStates()) {
             Platform.runLater(() -> {
                 Line line = new Line(newLineState.getStartPos().getX(), newLineState.getStartPos().getY(), newLineState.getFinalPos().getX(), newLineState.getFinalPos().getY());
@@ -82,12 +87,14 @@ public class PacketControllerClient {
     }
 
     public void handleAddLocalEntityReturn(AddLocalEntityReturn packet) {
+        //initialised local player, so each client knows which entity is local.
         NewAnimatedEntityState entityState = packet.getNewEntityState();
         AppClient.currentGame.handleLocalPlayer(new LocalPlayer(entityState));
     }
 
 
     public void handleStateReturn(StateReturn packet) {
+        //change player position an animation state based on server response.
         Entity.calculateTimeDiffBetweenPackets();
         for (ExistingEntityState existingEntityState : packet.getEntityStates()) {
             Entity entity = EntityRegistryClient.getEntity(existingEntityState.getRegistrationID());
@@ -96,20 +103,8 @@ public class PacketControllerClient {
         }
     }
 
-//    private final Counter gameStartCounter = new Counter(300, 200, 50);
-//
-//    public void handleGameStartTimerReturn(GameStartTimer packet) {
-//        Platform.runLater(() -> gameStartCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
-//    }
-//
-//
-//    private final Counter killCoolDownCounter = new Counter(500, 350, 50);
-//
-//    public void handleKillCoolDownTimer(KillCoolDownTimer packet) {
-//        Platform.runLater(() -> killCoolDownCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
-//    }
-
     public void handleClearEntityReturn(ClearEntityReturn packet) {
+        //remove all entities on the screen
         for (int tileID : packet.getRegistrationIDs()) {
             Entity entity = EntityRegistryClient.getEntity(tileID);
             EntityRegistryClient.removeEntity(tileID);
@@ -119,14 +114,17 @@ public class PacketControllerClient {
     }
 
     public void handleScrollingEnableReturn(ScrollingEnableReturn packet) {
+        //set boolean to determine if entities position on screen is dependant on player offset.
         AppClient.currentGame.getMyPlayer().setScrollingEnabled(packet.isScrollingEnabled());
     }
 
     public void handleAddNestedPane(AddNestedPane packet) {
+        //create a pane within current screen
         Platform.runLater(() -> NestedScreenHandler.createGameScreen(packet));
     }
 
     public void removeNestedScreen() {
+        //remove nested screen of the screen
         Platform.runLater(() -> {
             if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {
                 ScreenManager.getScreen(GameScreen.class).removeNestedScreen();
@@ -137,33 +135,34 @@ public class PacketControllerClient {
     private SudokuHandler sudokuHandler;
 
     public void handleAddSudokuPane(AddSudokuPane packet) {
+        //display sudoku on screen
         this.sudokuHandler = new SudokuHandler();
         Platform.runLater(() -> sudokuHandler.addSudokuToScreen(packet));
     }
 
     public void handleVerifySudokuReturn(VerifySudokuReturn packet) {
-        if (packet.isSudokuComplete()) removeNestedScreen();//todo maybe no need to check if sudoku is complete
+        if (packet.isSudokuComplete()) removeNestedScreen();
     }
 
-    public void handleAnimationDisplayReturn(AnimationDisplayReturn packet) {//todo delete
-        ImageView imageView = new ImageView(TextureManager.getTexture(packet.getTexture()));
-        imageView.setX(packet.getPos().getX());
-        imageView.setY(packet.getPos().getY());
-        imageView.setFitWidth(packet.getWidth());
-        imageView.setFitHeight(packet.getHeight());
-        Platform.runLater(() -> ScreenManager.getCurrentScreen().addNode(imageView));
-
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Platform.runLater(() -> {
-                    ScreenManager.getCurrentScreen().removeNode(imageView);
-                });
-            }
-        }, packet.getDuration());
-
-    }
+//    public void handleAnimationDisplayReturn(AnimationDisplayReturn packet) {
+//        ImageView imageView = new ImageView(TextureManager.getTexture(packet.getTexture()));
+//        imageView.setX(packet.getPos().getX());
+//        imageView.setY(packet.getPos().getY());
+//        imageView.setFitWidth(packet.getWidth());
+//        imageView.setFitHeight(packet.getHeight());
+//        Platform.runLater(() -> ScreenManager.getCurrentScreen().addNode(imageView));
+//
+//        Timer timer = new Timer();
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                Platform.runLater(() -> {
+//                    ScreenManager.getCurrentScreen().removeNode(imageView);
+//                });
+//            }
+//        }, packet.getDuration());
+//
+//    }
 
 
 //    public void handleSound(Sound packet) {
@@ -183,8 +182,8 @@ public class PacketControllerClient {
     private VotingPaneHandler votingPaneHandler = new VotingPaneHandler();
 
     public void handleAddVotingPane(AddVotingPane packet) {
+        //adds voting pane as a nested screen
         Platform.runLater(() -> {
-//            killCoolDownCounter.setTimerOn(false);
             votingPaneHandler = new VotingPaneHandler();
             votingPaneHandler.createVotingPane(packet);
         });
@@ -192,19 +191,19 @@ public class PacketControllerClient {
     }
 
     public void handleRemoveVotingScreen(DisplayVoteResults packet) {
-        votingPaneHandler.showVotes(packet.getPlayerVoteInfo());
-        new Timer().schedule(new TimerTask() {
+        //remove voting pane of the screen
+        votingPaneHandler.showVotes(packet.getPlayerVoteInfo());//display who voted for who as an animation
+        new Timer().schedule(new TimerTask() {//set timer so each player can look at the scores before the pane is removed
             @Override
             public void run() {
-//                killCoolDownCounter.setTimerOn(true);//un-pause timer
-                if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {
-                    removeNestedScreen();
+                if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {//check it nested screen hasn't been removed elsewhere in code
+                    removeNestedScreen();//remove voting pane
                 }
             }
         }, 2000);
     }
 
-    public void handleTimer(CountDown packet) {
+    public void handleTimer(CountDown packet) {//add count down timer to screen
         CounterHandler.addCountDown(packet);
 //        final AtomicInteger atomicInteger = new AtomicInteger(packet.countDownValue);
 //        final Text text = new Text();
@@ -235,18 +234,13 @@ public class PacketControllerClient {
     }
 
 
-//    private final Counter votingTimerCounter = new Counter(ScreenManager.STAGE_WIDTH - 80, ScreenManager.STAGE_HEIGHT - 80, 50);
-//
-//    public void handleVotingTimer(VotingTimer packet) {
-//        Platform.runLater(() -> votingTimerCounter.updateCounterValue(String.valueOf(packet.getCountDownValue())));
-//    }
-
     public void handleTaskBarUpdate(TaskBarUpdate packet) {
+        //update progress bar at the top of screen displaying showing portion of tasks left to do
         Entity taskBar = EntityRegistryClient.getEntity(packet.getRegistrationID());
         TaskBarHandler.updateTaskBar(taskBar, packet.getNewWidth());
     }
 
-    public void handleRoleNotify(RoleNotify packet) {
+    public void handleRoleNotify(RoleNotify packet) {//displays role of player (impostor or crewmate) on screen
         String role = packet.isImpostor() ? "impostor" : "crew";
         Text text = new Text(200, 150, "ROLE: " + role);
         text.setFont(Font.font(50));
@@ -260,27 +254,26 @@ public class PacketControllerClient {
     }
 
     public void handleCrewWin() {
-//        CounterHandler.stopAllCountDowns();
+        //process crew mates winning the game
         if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {
-            removeNestedScreen();
+            removeNestedScreen();//remove nested screen if there is one.
         }
-        ScreenManager.activate(CrewWinScreen.class);
-        AppClient.currentGame.setRunning(false);
-        revertToMenu();
+        ScreenManager.activate(CrewWinScreen.class);//show crew mate win screen
+        AppClient.currentGame.setRunning(false);//stop game loop
+        revertToMenu();//display menu after timer
     }
 
     public void handleImpostorWin() {
-//        CounterHandler.stopAllCountDowns();
-
+        //process impostor winning the game
         if (ScreenManager.getScreen(GameScreen.class).getNestedScreen() != null) {
-            removeNestedScreen();
+            removeNestedScreen();//remove nested screen if there is one.
         }
-        ScreenManager.activate(ImpostorWinScreen.class);
-        AppClient.currentGame.setRunning(false);
-        revertToMenu();
+        ScreenManager.activate(ImpostorWinScreen.class);//show impostor win screen
+        AppClient.currentGame.setRunning(false);//stop game loop
+        revertToMenu();//display menu after timer
     }
 
-    public void revertToMenu() {
+    public void revertToMenu() {//wait for 3 second and activate menu screen
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -290,6 +283,7 @@ public class PacketControllerClient {
     }
 
     public void handleSudokuFailedReturn(SudokuFailedReturn packet) {
+        //highlight in red each cell that is input by user that opposes one of the constraints of the sudoku puzzle
         sudokuHandler.unhighlightAllErrors();
         for (Pos pos : packet.errorsFound) {
             sudokuHandler.highlightError(pos);
@@ -297,10 +291,12 @@ public class PacketControllerClient {
     }
 
     public void handleChatMessageReturn(ChatMessageReturn packet) {
+        //display chat and user name of the player who input the message
         votingPaneHandler.handleChat(packet);
     }
 
     public void handleLeaderBoardReturn(LeaderBoardReturn packet) {
+        //display leaderboard, with player server returns
         ScreenManager.activate(LeaderBoardScreen.class);
         VBox content = (VBox) ScreenManager.getScreen(LeaderBoardScreen.class).getNode("content");
         Platform.runLater(() -> content.getChildren().clear());
@@ -318,10 +314,8 @@ public class PacketControllerClient {
     }
 
     public void handleRemoveCountDown(RemoveCountDown packet) {
+        //remove count down from screen
         CounterHandler.stopCountDown(packet.id);
     }
 
-//    public void handleElectionReturn(ElectionReturn packet) {
-//
-//    }
 }

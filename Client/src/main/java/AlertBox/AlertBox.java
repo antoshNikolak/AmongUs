@@ -7,6 +7,7 @@ import javafx.scene.control.ButtonType;
 public class AlertBox {
 
     public static void display(String message){
+        //create pop up alert box with message as parameter
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.setContentText(message);
         ButtonType type = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);

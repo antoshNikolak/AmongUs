@@ -13,12 +13,13 @@ import PlayerColourManager.PlayerColourFactory;
 import TimerHandler.CounterStarter;
 import World.World;
 import System.*;
+import javafx.scene.image.Image;
 
 import static StartUpServer.AppServer.currentGame;
 
 public class LobbyState extends PlayingState {
 
-    public static final int PLAYER_LIMIT = 4;
+    public static final int PLAYER_LIMIT = 2;
     private final PlayerColourFactory playerColourFactory = new PlayerColourFactory();
 
     public LobbyState() {

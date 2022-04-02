@@ -18,7 +18,7 @@ public class AppClient  extends Application {
     public static Game currentGame;
 
     public static void main(String[] args) {
-        launch(args);
+        launch(args);//invokes start method, initializes application class
     }
 
     @Override

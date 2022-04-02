@@ -2,7 +2,7 @@ package Component;
 
 public class ColourComp implements Component{
 
-    private String colour;
+    private final String colour;//stores colour of player
 
     public ColourComp(String colour) {
         this.colour = colour;

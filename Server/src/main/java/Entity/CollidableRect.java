@@ -6,7 +6,6 @@ import Position.Pos;
 import javafx.scene.shape.Line;
 
 public class CollidableRect extends Entity {
-    private Line line;
 
     public CollidableRect(Pos pos1,  int width, int height) {
         super();

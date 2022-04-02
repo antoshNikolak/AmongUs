@@ -5,13 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class PlayerColourFactory {//todo remove static AND DOC
+public class PlayerColourFactory {
     private final  List<String> availableColours;
-
-//    static {
-
-//    }
-
 
     public PlayerColourFactory(){
         String [] playerColours = new String[]{"green", "blue", "orange", "cyan", "yellow", "pink", "red"};

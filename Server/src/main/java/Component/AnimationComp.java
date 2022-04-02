@@ -9,24 +9,26 @@ import Packet.Animation.AnimState;
 import Packet.Animation.NewAnimationReturn;
 
 public class AnimationComp implements Component {
-    private Animation currentAnimation;
-    private AnimState currentAnimationState = AnimState.CONST;
-    private final EnumMap<AnimState, Animation> directionAnimationMap = new EnumMap<>(AnimState.class);
+    private AnimState currentAnimationState = AnimState.CONST;//stores animation type being displayed
+    private final EnumMap<AnimState, Animation> directionAnimationMap = new EnumMap<>(AnimState.class);//maps each type of animation to the animation itself
 
-
+    //overload methods for adding animation
     public void addAnimation(AnimState animState, String [] frames, int framesPerIndex) {
         directionAnimationMap.put(animState, new Animation(frames, framesPerIndex));
     }
 
+    //overload methods for adding animation
     public void addAnimation(AnimState animState, String texture){
         directionAnimationMap.put(animState, new Animation(new String[]{texture}, 0));
     }
 
+    //overload methods for adding animation
     public void addAnimation(String texture){
         directionAnimationMap.put(AnimState.CONST, new Animation(new String[]{texture}, 0));
     }
 
     public List<NewAnimationReturn> adaptToAllNewAnimations(){
+        //convert each animation to a new animation return object which will be sent to clients
         List <NewAnimationReturn> animationReturns = new ArrayList<>();
         directionAnimationMap.forEach((animState, animation) -> {
             animationReturns.add(new NewAnimationReturn(animState, animation.frames, animation.indexesPerFrame));
@@ -36,8 +38,7 @@ public class AnimationComp implements Component {
 
     public void setCurrentAnimation(AnimState animState){
         this.currentAnimationState = animState;
-        this.currentAnimation = directionAnimationMap.get(animState);
-        this.currentAnimation.setIndex(0);
+        directionAnimationMap.get(animState).setIndex(0);
     }
 
     public AnimState getCurrentAnimationState() {
@@ -45,25 +46,15 @@ public class AnimationComp implements Component {
     }
 
     public Animation getCurrentAnimation() {
-        return currentAnimation;
+        return directionAnimationMap.get(currentAnimationState);
     }
 
     public Set<AnimState> getAnimStates(){
         return directionAnimationMap.keySet();
-//        return new ArrayList<>(directionAnimationMap.keySet());
     }
     public Animation getAnimation(AnimState animState){
         return directionAnimationMap.get(animState);
     }
-
-//    public boolean isAnimationRunnable(AnimationCondition animationCondition) {
-//        return animationCondition.returnLogic();
-//    }
-//
-//    public boolean isAnimationResetable(AnimationCondition animationCondition) {
-//        return animationCondition.returnLogic();
-//    }
-
 
     public static class Animation {
         private final String[] frames;//array of texture

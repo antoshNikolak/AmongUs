@@ -5,11 +5,11 @@ import Component.*;
 import State.TaskState;
 
 public class MazePlayer extends Entity {
-    private int connectionID;
+//    private int connectionID;
 
     public MazePlayer(TaskState taskState, int connectionID) {
         super();
-        this.connectionID = connectionID;
+//        this.connectionID = connectionID;
         AnimationComp animationComp = new AnimationComp();
         animationComp.addAnimation("red-rect");
         animationComp.setCurrentAnimation(AnimState.CONST);

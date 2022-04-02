@@ -11,7 +11,7 @@ public class Camera {
     private double offsetX;
 
 
-    public void centreOnEntity(Entity player) {
+    public void centreOnEntity(Entity player) {//calculate x and y offsets for rendering
         double centreX = ScreenManager.getScene().getWidth() / 2;//centre x co ordinate relative to left most point of scene
         double centreY = ScreenManager.getScene().getHeight() / 2;//centre y co ordinate relative up most point of scene.
         this.offsetY = player.getPos().getY() - centreY + TextureManager.getTexture("left0-red").getHeight() / 2;//smallest y position visible on screen relative to origin

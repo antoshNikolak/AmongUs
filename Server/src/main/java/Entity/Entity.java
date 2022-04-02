@@ -17,13 +17,6 @@ public abstract class Entity {
 
     protected Entity() {
         RegistryHandler.entityRegistryServer.addEntity(this);
-//        AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(this);
-//
-//        if (hasComponent(TaskPlayerComp.class)) {
-//            getComponent(TaskPlayerComp.class).getTaskState().getEntities().add(this);
-//        } else {
-//            AppServer.currentGame.getStateManager().getCurrentState().getEntities().add(this);
-//        }
     }
 
     public ExistingEntityState adaptToEntityState() {
@@ -39,7 +32,7 @@ public abstract class Entity {
         int registrationID = RegistryHandler.entityRegistryServer.getItemID(this);
         NewAnimatedEntityState newAnimatedEntityState = new NewAnimatedEntityState(registrationID, posComp.getPos(), animationComp.adaptToAllNewAnimations(), animationComp.getCurrentAnimationState());
         newAnimatedEntityState.setScrollable(scrollable);
-        return newAnimatedEntityState;//todo record in document and simplify
+        return newAnimatedEntityState;
     }
 
     public NewLineState adaptToNewLineState() {

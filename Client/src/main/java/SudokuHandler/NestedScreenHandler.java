@@ -10,14 +10,13 @@ import javafx.scene.shape.Rectangle;
 public class NestedScreenHandler {
 
     public static GameScreen createGameScreen(AddsPane packet) {
-        Pane pane = createPane(packet);
-        createBackground(pane);
+        Pane pane = createPane(packet);//create pane with desired dimensions
+        createBackground(pane);//set background of pane
         GameScreen gameScreen = new GameScreen.Builder(pane)
                 .withNodes(packet.getNodes())
                 .withNewEntityStates(packet.getNewEntityStates())
-                .build();
-        addNestedScreen(gameScreen);
-//        gameScreen.setClearBoundaries(0, 0, packet.getPaneWidth(), packet.getPaneHeight());
+                .build();//create game screen with appropriate nodes and entities
+        addNestedScreen(gameScreen);//add as nested screen
         return gameScreen;
     }
 

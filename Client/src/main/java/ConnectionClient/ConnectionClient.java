@@ -1,7 +1,7 @@
 package ConnectionClient;
 
 import Packet.Animation.AnimState;
-import Packet.Animation.AnimationDisplayReturn;
+//import Packet.Animation.AnimationDisplayReturn;
 import Packet.Animation.AnimationOver;
 import Packet.AddEntityReturn.*;
 import Packet.Animation.NewAnimationReturn;
@@ -66,7 +66,10 @@ public final class ConnectionClient {
     private static void startConnection() {
         try {
             client.start();//start client thread
-            client.connect(5000, "localhost", 49158, 65521);//Opens a TCP and UDP client
+            client.connect(5000, "127.0.0.1", 49158, 65521);//Opens a TCP and UDP client
+//            client.connect(5000, "192.168.1.73", 49158, 65521);//Opens a TCP and UDP client
+//            client.connect(5000, "146.198.43.237", 49158, 65521);//Opens a TCP and UDP client
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,11 +86,9 @@ public final class ConnectionClient {
         kryo.register(StateReturn.class);
         kryo.register(InputRequest.class);
         kryo.register(Pos.class);
-//        kryo.register(AddStationaryEntityReturn.class);
         kryo.register(ExistingEntityState.class);
         kryo.register(ArrayList.class);
         kryo.register(AddLocalEntityReturn.class);
-//        kryo.register(AddChangingEntityReturn.class);
         kryo.register(CopyOnWriteArrayList.class);
         kryo.register(HashSet.class);
         kryo.register(NewEntityState.class);
@@ -97,8 +98,6 @@ public final class ConnectionClient {
         kryo.register(AnimState.class);
         kryo.register(CountDown.class);
         kryo.register(ClearEntityReturn.class);
-//        kryo.register(GameStartCountDown.class);
-//        kryo.register(KillCoolDownCountDown.class);
         kryo.register(ScrollingEnableReturn.class);
         kryo.register(NewAnimatedEntityState.class);
         kryo.register(AddLineReturn.class);
@@ -114,14 +113,13 @@ public final class ConnectionClient {
         kryo.register(Integer[][].class);
         kryo.register(Integer[].class);
         kryo.register(Integer.class);
-        kryo.register(AnimationDisplayReturn.class);
+//        kryo.register(AnimationDisplayReturn.class);
         kryo.register(NodeInfo.class);
         kryo.register(NodeType.class);
         kryo.register(Sound.class);
         kryo.register(AddVotingPane.class);
         kryo.register(byte[].class);
         kryo.register(ImpostorVote.class);
-//        kryo.register(VotingCountDown.class);
         kryo.register(ElectionReturn.class);
         kryo.register(DisplayVoteResults.class);
         kryo.register(HashMap.class);

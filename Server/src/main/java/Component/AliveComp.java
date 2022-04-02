@@ -1,7 +1,7 @@
 package Component;
 
 public class AliveComp implements  Component{
-    private boolean isAlive;
+    private boolean isAlive;//boolean true if player is alive, false if player is ghost
 
     public AliveComp(boolean isAlive) {
         this.isAlive = isAlive;

@@ -26,9 +26,6 @@ import static StartUpServer.AppServer.currentGame;
 
 public class ImposterActionsSystem extends BaseSystem {
 
-//    private static final List<Player> ghosts = new ArrayList<>();
-
-
     @Override
     public void update() {
     }
@@ -38,29 +35,9 @@ public class ImposterActionsSystem extends BaseSystem {
         if (packet.isKillKey() && player.hasComponent(ImpostorComp.class)) {
             if (player.getComponent(ImpostorComp.class).isAbleToKill()) {
                 handleKillAction(player);
-//                EndGameHandler.checkImpostorWin(getAlivePlayers().size());
             }
         }
     }
-
-//    private void checkImpostorWin() {
-//        if (getAlivePlayers().size() == 2) {
-//            System.out.println("IMPOSTOR WON");
-//            recordImpostorWin();
-//            ConnectionServer.sendTCPToAllPlayers(new ImpostorWin());
-//            AppServer.currentGame.stopGame();
-//        }
-//    }
-
-
-
-//    public void handleSpecialActions(Player player, PosRequest packet) {
-//        if (packet.isKillKey() && player.hasComponent(ImposterComp.class)) {
-//            if (player.getComponent(ImposterComp.class).isAbleToKill()) {
-//                handleKillAction(player);
-//            }
-//        }
-//    }
 
     private void handleKillAction(Player imposter) {
         Optional<Player> crewMateOptional = getCrewMateToKill(imposter, getCrewMates());
@@ -90,14 +67,6 @@ public class ImposterActionsSystem extends BaseSystem {
 
     private void registerDeadBody(DeadBody deadBody) {
         currentGame.getStateManager().getTopState().getSystem(ReportBodySystem.class).getDeadBodies().add(deadBody);
-    }
-
-    public void stopCrewMateTask(Player crewMate) {//MIGRATE TO PLAYER CLASS
-        if (crewMate.getCurrentTask() != null) {
-            ConnectionServer.sendTCP(new RemoveNestedScreen(), crewMate.getConnectionID());
-            crewMate.getCurrentTask().setPlayer(null);
-            crewMate.setCurrentTask(null);
-        }
     }
 
     private void startKillImposterCoolDown(Player imposter) {
@@ -147,10 +116,6 @@ public class ImposterActionsSystem extends BaseSystem {
         registerDeadBody(deadBody);
     }
 
-    //        DeadPlayer deadPlayer = new DeadPlayer(colourComp.getColour(), new PosComp(posComp.getPos(), posComp.getWidth(), posComp.getHeight()));//todo add this to the diary
-
-
-
     public List<Player> getCrewMates() {
         return currentGame.getPlayers().stream().
                 filter(player -> !player.hasComponent(ImpostorComp.class)).
@@ -166,16 +131,8 @@ public class ImposterActionsSystem extends BaseSystem {
         return currentGame.getPlayers().stream().
                 filter(player -> !player.getComponent(AliveComp.class).isAlive()).
                 collect(Collectors.toList());
-//        return A.stream().
-//                map(Client::getPlayer).
-//                filter(player -> !player.getComponent(AliveComp.class).isAlive()).
-//                collect(Collectors.toList());
     }
 
-
-//    public  List<Integer> getAliveConnectionIDs() {
-//        return ConnectionServer.getPlayerConnectionIDs(getAlivePlayers());
-//    }
 
     public  List<Player> getAlivePlayers() {
         return currentGame.getPlayers().stream().

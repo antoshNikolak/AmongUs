@@ -32,13 +32,6 @@ public class TaskSystem extends BaseSystem {
         }
     }
 
-//    public void handleTaskAction(Player player, PosRequest posRequest) {
-//        if (isPlayerEligibleToPlayerTask(player, posRequest)) {
-//            Optional<Tile> closestTaskTile = DistanceFinder.getClosestEntity(player, AppServer.currentGame.getStateManager().getCurrentState().getWorld().getTilesWithTask(), 70);
-//            closestTaskTile.ifPresent(tile -> createTaskPlayerRelation(player, tile));
-//        }
-//    }
-
     private boolean isPlayerEligibleToPlayerTask(Player player, InputRequest inputRequest) {
         return inputRequest.isTaskKey() &&
                 !player.hasComponent(ImpostorComp.class) &&

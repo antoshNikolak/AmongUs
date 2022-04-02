@@ -14,20 +14,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class CounterHandler {
 
-            private final static Map<Integer, CountDownTimerTask> countDownMap = new HashMap<>();
-//    private final static Map<CountDown, CountDownTimerTask> countDownMap = new HashMap<>();
+    private final static Map<Integer, CountDownTimerTask> countDownMap = new HashMap<>();
+    //maps id with count down object
 
 
     public static void addCountDown(CountDown packet) {
         final AtomicInteger atomicInteger = new AtomicInteger(packet.countDownValue);
         final GameScreen gameScreen = ScreenManager.getScreen(GameScreen.class);
         final Label text = createText(packet, gameScreen);
-        final GameScreen correctScreen = addTextToScreen(gameScreen, text);
-        startTimer(text, atomicInteger, correctScreen, packet);
+        final GameScreen correctScreen = addTextToScreen(gameScreen, text);//adds text node to screen
+        startTimer(text, atomicInteger, correctScreen, packet);//counter will start decrementing on screen
     }
 
 
     public static GameScreen addTextToScreen(GameScreen gameScreen, Label text) {
+        //add text node to correct screen
         GameScreen correctScreen;
         if (gameScreen.getNestedScreen() != null) {
             correctScreen = gameScreen.getNestedScreen();
@@ -42,29 +43,13 @@ public class CounterHandler {
 
 
     public static void stopCountDown(int id) {
+        //remove count down of the screen
         Platform.runLater(() -> {
             CountDownTimerTask timerTask = countDownMap.get(id);
             timerTask.cancel();//invoke cancel method of timer task
             countDownMap.remove(id);//deregister countdown on client side
         });
     }
-
-//    public static void stopCountDown(CountDown countDown) {
-//        Platform.runLater(() -> {
-//            CountDownTimerTask timerTask = countDownMap.get(countDown);
-//            timerTask.cancel();//invoke cancel method of timer task
-//            countDownMap.remove(countDown);//deregister countdown on client side
-//        });
-//    }
-//
-//    private static CountDown getCountDown(int id) {
-//        for (CountDown countDown : countDownMap.keySet()) {
-//            if (countDown.id == id) {
-//                return countDown;
-//            }
-//        }
-//        return null;
-//    }
 
     private static void startTimer(Label text, AtomicInteger atomicInteger, GameScreen gameScreen, CountDown packet) {
         CountDownTimerTask countDownTimerTask = new CountDownTimerTask(text, atomicInteger, gameScreen);

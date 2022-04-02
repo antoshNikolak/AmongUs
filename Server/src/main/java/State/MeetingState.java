@@ -23,8 +23,6 @@ import java.util.Optional;
 import static StartUpServer.AppServer.currentGame;
 
 public class MeetingState extends PlayingState {
-    //Only use this class i game class is on the stack before it
-
     private VoteHandler voteHandler;
 
     public static void checkStateValid(Player player) {

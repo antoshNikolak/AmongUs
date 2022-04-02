@@ -24,14 +24,6 @@ import static StartUpServer.AppServer.currentGame;
 public class VoteHandler {
 
     private final Map<String, VoteOption> playerVoteMap = new HashMap<>();
-//    private final MeetingState meetingState;
-
-//    public VoteHandler(MeetingState meetingState) {
-//        this.meetingState = meetingState;
-//    }
-
-
-
 
     private Optional<VoteOption> getVoteOptionWithMostVotes() {
         Map<VoteOption, Integer> playerVotes = getSuspectVoteCountMap();//maps vote option to num of votes

@@ -10,16 +10,15 @@ import javafx.scene.input.MouseEvent;
 
 public class MenuScreenController {
 
-    public void startGame() {
+    public void startGame() {//handle start game button pressed
         ConnectionClient.sendTCP(new StartGameRequest());
     }
 
-    public void showLeaderBoard() {
-        System.out.println("showing leaderboard");
+    public void showLeaderBoard() {//handle show leader board button being pressed
         ConnectionClient.sendTCP(new RequestLeaderBoard());
     }
 
-    public void logout() {
+    public void logout() {//handle logout button being pressed
         ConnectionClient.sendTCP(new LogoutRequest());
         ScreenManager.activate(EntryScreen.class);
     }

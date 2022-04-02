@@ -21,8 +21,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Game {
     private final List<Entity> changingEntities = new CopyOnWriteArrayList<>();
     private LocalPlayer myPlayer;
-//    private RecordHandler recordHandler = new RecordHandler();
-    private AnimationTimer animationTimer;
     private boolean running = true;
 
 
@@ -47,9 +45,9 @@ public class Game {
     }
 
     public void startTimer() {
-        this.animationTimer = new AnimationTimer() {
+        AnimationTimer animationTimer = new AnimationTimer() {
             @Override
-            public void handle(long now) {
+            public void handle(long now) {//game loop, runs at 60 fps
                 if (running) {
                     myPlayer.sendInput();
                     interpolate(ScreenManager.getScreen(GameScreen.class));
@@ -60,23 +58,23 @@ public class Game {
 
             }
         };
-        this.animationTimer.start();
+        animationTimer.start();
     }
 
     private void stopGame() {
-        ScreenManager.getScreen(GameScreen.class).getEntities().clear();
-        TaskBarHandler.getTaskBarProgress().setWidth(0);
-        this.changingEntities.clear();
+        ScreenManager.getScreen(GameScreen.class).getEntities().clear();//remove entities of screen
+        TaskBarHandler.getTaskBarProgress().setWidth(0);//reset progress bar
+        this.changingEntities.clear();//remove entity objects from the list, so they are garbage collected
         myPlayer = null;
     }
 
-
-    private void interpolate(GameScreen gameScreen) {//todo doc recursion
+    private void interpolate(GameScreen gameScreen) {
+        //interpolate between entity positions to show smooth transition
         for (Entity entity : gameScreen.getEntities()) {
             entity.interpolate();
         }
         if (gameScreen.getNestedScreen() != null) {
-            interpolate(gameScreen.getNestedScreen());
+            interpolate(gameScreen.getNestedScreen());//perform interpolation on entities inside of nested pane
         }
     }
 
@@ -98,11 +96,4 @@ public class Game {
         return changingEntities;
     }
 
-//    public RecordHandler getRecordHandler() {
-//        return recordHandler;
-//    }
-//
-//    public void setRecordHandler(RecordHandler recordHandler) {
-//        this.recordHandler = recordHandler;
-//    }
 }
