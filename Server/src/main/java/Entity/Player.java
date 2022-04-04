@@ -12,15 +12,12 @@ import State.TaskState;
 import static StartUpServer.AppServer.currentGame;
 
 public class Player extends Entity {
-    //each player must have its own state
     private TaskState currentTask;
     private final Client client;
-//    private final int connectionID;
     private final String nameTag;
 
 
     public Player(Client client, String colour) {
-//        this.connectionID = connectionID;
         this.client = client;
         this.nameTag = client.getUserData().getUserName();
         startComps(new PosComp(100, 100, 50, 63), colour, client.getConnectionID());
@@ -35,7 +32,7 @@ public class Player extends Entity {
         NewAnimatedEntityState newAnimatedEntityState = new NewAnimatedEntityState(registrationID, posComp.getPos(), animationComp.adaptToAllNewAnimations(), animationComp.getCurrentAnimationState());
         newAnimatedEntityState.setScrollable(scrollable);
         newAnimatedEntityState.setNameTag(this.nameTag);
-        return newAnimatedEntityState;//todo record in document and simplify
+        return newAnimatedEntityState;
     }
 
     public String getNameTag() {

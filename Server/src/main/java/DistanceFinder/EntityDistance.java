@@ -5,7 +5,7 @@ import Entity.Entity;
 public final class EntityDistance<T extends Entity, S extends Entity>  implements Comparable<EntityDistance<T, S>>{
     private final T entity1;
     private final S entity2;
-    private final double distance;
+    private final double distance;//distance between entity 1 and entity 2.
 
     public EntityDistance(T entity, S entity2, double distance) {
         this.entity1 = entity;

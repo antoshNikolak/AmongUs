@@ -113,11 +113,6 @@ public final class ConnectionServer {
                 collect(Collectors.toList());
     }
 
-
-
-
-
-
     public static void start(){
         startConnection();
         registerPackets();
@@ -133,47 +128,50 @@ public final class ConnectionServer {
         }
     }
 
-    public static Optional<Client> getClientFromConnectionID(List<Client> clients, int connectionID) {//should this return optional
+    public static Client getClientFromConnectionID(List<Client> clients, int connectionID) {//should this return optional
         for (Client client: clients){
             if (client.getConnectionID() == connectionID){
-                return Optional.of(client);
+                return client;
             }
         }
-        return Optional.empty();
+        return null;
+//        throw new IllegalStateException("Client doesnt exist");
+
+//        return Optional.empty();
     }
 
-    public static Optional<Client> getClientFromConnectionID(int connectionID){
+    public static Client getClientFromConnectionID(int connectionID){
         return getClientFromConnectionID(AppServer.getClients(), connectionID);
     }
 
 
 
-    public static Optional<Player> getPlayerFromConnectionID(List<Player> players, int connectionID) {//should this return optional
+    public static Player getPlayerFromConnectionID(List<Player> players, int connectionID) {//should this return optional
         for (Player player: players){
             if (player.getConnectionID() == connectionID){
-                return Optional.of(player);
+                return player;
             }
         }
-        return Optional.empty();
+        return null;
+//        throw new IllegalStateException("Player doesnt exist");
+
+//        return Optional.empty();
     }
 
-    public static Optional<Player> getPlayerFromConnectionID( int connectionID) {//todo should this return optional?
-        for (Player player: currentGame.getPlayers()){
-            if (player.getConnectionID() == connectionID){
-                return Optional.of(player);
-            }
-        }
-        return Optional.empty();
+    public static Player getPlayerFromConnectionID(int connectionID) {
+        return getPlayerFromConnectionID(currentGame.getPlayers(), connectionID);
+//        for (Player player: currentGame.getPlayers()){
+//            if (player.getConnectionID() == connectionID){
+//                return player;
+////                return Optional.of(player);
+//            }
+//        }
+//        throw new IllegalStateException("Client doesnt exist");
+//        return null;
+
+//        return Optional.empty();
     }
 
-    public static int getConnectionIDFromPlayer(Player player){
-        for (Client client: AppServer.getClients()){
-            if (player == client.getPlayer()){
-                return client.getConnectionID();
-            }
-        }
-        return -1;
-    }
 
     private static void registerPackets() {
         Kryo kryo = server.getKryo();

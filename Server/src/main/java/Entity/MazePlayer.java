@@ -4,12 +4,11 @@ import Packet.Animation.AnimState;
 import Component.*;
 import State.TaskState;
 
+//entity used when a player plays the maze mini game
 public class MazePlayer extends Entity {
-//    private int connectionID;
 
     public MazePlayer(TaskState taskState, int connectionID) {
         super();
-//        this.connectionID = connectionID;
         AnimationComp animationComp = new AnimationComp();
         animationComp.addAnimation("red-rect");
         animationComp.setCurrentAnimation(AnimState.CONST);

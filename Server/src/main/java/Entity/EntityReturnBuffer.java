@@ -43,34 +43,31 @@ public class EntityReturnBuffer {
                 collect(Collectors.toSet());
     }
 
-    public static Set<NewLineState> adaptCollectionToNewLineStates(Collection<? extends Entity> entities) {
-        return entities.stream().
-                map(entity -> entity.adaptToNewLineState()).
-                collect(Collectors.toSet());
-    }
-
-
     private List<Integer> getAllConnectionIDs() {
         return AppServer.currentGame.getPlayers().stream().
                 map(Player::getConnectionID).
                 collect(Collectors.toList());
     }
 
+    //overloaded method to add entity to buffer, entity will be broadcast to all client
     public synchronized void putEntity(Entity entity) {
         if (RegistryHandler.entityRegistryServer.getItemID(entity) == null) return;
         entityDestinationsReturnBuffer.put(entity, getAllConnectionIDs());
     }
 
+    //overloaded method to add entity to buffer, entity will be broadcast to clients with connection ID's input
     public synchronized void putEntity(Entity entity, List<Integer> connectionIDs) {
         if (RegistryHandler.entityRegistryServer.getItemID(entity) == null) return;
         entityDestinationsReturnBuffer.put(entity, connectionIDs);
     }
 
+    //overloaded method to add entity to buffer, entity will be broadcast to clients with connection ID's in var args
     public synchronized void putEntity(Entity entity, Integer... connectionIDs) {
         if (RegistryHandler.entityRegistryServer.getItemID(entity) == null) return;
         entityDestinationsReturnBuffer.put(entity, Arrays.asList(connectionIDs));
     }
 
+    //removes entity from buffer
     public synchronized void removeEntity(Entity entity) {
         this.entityDestinationsReturnBuffer.remove(entity);
     }

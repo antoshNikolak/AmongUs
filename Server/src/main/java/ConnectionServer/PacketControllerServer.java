@@ -25,14 +25,14 @@ import Packet.UserData.UserData;
 import Packet.Voting.ImpostorVote;
 
 import java.util.LinkedHashMap;
-import java.util.Optional;
+import java.util.Objects;
 
 import static StartUpServer.AppServer.currentGame;
 
 public class PacketControllerServer {
 
     public void handleLogin(LoginRequest packet, int connectionID) {
-        if (ConnectionServer.getClientFromConnectionID(connectionID).isEmpty()) {//check this client has not already logged in
+        if (ConnectionServer.getClientFromConnectionID(connectionID) == null) {//check this client has not already logged in
             UserData userData = packet.getUserData();
             RegistrationConfirmation confirmation = AuthorizationServer.handleLogin(userData);
             AuthorizationServer.handleRegistrationConfirmation(confirmation, userData, connectionID);//notify user if they have been authorized
@@ -50,26 +50,23 @@ public class PacketControllerServer {
             ConnectionServer.sendTCP(new StartGameReturn(false), connectionID);//send back rejection
             return;//stops client from entering once game start
         }
-        Optional<Client> clientOptional = ConnectionServer.getClientFromConnectionID(connectionID);
-        if (clientOptional.isPresent() && clientOptional.get().getPlayer() != null) {
+        Client client = ConnectionServer.getClientFromConnectionID(connectionID);
+        if (client != null && client.getPlayer() != null) {
             return;//stops client from pressing button 2x to crash the game
         }
-        ConnectionServer.sendTCP(new StartGameReturn(clientOptional.isPresent()), connectionID);//send back confirmation
-        clientOptional.ifPresent(client -> {
-            LobbyState.prepareGame();
-            currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(client);
-        });
+        ConnectionServer.sendTCP(new StartGameReturn(client != null), connectionID);//send back confirmation
+        LobbyState.prepareGame();
+        currentGame.getStateManager().getState(LobbyState.class).handleNewPlayerJoin(Objects.requireNonNull(client));
     }
 
     public void handleKeyBoardInput(InputRequest packet, int connectionId) {
-        Optional<Player> optionalPlayer = ConnectionServer.getPlayerFromConnectionID(currentGame.getPlayers(), connectionId);
-        if (optionalPlayer.isPresent()) {
-            if (packet.isEmergencyMeetingKey()) {//check player pressed E
-                MeetingState.checkStateValid(optionalPlayer.get());//push meeting state onto stack if correct conditions
-            }
-            State state = getPlayerState(optionalPlayer.get());
-            state.processPlayingSystems(optionalPlayer.get(), packet);
+        Player player = Objects.requireNonNull(ConnectionServer.getPlayerFromConnectionID(currentGame.getPlayers(), connectionId));
+        if (packet.isEmergencyMeetingKey()) {//check player pressed E
+            MeetingState.checkStateValid(player);//push meeting state onto stack if correct conditions
         }
+        State state = getPlayerState(player);
+        state.processPlayingSystems(player, packet);
+
     }
 
     //returns state of player task
@@ -82,26 +79,25 @@ public class PacketControllerServer {
 
     public void handleVerifySudokuRequest(VerifySudokuRequest packet, int connectionID) {
         //check if sudoku client sent is correctly solved
-        Optional<Player> playerOptional = ConnectionServer.getPlayerFromConnectionID(connectionID);
-        playerOptional.ifPresent(player -> {
-            SudokuTaskState sudokuTaskState = (SudokuTaskState) player.getCurrentTask();
-            sudokuTaskState.handleCompletionVerification(packet.getSudoku(), player.getClient());
-        });
+        Player player = ConnectionServer.getPlayerFromConnectionID(connectionID);
+//        playerOptional.ifPresent(player -> {
+        SudokuTaskState sudokuTaskState = (SudokuTaskState) player.getCurrentTask();
+        sudokuTaskState.handleCompletionVerification(packet.getSudoku(), player.getClient());
+//        });
     }
 
 
     public void handleImpostorVote(ImpostorVote packet, int connectionID) {
-        //handle player vote durin meeting state
+        //handle player vote during meeting state
         MeetingState meetingState = currentGame.getStateManager().getState(MeetingState.class);
         if (meetingState == null) return;
-        Optional<Player> playerOptional = ConnectionServer.getPlayerFromConnectionID(connectionID);
-        playerOptional.ifPresent(player -> meetingState.getVoteHandler().registerVote(player, packet.getVoteOption()));
+        Player player = ConnectionServer.getPlayerFromConnectionID(connectionID);
+        meetingState.getVoteHandler().registerVote(player, packet.getVoteOption());
     }
 
-    public void handleLogout(int id) {
-        //handle client logout request
-        Optional<Client> playerOptional = ConnectionServer.getClientFromConnectionID(id);
-        playerOptional.ifPresent(client -> AppServer.getClients().remove(client));
+    public void handleLogout(int id) {//handle client logout request
+        Client client = ConnectionServer.getClientFromConnectionID(id);
+        AppServer.getClients().remove(client);
     }
 
     public void handleScreenInfo(ScreenInfo packet) {
@@ -110,26 +106,17 @@ public class PacketControllerServer {
     }
 
     public void handleChatMessageRequest(ChatMessageRequest packet, int connectionID) {
-        //handle chat message/
-        Optional<Player> playerOptional = ConnectionServer.getPlayerFromConnectionID(connectionID);
-        if (playerOptional.isEmpty() || !playerOptional.get().getComponent(AliveComp.class).isAlive()) return;
-        String colour = playerOptional.get().getComponent(AnimationComp.class).getAnimation(AnimState.RIGHT).getFrames()[0];
-        ConnectionServer.sendTCPToAllPlayers(new ChatMessageReturn(packet.message, playerOptional.get().getNameTag(), colour));
+        //handle chat message
+        Player player = ConnectionServer.getPlayerFromConnectionID(connectionID);
+        if (!player.getComponent(AliveComp.class).isAlive()) return;
+        String colour = player.getComponent(AnimationComp.class).getAnimation(AnimState.RIGHT).getFrames()[0];
+        ConnectionServer.sendTCPToAllPlayers(new ChatMessageReturn(packet.message, player.getNameTag(), colour));
     }
 
     public void handleLeaderBoardRequest(int connectionID) {
+        //return top 10 players with fastest impostor win time, along with their win time
         LinkedHashMap<String, Double> leaderBoard = DataBaseUtil.getLeaderBoard();
         ConnectionServer.sendTCP(new LeaderBoardReturn(leaderBoard), connectionID);
     }
 
-
-//    public void handleAnimationOver(AnimationOver packet, int connectionID) {
-////        EmergencyTableSystem s = AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class);//todo NULL POINTER SYSTEM
-////        //s is null
-////
-//////        System.out.println("E"+s);
-//////        System.out.println(AppServer.currentGame.getStateManager().getCurrentState().getSystem(EmergencyTableSystem.class));
-////        s.onAnimationOver();
-////        AppServer.currentGame.getStateManager().getCurrentState().removeSystem(EmergencyTableSystem.class);
-//    }
 }

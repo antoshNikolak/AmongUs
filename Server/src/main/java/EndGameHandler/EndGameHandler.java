@@ -32,17 +32,20 @@ public class EndGameHandler {
         }
     }
 
+    //returns of the number of players alive
     private int getPlayersAlive() {
         return AppServer.currentGame.getStateManager().getState(GameState.class).getSystem(ImposterActionsSystem.class).
                 getAlivePlayers().size();
     }
 
+    //insert impostor win into data base, if faster than previous time
     public void recordImpostorWin() {
         double time = AppServer.currentGame.getStateManager().getState(GameState.class).stopGameDurationTimer();
         String userName = getImpostorUserName();
         DataBaseUtil.updateImpostorWinTime(userName, time / 1000);
     }
 
+    //returns username of impostor
     private String getImpostorUserName() {
         for (Player player : AppServer.currentGame.getPlayers()) {
             if (player.hasComponent(ImpostorComp.class)) {
@@ -60,13 +63,13 @@ public class EndGameHandler {
         }).start();
     }
 
+    //remove timers of client screens,and de-registers from server
     private void stopAllTimers() {
         CountDownRegistryServer registry = RegistryHandler.countDownRegistryServer;
         for (CountDown countDown : registry.getCountDowns()) {
             registry.stopCountDown(countDown);
             registry.removeEntity(countDown);
         }
-//        registry.getCountDowns().forEach(registry::stopCountDown);
-
     }
+
 }

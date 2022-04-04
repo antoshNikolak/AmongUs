@@ -21,7 +21,6 @@ import State.GameState;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
-import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
 public class PacketListenerServer extends Listener {
@@ -29,29 +28,26 @@ public class PacketListenerServer extends Listener {
     private final Semaphore semaphore = new Semaphore(1);
 
     @Override
-    public void disconnected(Connection connection) {
-        Optional<Client> clientOpt = ConnectionServer.getClientFromConnectionID(connection.getID());
-        if(clientOpt.isPresent()){
-            Client client = clientOpt.get();
-            AppServer.getClients().remove(client);//remove as a client
+    public void disconnected(Connection connection) {//method invoked when client disconnects
+        Client client = ConnectionServer.getClientFromConnectionID(connection.getID());
+        AppServer.getClients().remove(client);//remove as a client
 
-            if (client.getPlayer() != null ){
-                AppServer.currentGame.getPlayers().remove(client.getPlayer());//remove player from game server
-                RegistryHandler.entityRegistryServer.removeEntity(client.getPlayer());//de register entity, remove on client side
-            }
+        if (client.getPlayer() != null) {
+            AppServer.currentGame.getPlayers().remove(client.getPlayer());//remove player from game server
+            RegistryHandler.entityRegistryServer.removeEntity(client.getPlayer());//de register entity, remove on client side
+        }
 
-            if (AppServer.currentGame!=null && AppServer.currentGame.getStateManager().hasState(GameState.class)) {
-                EndGameHandler endGameHandler = AppServer.currentGame.getStateManager().getState(GameState.class).getEndGameHandler();
-                if (endGameHandler != null) {
-                    if (client.getPlayer().hasComponent(ImpostorComp.class)) {//check if the game has been won
-                        endGameHandler.handleCrewWin();
-                    } else {
-                        endGameHandler.checkImpostorWin();
-                    }
+        if (AppServer.currentGame != null && AppServer.currentGame.getStateManager().hasState(GameState.class)) {
+            EndGameHandler endGameHandler = AppServer.currentGame.getStateManager().getState(GameState.class).getEndGameHandler();
+            if (endGameHandler != null) {
+                if (client.getPlayer().hasComponent(ImpostorComp.class)) {//check if the game has been won
+                    endGameHandler.handleCrewWin();
+                } else {
+                    endGameHandler.checkImpostorWin();
                 }
             }
         }
-
+//        }
 
 
     }
@@ -84,17 +80,12 @@ public class PacketListenerServer extends Listener {
         }
         if (AppServer.currentGame == null) return;
         if (packet instanceof InputRequest) {
-            ;
             packetController.handleKeyBoardInput((InputRequest) packet, connection.getID());
         } else if (packet instanceof VerifySudokuRequest) {
             packetController.handleVerifySudokuRequest((VerifySudokuRequest) packet, connection.getID());
-        } else if (packet instanceof Sound) {
-//            packetController.handleVoiceChat((Sound) packet, connection.getID());
         } else if (packet instanceof ImpostorVote) {
             packetController.handleImpostorVote((ImpostorVote) packet, connection.getID());
-        } else if (packet instanceof AnimationOver) {
-//            packetController.handleAnimationOver((AnimationOver) packet, connection.getID());
-        } else if (packet instanceof ChatMessageRequest) {
+        }else if (packet instanceof ChatMessageRequest) {
             packetController.handleChatMessageRequest((ChatMessageRequest) packet, connection.getID());
         }
     }
@@ -103,5 +94,4 @@ public class PacketListenerServer extends Listener {
         return semaphore;
     }
 
-    //todo guys can log on 2x
 }
